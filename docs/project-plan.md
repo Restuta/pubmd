@@ -66,7 +66,7 @@ Reader hits URL → CDN serves pre-rendered .html directly from object storage
   Target: < 30ms TTFB globally, < 20KB page weight, effectively free at any scale.
 ```
 
-**Implementation note (2026-03-19):** current production uses a private Blob store for metadata and a public Blob store for content. The pure CDN read path and KV metadata split in the diagram remain the target architecture, but the deployed app still serves reads through Hono while storing published content in Blob.
+**Implementation note (2026-03-19):** current production uses a private Blob store for metadata and a public Blob store for content. On Vercel, the deployed app currently serves reads through Hono with aggressive edge-cache headers, so the first read may hit the function but subsequent reads are CDN-served. The pure CDN no-function read path and KV metadata split remain the target architecture.
 
 ### Why This Stack
 - **Vercel**: free tier generous, edge CDN fast, blob storage simple
@@ -140,7 +140,7 @@ Local .pub mapping:
 - [x] Auth path implemented locally (namespace claiming shipped earlier than originally planned)
 - [x] **Goal**: local publish flow produces working URLs with pre-rendered HTML
 
-**Current note:** deployment is live on Vercel and aliased to `bul.sh`. The local and production publish flows are both verified.
+**Current note:** deployment is live on Vercel and aliased to `bul.sh`. The local and production publish flows are both verified. Content is stored in Blob; rendered HTML responses are edge-cached aggressively on Vercel.
 
 ### M1: CLI + Auth (2-3 days)
 - [x] `pub claim`, `pub publish` (idempotent create/update), `pub list`, `pub remove`

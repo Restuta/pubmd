@@ -99,23 +99,25 @@ export class BlobStore implements PublishRepository {
   ): Promise<void> {
     const previousPage = await this.findPageById(page.pageId);
 
-    await put(markdown.key, markdown.content, {
-      access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      token: this.contentToken,
-    });
-    await put(html.key, html.content, {
-      access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      token: this.contentToken,
-    });
-    await this.writeJsonBlob(this.pagePath(page.pageId), page);
-    await this.writeJsonBlob(this.lookupPath(page.namespace, page.slug), {
-      pageId: page.pageId,
-    });
-    await this.writeNamespaceIndex(page.namespace, page);
+    await Promise.all([
+      put(markdown.key, markdown.content, {
+        access: "public",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        token: this.contentToken,
+      }),
+      put(html.key, html.content, {
+        access: "public",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        token: this.contentToken,
+      }),
+      this.writeJsonBlob(this.pagePath(page.pageId), page),
+      this.writeJsonBlob(this.lookupPath(page.namespace, page.slug), {
+        pageId: page.pageId,
+      }),
+      this.writeNamespaceIndex(page.namespace, page),
+    ]);
 
     if (previousPage !== null && previousPage.slug !== page.slug) {
       await del(this.lookupPath(previousPage.namespace, previousPage.slug), {
