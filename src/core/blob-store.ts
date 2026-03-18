@@ -68,9 +68,9 @@ export function createBlobStore(
     );
     const pages = index?.pages ?? [];
 
-    return pages
-      .filter((page) => page.namespace === namespace)
-      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+    return pages.sort((left, right) =>
+      right.updatedAt.localeCompare(left.updatedAt),
+    );
   }
 
   async function findPageById(pageId: string): Promise<StoredPage | null> {
@@ -101,18 +101,8 @@ export function createBlobStore(
     const previousPage = await findPageById(page.pageId);
 
     await Promise.all([
-      put(markdown.key, markdown.content, {
-        access: "public",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        token: contentToken,
-      }),
-      put(html.key, html.content, {
-        access: "public",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        token: contentToken,
-      }),
+      writeContentBlob(markdown.key, markdown.content),
+      writeContentBlob(html.key, html.content),
       writeJsonBlob(pagePath(page.pageId), page),
       writeJsonBlob(lookupPath(page.namespace, page.slug), {
         pageId: page.pageId,
@@ -128,17 +118,17 @@ export function createBlobStore(
   }
 
   async function deletePage(page: StoredPage): Promise<void> {
-    if ((await findPageById(page.pageId)) === null) {
-      throw new PageNotFoundError(page.namespace, page.slug);
-    }
-
-    await del([pagePath(page.pageId), lookupPath(page.namespace, page.slug)], {
-      token: metadataToken,
-    });
-    await del([page.markdownBlobKey, page.htmlBlobKey], {
-      token: contentToken,
-    });
-    await removeFromNamespaceIndex(page.namespace, page.pageId);
+    await Promise.all([
+      del(
+        [pagePath(page.pageId), lookupPath(page.namespace, page.slug)],
+        { token: metadataToken },
+      ),
+      del(
+        [page.markdownBlobKey, page.htmlBlobKey],
+        { token: contentToken },
+      ),
+      removeFromNamespaceIndex(page.namespace, page.pageId),
+    ]);
   }
 
   async function readMarkdown(key: string): Promise<string> {
@@ -179,6 +169,18 @@ export function createBlobStore(
     return schema.parse(
       JSON.parse(await streamToString(result.stream)) as unknown,
     );
+  }
+
+  async function writeContentBlob(
+    key: string,
+    content: string,
+  ): Promise<void> {
+    await put(key, content, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      token: contentToken,
+    });
   }
 
   async function writeJsonBlob(
@@ -269,29 +271,7 @@ export function createBlobStore(
 async function streamToString(
   stream: ReadableStream<Uint8Array>,
 ): Promise<string> {
-  const reader = stream.getReader();
-  const chunks: Uint8Array[] = [];
-
-  while (true) {
-    const chunk = await reader.read();
-
-    if (chunk.done) {
-      break;
-    }
-
-    chunks.push(chunk.value);
-  }
-
-  const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-  const merged = new Uint8Array(totalLength);
-  let offset = 0;
-
-  for (const chunk of chunks) {
-    merged.set(chunk, offset);
-    offset += chunk.length;
-  }
-
-  return new TextDecoder().decode(merged);
+  return new Response(stream).text();
 }
 
 function stringifyJson(value: unknown): string {
