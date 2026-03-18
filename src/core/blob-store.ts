@@ -10,7 +10,6 @@ import {
 import {
   type FilePayload,
   NamespaceNotFoundError,
-  PageNotFoundError,
   type PublishRepository,
 } from "./repository.js";
 
@@ -119,14 +118,10 @@ export function createBlobStore(
 
   async function deletePage(page: StoredPage): Promise<void> {
     await Promise.all([
-      del(
-        [pagePath(page.pageId), lookupPath(page.namespace, page.slug)],
-        { token: metadataToken },
-      ),
-      del(
-        [page.markdownBlobKey, page.htmlBlobKey],
-        { token: contentToken },
-      ),
+      del([pagePath(page.pageId), lookupPath(page.namespace, page.slug)], {
+        token: metadataToken,
+      }),
+      del([page.markdownBlobKey, page.htmlBlobKey], { token: contentToken }),
       removeFromNamespaceIndex(page.namespace, page.pageId),
     ]);
   }
@@ -171,10 +166,7 @@ export function createBlobStore(
     );
   }
 
-  async function writeContentBlob(
-    key: string,
-    content: string,
-  ): Promise<void> {
+  async function writeContentBlob(key: string, content: string): Promise<void> {
     await put(key, content, {
       access: "public",
       addRandomSuffix: false,
