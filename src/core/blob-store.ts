@@ -23,7 +23,10 @@ const NamespacePageIndexSchema = z.object({
 });
 
 export class BlobStore implements PublishRepository {
-  constructor(private readonly token: string) {}
+  constructor(
+    private readonly contentToken: string,
+    private readonly metadataToken: string,
+  ) {}
 
   async claimNamespace(namespace: string, tokenHash: string): Promise<void> {
     const record: NamespaceRecord = {
@@ -97,16 +100,16 @@ export class BlobStore implements PublishRepository {
     const previousPage = await this.findPageById(page.pageId);
 
     await put(markdown.key, markdown.content, {
-      access: "private",
+      access: "public",
       addRandomSuffix: false,
       allowOverwrite: true,
-      token: this.token,
+      token: this.contentToken,
     });
     await put(html.key, html.content, {
-      access: "private",
+      access: "public",
       addRandomSuffix: false,
       allowOverwrite: true,
-      token: this.token,
+      token: this.contentToken,
     });
     await this.writeJsonBlob(this.pagePath(page.pageId), page);
     await this.writeJsonBlob(this.lookupPath(page.namespace, page.slug), {
@@ -116,7 +119,7 @@ export class BlobStore implements PublishRepository {
 
     if (previousPage !== null && previousPage.slug !== page.slug) {
       await del(this.lookupPath(previousPage.namespace, previousPage.slug), {
-        token: this.token,
+        token: this.metadataToken,
       });
     }
   }
@@ -127,16 +130,14 @@ export class BlobStore implements PublishRepository {
     }
 
     await del(
-      [
-        this.pagePath(page.pageId),
-        this.lookupPath(page.namespace, page.slug),
-        page.markdownBlobKey,
-        page.htmlBlobKey,
-      ],
+      [this.pagePath(page.pageId), this.lookupPath(page.namespace, page.slug)],
       {
-        token: this.token,
+        token: this.metadataToken,
       },
     );
+    await del([page.markdownBlobKey, page.htmlBlobKey], {
+      token: this.contentToken,
+    });
     await this.removeFromNamespaceIndex(page.namespace, page.pageId);
   }
 
@@ -150,9 +151,8 @@ export class BlobStore implements PublishRepository {
 
   private async readTextBlob(pathname: string): Promise<string> {
     const result = await get(pathname, {
-      access: "private",
-      token: this.token,
-      useCache: false,
+      access: "public",
+      token: this.contentToken,
     });
 
     if (result === null || result.statusCode !== 200) {
@@ -168,7 +168,7 @@ export class BlobStore implements PublishRepository {
   ): Promise<T | null> {
     const result = await get(pathname, {
       access: "private",
-      token: this.token,
+      token: this.metadataToken,
       useCache: false,
     });
 
@@ -190,7 +190,7 @@ export class BlobStore implements PublishRepository {
       access: "private",
       addRandomSuffix: false,
       allowOverwrite,
-      token: this.token,
+      token: this.metadataToken,
     });
   }
 

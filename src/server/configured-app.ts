@@ -10,10 +10,14 @@ export interface AppConfig {
 }
 
 export function createConfiguredApp(config: AppConfig = {}) {
-  const blobToken = getEnv("BLOB_READ_WRITE_TOKEN");
+  const contentBlobToken = getEnv("BLOB_READ_WRITE_TOKEN");
+  const metadataBlobToken = getEnv("METADATA_BLOB_READ_WRITE_TOKEN");
   const repository =
-    blobToken !== undefined && blobToken.length > 0
-      ? new BlobStore(blobToken)
+    contentBlobToken !== undefined &&
+    contentBlobToken.length > 0 &&
+    metadataBlobToken !== undefined &&
+    metadataBlobToken.length > 0
+      ? new BlobStore(contentBlobToken, metadataBlobToken)
       : new FileStore(
           config.dataDir ??
             getEnv("PUB_DATA_DIR") ??
@@ -25,7 +29,10 @@ export function createConfiguredApp(config: AppConfig = {}) {
 }
 
 function getEnv(
-  name: "BLOB_READ_WRITE_TOKEN" | "PUB_DATA_DIR",
+  name:
+    | "BLOB_READ_WRITE_TOKEN"
+    | "METADATA_BLOB_READ_WRITE_TOKEN"
+    | "PUB_DATA_DIR",
 ): string | undefined {
   return process.env[name];
 }
