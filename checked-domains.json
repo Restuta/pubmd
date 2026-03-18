@@ -1,0 +1,4964 @@
+{
+  "publi.sh": {
+    "domain": "publi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pu.sh": {
+    "domain": "pu.sh",
+    "status": "for sale",
+    "price": "$100,000",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "po.sh": {
+    "domain": "po.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fini.sh": {
+    "domain": "fini.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "poli.sh": {
+    "domain": "poli.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pos.to": {
+    "domain": "pos.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "prin.to": {
+    "domain": "prin.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pag.es": {
+    "domain": "pag.es",
+    "status": "for sale",
+    "price": "$60,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "not.es": {
+    "domain": "not.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "l.ink": {
+    "domain": "l.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cl.ink": {
+    "domain": "cl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "th.ink": {
+    "domain": "th.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bl.ink": {
+    "domain": "bl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sl.ink": {
+    "domain": "sl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wr.it": {
+    "domain": "wr.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "subm.it": {
+    "domain": "subm.it",
+    "status": "for sale",
+    "price": "$50,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "em.it": {
+    "domain": "em.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "ed.it": {
+    "domain": "ed.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "sp.it": {
+    "domain": "sp.it",
+    "status": "undelegated zone",
+    "price": "—",
+    "rawStatus": "undelegated zone",
+    "checkedAt": "2026-03-18"
+  },
+  "b.it": {
+    "domain": "b.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.dev": {
+    "domain": "pub.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.sh": {
+    "domain": "pub.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.io": {
+    "domain": "pub.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.is": {
+    "domain": "pub.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ru.sh": {
+    "domain": "ru.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fla.sh": {
+    "domain": "fla.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "da.sh": {
+    "domain": "da.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sla.sh": {
+    "domain": "sla.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cru.sh": {
+    "domain": "cru.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sma.sh": {
+    "domain": "sma.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "spla.sh": {
+    "domain": "spla.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hu.sh": {
+    "domain": "hu.sh",
+    "status": "for sale",
+    "price": "$75,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "gu.sh": {
+    "domain": "gu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bru.sh": {
+    "domain": "bru.sh",
+    "status": "",
+    "price": "—",
+    "checkedAt": "2026-03-18"
+  },
+  "flu.sh": {
+    "domain": "flu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "squa.sh": {
+    "domain": "squa.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "blu.sh": {
+    "domain": "blu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "plu.sh": {
+    "domain": "plu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "mu.sh": {
+    "domain": "mu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "la.sh": {
+    "domain": "la.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wa.sh": {
+    "domain": "wa.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tu.sh": {
+    "domain": "tu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bu.sh": {
+    "domain": "bu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lu.sh": {
+    "domain": "lu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "shr.ink": {
+    "domain": "shr.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "w.ink": {
+    "domain": "w.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "p.ink": {
+    "domain": "p.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "s.ink": {
+    "domain": "s.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "t.ink": {
+    "domain": "t.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pr.ink": {
+    "domain": "pr.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "br.ink": {
+    "domain": "br.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "st.ink": {
+    "domain": "st.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "sk.ink": {
+    "domain": "sk.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "typ.es": {
+    "domain": "typ.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lin.es": {
+    "domain": "lin.es",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "fil.es": {
+    "domain": "fil.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "quot.es": {
+    "domain": "quot.es",
+    "status": "for sale",
+    "price": "$9,950",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "vers.es": {
+    "domain": "vers.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "pars.es": {
+    "domain": "pars.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "stori.es": {
+    "domain": "stori.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "seri.es": {
+    "domain": "seri.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "phras.es": {
+    "domain": "phras.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "piec.es": {
+    "domain": "piec.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cur.es": {
+    "domain": "cur.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "slic.es": {
+    "domain": "slic.es",
+    "status": "for sale",
+    "price": "$25,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "rout.es": {
+    "domain": "rout.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "scop.es": {
+    "domain": "scop.es",
+    "status": "for sale",
+    "price": "$1,595",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "phas.es": {
+    "domain": "phas.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cach.es": {
+    "domain": "cach.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "dos.es": {
+    "domain": "dos.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "zon.es": {
+    "domain": "zon.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "tun.es": {
+    "domain": "tun.es",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "f.it": {
+    "domain": "f.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "h.it": {
+    "domain": "h.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "k.it": {
+    "domain": "k.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "s.it": {
+    "domain": "s.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "tw.it": {
+    "domain": "tw.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "gr.it": {
+    "domain": "gr.it",
+    "status": "undelegated zone",
+    "price": "—",
+    "rawStatus": "undelegated zone",
+    "checkedAt": "2026-03-18"
+  },
+  "kn.it": {
+    "domain": "kn.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "fl.it": {
+    "domain": "fl.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "sl.it": {
+    "domain": "sl.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "wh.it": {
+    "domain": "wh.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "un.it": {
+    "domain": "un.it",
+    "status": "undelegated disallowed",
+    "price": "—",
+    "rawStatus": "undelegated disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "go.to": {
+    "domain": "go.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "in.to": {
+    "domain": "in.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "on.to": {
+    "domain": "on.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pho.to": {
+    "domain": "pho.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pro.to": {
+    "domain": "pro.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "au.to": {
+    "domain": "au.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sen.to": {
+    "domain": "sen.to",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "mo.to": {
+    "domain": "mo.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fac.to": {
+    "domain": "fac.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "vec.to": {
+    "domain": "vec.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "men.to": {
+    "domain": "men.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "wi.sh": {
+    "domain": "wi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "swi.sh": {
+    "domain": "swi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fi.sh": {
+    "domain": "fi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "di.sh": {
+    "domain": "di.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lavi.sh": {
+    "domain": "lavi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "reli.sh": {
+    "domain": "reli.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bani.sh": {
+    "domain": "bani.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "vani.sh": {
+    "domain": "vani.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "peri.sh": {
+    "domain": "peri.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "unlea.sh": {
+    "domain": "unlea.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gna.sh": {
+    "domain": "gna.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lea.sh": {
+    "domain": "lea.sh",
+    "status": "for sale",
+    "price": "$4,500",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "tra.sh": {
+    "domain": "tra.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.sh": {
+    "domain": "ink.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.sh": {
+    "domain": "pen.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "txt.sh": {
+    "domain": "txt.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.sh": {
+    "domain": "raw.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "get.sh": {
+    "domain": "get.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "put.sh": {
+    "domain": "put.sh",
+    "status": "for sale",
+    "price": "$19,111",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "set.sh": {
+    "domain": "set.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "run.sh": {
+    "domain": "run.sh",
+    "status": "for sale",
+    "price": "$88,888",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "log.sh": {
+    "domain": "log.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "cli.sh": {
+    "domain": "cli.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.sh": {
+    "domain": "new.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.sh": {
+    "domain": "say.sh",
+    "status": "for sale",
+    "price": "$8,911",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "pip.sh": {
+    "domain": "pip.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tap.sh": {
+    "domain": "tap.sh",
+    "status": "for sale",
+    "price": "$8,111",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.sh": {
+    "domain": "zap.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jet.sh": {
+    "domain": "jet.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.sh": {
+    "domain": "jot.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nb.sh": {
+    "domain": "nb.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "md.sh": {
+    "domain": "md.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ai.sh": {
+    "domain": "ai.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "out.sh": {
+    "domain": "out.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.dev": {
+    "domain": "jot.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.ink": {
+    "domain": "jot.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.io": {
+    "domain": "jot.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.dev": {
+    "domain": "raw.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.io": {
+    "domain": "raw.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.dev": {
+    "domain": "zap.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.io": {
+    "domain": "zap.io",
+    "status": "for sale",
+    "price": "$100,000",
+    "rawStatus": "marketed priced transferable active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.dev": {
+    "domain": "ink.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.dev": {
+    "domain": "pen.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "txt.dev": {
+    "domain": "txt.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.dev": {
+    "domain": "say.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.io": {
+    "domain": "say.io",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "tap.dev": {
+    "domain": "tap.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "tap.io": {
+    "domain": "tap.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "put.dev": {
+    "domain": "put.dev",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "get.dev": {
+    "domain": "get.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cli.dev": {
+    "domain": "cli.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nb.dev": {
+    "domain": "nb.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "md.dev": {
+    "domain": "md.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "get.ink": {
+    "domain": "get.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.ink": {
+    "domain": "pub.ink",
+    "status": "for sale",
+    "price": "$248",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.ink": {
+    "domain": "say.ink",
+    "status": "for sale",
+    "price": "$5,500",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "tap.ink": {
+    "domain": "tap.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.ink": {
+    "domain": "new.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "set.ink": {
+    "domain": "set.ink",
+    "status": "for sale",
+    "price": "$472",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.ink": {
+    "domain": "raw.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "run.ink": {
+    "domain": "run.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "log.ink": {
+    "domain": "log.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "out.ink": {
+    "domain": "out.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "put.ink": {
+    "domain": "put.ink",
+    "status": "for sale",
+    "price": "$944",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "jet.ink": {
+    "domain": "jet.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.ink": {
+    "domain": "zap.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pip.ink": {
+    "domain": "pip.ink",
+    "status": "for sale",
+    "price": "$1,298",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "yeet.sh": {
+    "domain": "yeet.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "drop.sh": {
+    "domain": "drop.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "send.sh": {
+    "domain": "send.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "post.sh": {
+    "domain": "post.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "emit.sh": {
+    "domain": "emit.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cast.sh": {
+    "domain": "cast.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fire.sh": {
+    "domain": "fire.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "beam.sh": {
+    "domain": "beam.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "spit.sh": {
+    "domain": "spit.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "dump.sh": {
+    "domain": "dump.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gist.sh": {
+    "domain": "gist.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ship.sh": {
+    "domain": "ship.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nope.sh": {
+    "domain": "nope.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "yolo.sh": {
+    "domain": "yolo.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "post.dev": {
+    "domain": "post.dev",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "marketed priced undelegated premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "send.dev": {
+    "domain": "send.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "drop.dev": {
+    "domain": "drop.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ship.dev": {
+    "domain": "ship.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "yeet.dev": {
+    "domain": "yeet.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cast.dev": {
+    "domain": "cast.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "emit.dev": {
+    "domain": "emit.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gist.dev": {
+    "domain": "gist.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "beam.dev": {
+    "domain": "beam.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fire.dev": {
+    "domain": "fire.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "dump.dev": {
+    "domain": "dump.dev",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "nope.dev": {
+    "domain": "nope.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.run": {
+    "domain": "pub.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.run": {
+    "domain": "ink.run",
+    "status": "for sale",
+    "price": "$9,499",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.run": {
+    "domain": "pen.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "txt.run": {
+    "domain": "txt.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.run": {
+    "domain": "say.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.run": {
+    "domain": "jot.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "get.run": {
+    "domain": "get.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "set.run": {
+    "domain": "set.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.run": {
+    "domain": "new.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "put.run": {
+    "domain": "put.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "tap.run": {
+    "domain": "tap.run",
+    "status": "for sale",
+    "price": "$4,850",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.run": {
+    "domain": "zap.run",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.to": {
+    "domain": "pub.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.to": {
+    "domain": "ink.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.to": {
+    "domain": "say.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.to": {
+    "domain": "jot.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.to": {
+    "domain": "pen.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "put.to": {
+    "domain": "put.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "get.to": {
+    "domain": "get.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "set.to": {
+    "domain": "set.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.to": {
+    "domain": "new.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tap.to": {
+    "domain": "tap.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "txt.to": {
+    "domain": "txt.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.to": {
+    "domain": "raw.to",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "th.is": {
+    "domain": "th.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bas.is": {
+    "domain": "bas.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "thes.is": {
+    "domain": "thes.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "genes.is": {
+    "domain": "genes.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "oas.is": {
+    "domain": "oas.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "publ.is": {
+    "domain": "publ.is",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gist.ink": {
+    "domain": "gist.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gist.io": {
+    "domain": "gist.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nb.pub": {
+    "domain": "nb.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ai.pub": {
+    "domain": "ai.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "go.pub": {
+    "domain": "go.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "up.pub": {
+    "domain": "up.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nb.ink": {
+    "domain": "nb.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "ai.ink": {
+    "domain": "ai.ink",
+    "status": "for sale",
+    "price": "$39,999",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "wet.ink": {
+    "domain": "wet.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "red.ink": {
+    "domain": "red.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fast.ink": {
+    "domain": "fast.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "hot.ink": {
+    "domain": "hot.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "dry.ink": {
+    "domain": "dry.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "big.ink": {
+    "domain": "big.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "old.ink": {
+    "domain": "old.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "top.ink": {
+    "domain": "top.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "max.ink": {
+    "domain": "max.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "v.ink": {
+    "domain": "v.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "z.ink": {
+    "domain": "z.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bull.sh": {
+    "domain": "bull.sh",
+    "status": "for sale",
+    "price": "$49,999",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "nobu.sh": {
+    "domain": "nobu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bul.sh": {
+    "domain": "bul.sh",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "bol.sh": {
+    "domain": "bol.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nob.sh": {
+    "domain": "nob.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gar.sh": {
+    "domain": "gar.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bla.sh": {
+    "domain": "bla.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "go.ink": {
+    "domain": "go.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "do.ink": {
+    "domain": "do.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "my.ink": {
+    "domain": "my.ink",
+    "status": "for sale",
+    "price": "$2,500",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "no.ink": {
+    "domain": "no.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "to.ink": {
+    "domain": "to.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "re.ink": {
+    "domain": "re.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "ok.ink": {
+    "domain": "ok.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "up.ink": {
+    "domain": "up.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "it.ink": {
+    "domain": "it.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "it.pub": {
+    "domain": "it.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "my.pub": {
+    "domain": "my.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "no.pub": {
+    "domain": "no.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "do.pub": {
+    "domain": "do.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ok.pub": {
+    "domain": "ok.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed priced undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "ez.pub": {
+    "domain": "ez.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "my.page": {
+    "domain": "my.page",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "one.page": {
+    "domain": "one.page",
+    "status": "for sale",
+    "price": "$50,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.page": {
+    "domain": "new.page",
+    "status": "for sale",
+    "price": "$286,950",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "a.page": {
+    "domain": "a.page",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "the.page": {
+    "domain": "the.page",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "writ.dev": {
+    "domain": "writ.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "quill.dev": {
+    "domain": "quill.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "blurb.dev": {
+    "domain": "blurb.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "prose.dev": {
+    "domain": "prose.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "draft.dev": {
+    "domain": "draft.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "brief.dev": {
+    "domain": "brief.dev",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "slug.dev": {
+    "domain": "slug.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pipe.dev": {
+    "domain": "pipe.dev",
+    "status": "for sale",
+    "price": "$27,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "echo.dev": {
+    "domain": "echo.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tee.dev": {
+    "domain": "tee.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "curl.dev": {
+    "domain": "curl.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bold.dev": {
+    "domain": "bold.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "type.dev": {
+    "domain": "type.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "po.st": {
+    "domain": "po.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bla.st": {
+    "domain": "bla.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ca.st": {
+    "domain": "ca.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ho.st": {
+    "domain": "ho.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fa.st": {
+    "domain": "fa.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fir.st": {
+    "domain": "fir.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "be.st": {
+    "domain": "be.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "la.st": {
+    "domain": "la.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "te.st": {
+    "domain": "te.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "tru.st": {
+    "domain": "tru.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "du.st": {
+    "domain": "du.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ju.st": {
+    "domain": "ju.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "mu.st": {
+    "domain": "mu.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "bu.st": {
+    "domain": "bu.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ru.st": {
+    "domain": "ru.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "li.st": {
+    "domain": "li.st",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cla.sh": {
+    "domain": "cla.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cra.sh": {
+    "domain": "cra.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ha.sh": {
+    "domain": "ha.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jo.sh": {
+    "domain": "jo.sh",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "ma.sh": {
+    "domain": "ma.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "me.sh": {
+    "domain": "me.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "mo.sh": {
+    "domain": "mo.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "no.sh": {
+    "domain": "no.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ra.sh": {
+    "domain": "ra.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "to.sh": {
+    "domain": "to.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ca.sh": {
+    "domain": "ca.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "co.sh": {
+    "domain": "co.sh",
+    "status": "undelegated zone",
+    "price": "—",
+    "rawStatus": "undelegated zone",
+    "checkedAt": "2026-03-18"
+  },
+  "bo.sh": {
+    "domain": "bo.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sa.sh": {
+    "domain": "sa.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "go.sh": {
+    "domain": "go.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "who.sh": {
+    "domain": "who.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "slo.sh": {
+    "domain": "slo.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tldr.sh": {
+    "domain": "tldr.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tldr.dev": {
+    "domain": "tldr.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tldr.ink": {
+    "domain": "tldr.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wip.sh": {
+    "domain": "wip.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wip.dev": {
+    "domain": "wip.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wip.ink": {
+    "domain": "wip.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "mvp.sh": {
+    "domain": "mvp.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "mvp.dev": {
+    "domain": "mvp.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pew.sh": {
+    "domain": "pew.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pow.sh": {
+    "domain": "pow.sh",
+    "status": "for sale",
+    "price": "$850",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "meh.sh": {
+    "domain": "meh.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "duh.sh": {
+    "domain": "duh.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ugh.sh": {
+    "domain": "ugh.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bah.sh": {
+    "domain": "bah.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "yap.sh": {
+    "domain": "yap.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ne.ws": {
+    "domain": "ne.ws",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "rea.me": {
+    "domain": "rea.me",
+    "status": "for sale",
+    "price": "$10,999",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "na.me": {
+    "domain": "na.me",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ti.me": {
+    "domain": "ti.me",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ho.me": {
+    "domain": "ho.me",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fra.me": {
+    "domain": "fra.me",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "on.ly": {
+    "domain": "on.ly",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "dai.ly": {
+    "domain": "dai.ly",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "bare.ly": {
+    "domain": "bare.ly",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "quick.ly": {
+    "domain": "quick.ly",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "nib.ink": {
+    "domain": "nib.ink",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "dip.ink": {
+    "domain": "dip.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "hey.ink": {
+    "domain": "hey.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fix.ink": {
+    "domain": "fix.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "dot.ink": {
+    "domain": "dot.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bit.ink": {
+    "domain": "bit.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pop.ink": {
+    "domain": "pop.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rip.ink": {
+    "domain": "rip.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tip.ink": {
+    "domain": "tip.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zip.ink": {
+    "domain": "zip.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "nib.dev": {
+    "domain": "nib.dev",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "quip.dev": {
+    "domain": "quip.dev",
+    "status": "for sale",
+    "price": "$9,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "blot.dev": {
+    "domain": "blot.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "note.dev": {
+    "domain": "note.dev",
+    "status": "for sale",
+    "price": "$37,999",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "snap.dev": {
+    "domain": "snap.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "edit.dev": {
+    "domain": "edit.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "copy.dev": {
+    "domain": "copy.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "blog.dev": {
+    "domain": "blog.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "page.dev": {
+    "domain": "page.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "mark.dev": {
+    "domain": "mark.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "no.bs": {
+    "domain": "no.bs",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.bs": {
+    "domain": "pub.bs",
+    "status": "undelegated",
+    "price": "—",
+    "rawStatus": "undelegated",
+    "checkedAt": "2026-03-18"
+  },
+  "the.bs": {
+    "domain": "the.bs",
+    "status": "undelegated",
+    "price": "—",
+    "rawStatus": "undelegated",
+    "checkedAt": "2026-03-18"
+  },
+  "zero.bs": {
+    "domain": "zero.bs",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cut.bs": {
+    "domain": "cut.bs",
+    "status": "undelegated",
+    "price": "—",
+    "rawStatus": "undelegated",
+    "checkedAt": "2026-03-18"
+  },
+  "less.bs": {
+    "domain": "less.bs",
+    "status": "undelegated",
+    "price": "—",
+    "rawStatus": "undelegated",
+    "checkedAt": "2026-03-18"
+  },
+  "nobull.sh": {
+    "domain": "nobull.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nobs.sh": {
+    "domain": "nobs.sh",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "nobs.dev": {
+    "domain": "nobs.dev",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "marketed priced undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "nobs.ink": {
+    "domain": "nobs.ink",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "nobs.pub": {
+    "domain": "nobs.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.wtf": {
+    "domain": "pub.wtf",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "no.wtf": {
+    "domain": "no.wtf",
+    "status": "for sale",
+    "price": "$59,888",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.wtf": {
+    "domain": "ink.wtf",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.lol": {
+    "domain": "pub.lol",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "no.lol": {
+    "domain": "no.lol",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.lol": {
+    "domain": "ink.lol",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.gg": {
+    "domain": "pub.gg",
+    "status": "for sale",
+    "price": "$12,999",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.gg": {
+    "domain": "ink.gg",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.so": {
+    "domain": "pub.so",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.so": {
+    "domain": "ink.so",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.cc": {
+    "domain": "pub.cc",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.cc": {
+    "domain": "ink.cc",
+    "status": "for sale",
+    "price": "$3,500",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.ac": {
+    "domain": "pub.ac",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.xyz": {
+    "domain": "pub.xyz",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.xyz": {
+    "domain": "ink.xyz",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.xyz": {
+    "domain": "pen.xyz",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.xyz": {
+    "domain": "raw.xyz",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.xyz": {
+    "domain": "jot.xyz",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.xyz": {
+    "domain": "zap.xyz",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nbs.xyz": {
+    "domain": "nbs.xyz",
+    "status": "for sale",
+    "price": "$1,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "nbs.sh": {
+    "domain": "nbs.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nbs.dev": {
+    "domain": "nbs.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nbs.io": {
+    "domain": "nbs.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nbs.pub": {
+    "domain": "nbs.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "spew.sh": {
+    "domain": "spew.sh",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "spew.dev": {
+    "domain": "spew.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "spew.ink": {
+    "domain": "spew.ink",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "yeet.ink": {
+    "domain": "yeet.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fling.sh": {
+    "domain": "fling.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fling.dev": {
+    "domain": "fling.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "toss.sh": {
+    "domain": "toss.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "toss.dev": {
+    "domain": "toss.dev",
+    "status": "for sale",
+    "price": "$30,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "toss.ink": {
+    "domain": "toss.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hurl.sh": {
+    "domain": "hurl.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hurl.dev": {
+    "domain": "hurl.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hurl.ink": {
+    "domain": "hurl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lob.sh": {
+    "domain": "lob.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lob.dev": {
+    "domain": "lob.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lob.ink": {
+    "domain": "lob.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.ai": {
+    "domain": "pub.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.ai": {
+    "domain": "ink.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.ai": {
+    "domain": "pen.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "txt.ai": {
+    "domain": "txt.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.ai": {
+    "domain": "jot.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.ai": {
+    "domain": "say.ai",
+    "status": "for sale",
+    "price": "$950,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.ai": {
+    "domain": "raw.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "drop.ai": {
+    "domain": "drop.ai",
+    "status": "for sale",
+    "price": "$320,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "post.ai": {
+    "domain": "post.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "send.ai": {
+    "domain": "send.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ship.ai": {
+    "domain": "ship.ai",
+    "status": "for sale",
+    "price": "$15,000,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "type.ai": {
+    "domain": "type.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "push.ai": {
+    "domain": "push.ai",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "writ.er": {
+    "domain": "writ.er",
+    "status": "disallowed",
+    "price": "—",
+    "rawStatus": "disallowed",
+    "checkedAt": "2026-03-18"
+  },
+  "aut.hr": {
+    "domain": "aut.hr",
+    "status": "undelegated",
+    "price": "—",
+    "rawStatus": "undelegated",
+    "checkedAt": "2026-03-18"
+  },
+  "autho.rs": {
+    "domain": "autho.rs",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "reade.rs": {
+    "domain": "reade.rs",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "printe.rs": {
+    "domain": "printe.rs",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "publis.hr": {
+    "domain": "publis.hr",
+    "status": "undelegated",
+    "price": "—",
+    "rawStatus": "undelegated",
+    "checkedAt": "2026-03-18"
+  },
+  "edito.rs": {
+    "domain": "edito.rs",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ace.ink": {
+    "domain": "ace.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "aim.ink": {
+    "domain": "aim.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "arc.ink": {
+    "domain": "arc.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "art.ink": {
+    "domain": "art.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "axe.ink": {
+    "domain": "axe.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bio.ink": {
+    "domain": "bio.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cue.ink": {
+    "domain": "cue.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "duo.ink": {
+    "domain": "duo.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gem.ink": {
+    "domain": "gem.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hex.ink": {
+    "domain": "hex.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hub.ink": {
+    "domain": "hub.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hue.ink": {
+    "domain": "hue.ink",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "key.ink": {
+    "domain": "key.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "kin.ink": {
+    "domain": "kin.ink",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "lit.ink": {
+    "domain": "lit.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "mix.ink": {
+    "domain": "mix.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "orb.ink": {
+    "domain": "orb.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "own.ink": {
+    "domain": "own.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "pic.ink": {
+    "domain": "pic.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "rad.ink": {
+    "domain": "rad.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "rev.ink": {
+    "domain": "rev.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tag.ink": {
+    "domain": "tag.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "via.ink": {
+    "domain": "via.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "vim.ink": {
+    "domain": "vim.ink",
+    "status": "for sale",
+    "price": "$488",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "web.ink": {
+    "domain": "web.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "wit.ink": {
+    "domain": "wit.ink",
+    "status": "for sale",
+    "price": "$1,416",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "wow.ink": {
+    "domain": "wow.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zen.ink": {
+    "domain": "zen.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "lux.ink": {
+    "domain": "lux.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ion.ink": {
+    "domain": "ion.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pi.sh": {
+    "domain": "pi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gi.sh": {
+    "domain": "gi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "vi.sh": {
+    "domain": "vi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "yi.sh": {
+    "domain": "yi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "du.sh": {
+    "domain": "du.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ku.sh": {
+    "domain": "ku.sh",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "nu.sh": {
+    "domain": "nu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zu.sh": {
+    "domain": "zu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ace.pub": {
+    "domain": "ace.pub",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "aim.pub": {
+    "domain": "aim.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bio.pub": {
+    "domain": "bio.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "duo.pub": {
+    "domain": "duo.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "gem.pub": {
+    "domain": "gem.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hex.pub": {
+    "domain": "hex.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hub.pub": {
+    "domain": "hub.pub",
+    "status": "for sale",
+    "price": "$3,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "key.pub": {
+    "domain": "key.pub",
+    "status": "for sale",
+    "price": "$9,999",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "lit.pub": {
+    "domain": "lit.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lux.pub": {
+    "domain": "lux.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "mix.pub": {
+    "domain": "mix.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "orb.pub": {
+    "domain": "orb.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "own.pub": {
+    "domain": "own.pub",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "rad.pub": {
+    "domain": "rad.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rev.pub": {
+    "domain": "rev.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tag.pub": {
+    "domain": "tag.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "via.pub": {
+    "domain": "via.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "vim.pub": {
+    "domain": "vim.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "web.pub": {
+    "domain": "web.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed priced undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "wit.pub": {
+    "domain": "wit.pub",
+    "status": "for sale",
+    "price": "$14,169",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "zen.pub": {
+    "domain": "zen.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "hot.pub": {
+    "domain": "hot.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "now.pub": {
+    "domain": "now.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "yes.pub": {
+    "domain": "yes.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nah.pub": {
+    "domain": "nah.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.pub": {
+    "domain": "raw.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.pub": {
+    "domain": "jot.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.pub": {
+    "domain": "zap.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "getl.ink": {
+    "domain": "getl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "url.ink": {
+    "domain": "url.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cli.ink": {
+    "domain": "cli.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rel.ink": {
+    "domain": "rel.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "al.ink": {
+    "domain": "al.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "deadl.ink": {
+    "domain": "deadl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "tol.ink": {
+    "domain": "tol.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sel.ink": {
+    "domain": "sel.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "opl.ink": {
+    "domain": "opl.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "for.pub": {
+    "domain": "for.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "the.pub": {
+    "domain": "the.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.pub": {
+    "domain": "pen.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "let.pub": {
+    "domain": "let.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "try.pub": {
+    "domain": "try.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "say.pub": {
+    "domain": "say.pub",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "marketed undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "set.pub": {
+    "domain": "set.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "get.pub": {
+    "domain": "get.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "run.pub": {
+    "domain": "run.pub",
+    "status": "for sale",
+    "price": "$708",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.pub": {
+    "domain": "new.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "any.pub": {
+    "domain": "any.pub",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "all.pub": {
+    "domain": "all.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "one.pub": {
+    "domain": "one.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "you.pub": {
+    "domain": "you.pub",
+    "status": "for sale",
+    "price": "$55,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "no.press": {
+    "domain": "no.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "the.press": {
+    "domain": "the.press",
+    "status": "for sale",
+    "price": "$187,500",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "hot.press": {
+    "domain": "hot.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.press": {
+    "domain": "ink.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.press": {
+    "domain": "pub.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.press": {
+    "domain": "raw.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "zen.press": {
+    "domain": "zen.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.ink": {
+    "domain": "pen.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "fin.ink": {
+    "domain": "fin.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ode.ink": {
+    "domain": "ode.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "vox.ink": {
+    "domain": "vox.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pix.ink": {
+    "domain": "pix.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "rux.ink": {
+    "domain": "rux.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "fox.ink": {
+    "domain": "fox.ink",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "mox.ink": {
+    "domain": "mox.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nox.ink": {
+    "domain": "nox.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cox.ink": {
+    "domain": "cox.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "sox.ink": {
+    "domain": "sox.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "box.ink": {
+    "domain": "box.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wax.ink": {
+    "domain": "wax.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lit.dev": {
+    "domain": "lit.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lit.sh": {
+    "domain": "lit.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lit.io": {
+    "domain": "lit.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rad.dev": {
+    "domain": "rad.dev",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rad.sh": {
+    "domain": "rad.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rad.io": {
+    "domain": "rad.io",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ai.press": {
+    "domain": "ai.press",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "go.press": {
+    "domain": "go.press",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "get.press": {
+    "domain": "get.press",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "now.press": {
+    "domain": "now.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "one.press": {
+    "domain": "one.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "full.press": {
+    "domain": "full.press",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nobs.press": {
+    "domain": "nobs.press",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "drop.press": {
+    "domain": "drop.press",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "fast.press": {
+    "domain": "fast.press",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "free.press": {
+    "domain": "free.press",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "npm.pub": {
+    "domain": "npm.pub",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "git.pub": {
+    "domain": "git.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ssh.pub": {
+    "domain": "ssh.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "api.pub": {
+    "domain": "api.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "npm.sh": {
+    "domain": "npm.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "git.sh": {
+    "domain": "git.sh",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "undelegated reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "ssh.sh": {
+    "domain": "ssh.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "api.sh": {
+    "domain": "api.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cli.pub": {
+    "domain": "cli.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "its.pub": {
+    "domain": "its.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "npm.ink": {
+    "domain": "npm.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "git.ink": {
+    "domain": "git.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ssh.ink": {
+    "domain": "ssh.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "api.ink": {
+    "domain": "api.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "writ.ink": {
+    "domain": "writ.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "publ.ink": {
+    "domain": "publ.ink",
+    "status": "for sale",
+    "price": "$2,790",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "sett.ink": {
+    "domain": "sett.ink",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "dr.ink": {
+    "domain": "dr.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wr.ink": {
+    "domain": "wr.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.page": {
+    "domain": "ink.page",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.page": {
+    "domain": "pub.page",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.page": {
+    "domain": "raw.page",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.page": {
+    "domain": "pen.page",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.page": {
+    "domain": "jot.page",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "txt.page": {
+    "domain": "txt.page",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ambu.sh": {
+    "domain": "ambu.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "boyi.sh": {
+    "domain": "boyi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "opu.sh": {
+    "domain": "opu.sh",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated active",
+    "checkedAt": "2026-03-18"
+  },
+  "repu.sh": {
+    "domain": "repu.sh",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "devi.sh": {
+    "domain": "devi.sh",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "so.ink": {
+    "domain": "so.ink",
+    "status": "for sale",
+    "price": "$7,827",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "ox.ink": {
+    "domain": "ox.ink",
+    "status": "for sale",
+    "price": "$12,000",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "ax.ink": {
+    "domain": "ax.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ex.ink": {
+    "domain": "ex.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "ad.ink": {
+    "domain": "ad.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "an.ink": {
+    "domain": "an.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "as.ink": {
+    "domain": "as.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "at.ink": {
+    "domain": "at.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "be.ink": {
+    "domain": "be.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "premium active",
+    "checkedAt": "2026-03-18"
+  },
+  "by.ink": {
+    "domain": "by.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "if.ink": {
+    "domain": "if.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "is.ink": {
+    "domain": "is.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "or.ink": {
+    "domain": "or.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "us.ink": {
+    "domain": "us.ink",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "we.ink": {
+    "domain": "we.ink",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "so.pub": {
+    "domain": "so.pub",
+    "status": "for sale",
+    "price": "$100,000",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "ox.pub": {
+    "domain": "ox.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ax.pub": {
+    "domain": "ax.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ex.pub": {
+    "domain": "ex.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "ad.pub": {
+    "domain": "ad.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "an.pub": {
+    "domain": "an.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "as.pub": {
+    "domain": "as.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "at.pub": {
+    "domain": "at.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "be.pub": {
+    "domain": "be.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed priced undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "by.pub": {
+    "domain": "by.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "if.pub": {
+    "domain": "if.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "is.pub": {
+    "domain": "is.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "or.pub": {
+    "domain": "or.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "us.pub": {
+    "domain": "us.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed priced undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "we.pub": {
+    "domain": "we.pub",
+    "status": "reserved",
+    "price": "contact registry",
+    "rawStatus": "marketed priced undelegated premium reserved",
+    "checkedAt": "2026-03-18"
+  },
+  "hi.pub": {
+    "domain": "hi.pub",
+    "status": "available (premium)",
+    "price": "TBD",
+    "rawStatus": "undelegated inactive premium",
+    "checkedAt": "2026-03-18"
+  },
+  "aha.pub": {
+    "domain": "aha.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "omg.pub": {
+    "domain": "omg.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "lol.pub": {
+    "domain": "lol.pub",
+    "status": "for sale",
+    "price": "$15,000",
+    "rawStatus": "marketed priced active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "wtf.pub": {
+    "domain": "wtf.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pls.pub": {
+    "domain": "pls.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "thx.pub": {
+    "domain": "thx.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "ooh.pub": {
+    "domain": "ooh.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "yep.pub": {
+    "domain": "yep.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "yup.pub": {
+    "domain": "yup.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "heh.pub": {
+    "domain": "heh.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "meh.pub": {
+    "domain": "meh.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "doh.pub": {
+    "domain": "doh.pub",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ick.pub": {
+    "domain": "ick.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "eek.pub": {
+    "domain": "eek.pub",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "pub.md": {
+    "domain": "pub.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ink.md": {
+    "domain": "ink.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "raw.md": {
+    "domain": "raw.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "cli.md": {
+    "domain": "cli.md",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "get.md": {
+    "domain": "get.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "new.md": {
+    "domain": "new.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jot.md": {
+    "domain": "jot.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "say.md": {
+    "domain": "say.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "set.md": {
+    "domain": "set.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "put.md": {
+    "domain": "put.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pen.md": {
+    "domain": "pen.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "read.md": {
+    "domain": "read.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed priced active",
+    "checkedAt": "2026-03-18"
+  },
+  "edit.md": {
+    "domain": "edit.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "post.md": {
+    "domain": "post.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "send.md": {
+    "domain": "send.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "drop.md": {
+    "domain": "drop.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ship.md": {
+    "domain": "ship.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "type.md": {
+    "domain": "type.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "push.md": {
+    "domain": "push.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "snap.md": {
+    "domain": "snap.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "go.md": {
+    "domain": "go.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "do.md": {
+    "domain": "do.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "my.md": {
+    "domain": "my.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active parked",
+    "checkedAt": "2026-03-18"
+  },
+  "no.md": {
+    "domain": "no.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "ok.md": {
+    "domain": "ok.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "up.md": {
+    "domain": "up.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "it.md": {
+    "domain": "it.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "al.md": {
+    "domain": "al.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "nb.md": {
+    "domain": "nb.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ai.md": {
+    "domain": "ai.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "vim.md": {
+    "domain": "vim.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "git.md": {
+    "domain": "git.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "npm.md": {
+    "domain": "npm.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ssh.md": {
+    "domain": "ssh.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "api.md": {
+    "domain": "api.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nbs.md": {
+    "domain": "nbs.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "lit.md": {
+    "domain": "lit.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "rad.md": {
+    "domain": "rad.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ace.md": {
+    "domain": "ace.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zen.md": {
+    "domain": "zen.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "hot.md": {
+    "domain": "hot.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "zap.md": {
+    "domain": "zap.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jet.md": {
+    "domain": "jet.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "marketed active",
+    "checkedAt": "2026-03-18"
+  },
+  "hex.md": {
+    "domain": "hex.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nob.md": {
+    "domain": "nob.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "bul.md": {
+    "domain": "bul.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "nobs.md": {
+    "domain": "nobs.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "spew.md": {
+    "domain": "spew.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "hue.md": {
+    "domain": "hue.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "yep.md": {
+    "domain": "yep.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "nah.md": {
+    "domain": "nah.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "orb.md": {
+    "domain": "orb.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pip.md": {
+    "domain": "pip.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "dip.md": {
+    "domain": "dip.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "writ.md": {
+    "domain": "writ.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "blot.md": {
+    "domain": "blot.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "quip.md": {
+    "domain": "quip.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "jab.md": {
+    "domain": "jab.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "yap.md": {
+    "domain": "yap.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "pow.md": {
+    "domain": "pow.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "oof.md": {
+    "domain": "oof.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "meh.md": {
+    "domain": "meh.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "duh.md": {
+    "domain": "duh.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "ugh.md": {
+    "domain": "ugh.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "pew.md": {
+    "domain": "pew.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "ohm.md": {
+    "domain": "ohm.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "vow.md": {
+    "domain": "vow.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "wit.md": {
+    "domain": "wit.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "awe.md": {
+    "domain": "awe.md",
+    "status": "undelegated claimed",
+    "price": "—",
+    "rawStatus": "undelegated claimed",
+    "checkedAt": "2026-03-18"
+  },
+  "cue.md": {
+    "domain": "cue.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "jig.md": {
+    "domain": "jig.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "slug.md": {
+    "domain": "slug.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "curl.md": {
+    "domain": "curl.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "pipe.md": {
+    "domain": "pipe.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "echo.md": {
+    "domain": "echo.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "bold.md": {
+    "domain": "bold.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "serif.md": {
+    "domain": "serif.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  },
+  "gist.md": {
+    "domain": "gist.md",
+    "status": "unclear (verify)",
+    "price": "—",
+    "rawStatus": "undelegated claimed active",
+    "checkedAt": "2026-03-18"
+  },
+  "tldr.md": {
+    "domain": "tldr.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "wip.md": {
+    "domain": "wip.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "mvp.md": {
+    "domain": "mvp.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "draft.md": {
+    "domain": "draft.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "prose.md": {
+    "domain": "prose.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "brief.md": {
+    "domain": "brief.md",
+    "status": "taken",
+    "price": "—",
+    "rawStatus": "active",
+    "checkedAt": "2026-03-18"
+  },
+  "blurb.md": {
+    "domain": "blurb.md",
+    "status": "available",
+    "price": "—",
+    "rawStatus": "undelegated inactive",
+    "checkedAt": "2026-03-18"
+  }
+}

@@ -1,0 +1,320 @@
+#!/usr/bin/env node
+
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
+import {
+  ClaimNamespaceResponseSchema,
+  ListPagesResponseSchema,
+  PublishedPageSchema,
+} from "../core/contract.js";
+import {
+  loadConfig,
+  loadMapping,
+  resolveApiBase,
+  saveConfig,
+  saveMapping,
+} from "./config.js";
+
+interface CommandContext {
+  args: string[];
+}
+
+interface CliOptions {
+  "api-base"?: string;
+  namespace?: string;
+  slug?: string;
+}
+
+async function main(): Promise<void> {
+  const [, , ...argv] = process.argv;
+
+  if (argv.length === 0 || argv[0] === "help" || argv[0] === "--help") {
+    printHelp();
+    return;
+  }
+
+  const [command, ...rest] = argv;
+  const context: CommandContext = { args: rest };
+
+  switch (command) {
+    case "claim":
+      await runClaim(context);
+      return;
+    case "publish":
+      await runPublish(context);
+      return;
+    case "list":
+      await runList(context);
+      return;
+    case "remove":
+      await runRemove(context);
+      return;
+    default:
+      throw new Error(`Unknown command: ${command}`);
+  }
+}
+
+async function runClaim(context: CommandContext): Promise<void> {
+  const [namespace, ...rest] = context.args;
+
+  if (namespace === undefined) {
+    throw new Error("Usage: pub claim <namespace> [--api-base <url>]");
+  }
+
+  const options = parseOptions(rest);
+  const config = await loadConfig();
+  const apiBase = resolveApiBase(config, options["api-base"]);
+  const response = await fetch(
+    `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/claim`,
+    {
+      method: "POST",
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const claimed = ClaimNamespaceResponseSchema.parse(await response.json());
+  config.apiBaseUrl = apiBase;
+  config.defaultNamespace ??= claimed.namespace;
+  config.namespaces[claimed.namespace] = {
+    token: claimed.token,
+  };
+  await saveConfig(config);
+  console.log(`Claimed namespace ${claimed.namespace}`);
+}
+
+async function runPublish(context: CommandContext): Promise<void> {
+  const { positional, options } = splitArgs(context.args);
+  const filePath = positional[0];
+  const config = await loadConfig();
+  const apiBase = resolveApiBase(config, options["api-base"]);
+  const mapping = await loadMapping();
+  const mappingKey =
+    filePath === undefined
+      ? undefined
+      : path.relative(process.cwd(), path.resolve(filePath));
+  const existingMapping =
+    mappingKey === undefined ? undefined : mapping.files[mappingKey];
+  const namespace =
+    options.namespace ?? existingMapping?.namespace ?? config.defaultNamespace;
+
+  if (namespace === undefined) {
+    throw new Error(
+      "No namespace configured. Run `pub claim <namespace>` first.",
+    );
+  }
+
+  const token = config.namespaces[namespace]?.token;
+
+  if (token === undefined) {
+    throw new Error(`No token configured for namespace "${namespace}".`);
+  }
+
+  const markdown =
+    filePath === undefined
+      ? await readStdin()
+      : await readFile(path.resolve(filePath), "utf8");
+  const response = await fetch(
+    `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages/publish`,
+    {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        markdown,
+        ...(options.slug === undefined ? {} : { slug: options.slug }),
+        ...(existingMapping?.pageId === undefined
+          ? {}
+          : { pageId: existingMapping.pageId }),
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const published = PublishedPageSchema.parse(await response.json());
+
+  if (mappingKey !== undefined) {
+    mapping.files[mappingKey] = {
+      namespace: published.namespace,
+      pageId: published.pageId,
+      slug: published.slug,
+      url: published.url,
+    };
+    await saveMapping(mapping);
+  }
+
+  console.log(published.url);
+}
+
+async function runList(context: CommandContext): Promise<void> {
+  const { options } = splitArgs(context.args);
+  const config = await loadConfig();
+  const apiBase = resolveApiBase(config, options["api-base"]);
+  const namespace = options.namespace ?? config.defaultNamespace;
+
+  if (namespace === undefined) {
+    throw new Error(
+      "No namespace configured. Run `pub claim <namespace>` first.",
+    );
+  }
+
+  const token = config.namespaces[namespace]?.token;
+
+  if (token === undefined) {
+    throw new Error(`No token configured for namespace "${namespace}".`);
+  }
+
+  const response = await fetch(
+    `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const payload = ListPagesResponseSchema.parse(await response.json());
+
+  for (const page of payload.pages) {
+    console.log(`${page.slug}\t${page.url}`);
+  }
+}
+
+async function runRemove(context: CommandContext): Promise<void> {
+  const { positional, options } = splitArgs(context.args);
+  const slug = positional[0];
+
+  if (slug === undefined) {
+    throw new Error(
+      "Usage: pub remove <slug> [--namespace <namespace>] [--api-base <url>]",
+    );
+  }
+
+  const config = await loadConfig();
+  const apiBase = resolveApiBase(config, options["api-base"]);
+  const namespace = options.namespace ?? config.defaultNamespace;
+
+  if (namespace === undefined) {
+    throw new Error(
+      "No namespace configured. Run `pub claim <namespace>` first.",
+    );
+  }
+
+  const token = config.namespaces[namespace]?.token;
+
+  if (token === undefined) {
+    throw new Error(`No token configured for namespace "${namespace}".`);
+  }
+
+  const response = await fetch(
+    `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages/${encodeURIComponent(slug)}`,
+    {
+      method: "DELETE",
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(await response.text());
+  }
+
+  const mapping = await loadMapping();
+  let mappingChanged = false;
+
+  for (const [key, value] of Object.entries(mapping.files)) {
+    if (value.namespace === namespace && value.slug === slug) {
+      delete mapping.files[key];
+      mappingChanged = true;
+    }
+  }
+
+  if (mappingChanged) {
+    await saveMapping(mapping);
+  }
+
+  console.log(`Removed ${namespace}/${slug}`);
+}
+
+function parseOptions(argumentsList: string[]): CliOptions {
+  return splitArgs(argumentsList).options;
+}
+
+function splitArgs(argumentsList: string[]): {
+  options: CliOptions;
+  positional: string[];
+} {
+  const options: CliOptions = {};
+  const positional: string[] = [];
+
+  for (let index = 0; index < argumentsList.length; index += 1) {
+    const current = argumentsList[index];
+
+    if (current === undefined) {
+      break;
+    }
+
+    if (!current.startsWith("--")) {
+      positional.push(current);
+      continue;
+    }
+
+    const key = current.slice(2);
+    const value = argumentsList[index + 1];
+
+    if (!isCliOptionKey(key)) {
+      throw new Error(`Unknown option: --${key}`);
+    }
+
+    if (value === undefined || value.startsWith("--")) {
+      throw new Error(`Expected value after ${current}`);
+    }
+
+    options[key] = value;
+    index += 1;
+  }
+
+  return { options, positional };
+}
+
+function isCliOptionKey(value: string): value is keyof CliOptions {
+  return value === "api-base" || value === "namespace" || value === "slug";
+}
+
+async function readStdin(): Promise<string> {
+  const chunks: Buffer[] = [];
+
+  for await (const chunk of process.stdin) {
+    chunks.push(Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+function printHelp(): void {
+  console.log(`Usage:
+  pub claim <namespace> [--api-base <url>]
+  pub publish [file] [--namespace <namespace>] [--slug <slug>] [--api-base <url>]
+  pub list [--namespace <namespace>] [--api-base <url>]
+  pub remove <slug> [--namespace <namespace>] [--api-base <url>]`);
+}
+
+main().catch((error: unknown) => {
+  const message =
+    error instanceof Error ? error.message : "Unexpected CLI error.";
+  console.error(message);
+  process.exitCode = 1;
+});
