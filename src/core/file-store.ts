@@ -20,74 +20,70 @@ import {
   type PublishRepository,
 } from "./repository.js";
 
-export class FileStore implements PublishRepository {
-  private readonly blobsDir: string;
-  private readonly namespacesDir: string;
-  private readonly pagesDir: string;
-  private readonly rootDir: string;
+export function createFileStore(rootDir: string): PublishRepository {
+  const namespacesDir = path.join(rootDir, "namespaces");
+  const pagesDir = path.join(rootDir, "pages");
+  const blobsDir = path.join(rootDir, "blobs");
 
-  constructor(rootDir: string) {
-    this.rootDir = rootDir;
-    this.namespacesDir = path.join(rootDir, "namespaces");
-    this.pagesDir = path.join(rootDir, "pages");
-    this.blobsDir = path.join(rootDir, "blobs");
-  }
+  async function claimNamespace(
+    namespace: string,
+    tokenHash: string,
+  ): Promise<void> {
+    await ensureDirectories();
 
-  async claimNamespace(namespace: string, tokenHash: string): Promise<void> {
-    await this.ensureDirectories();
+    const targetPath = namespacePath(namespace);
 
-    const namespacePath = this.namespacePath(namespace);
-
-    if (await pathExists(namespacePath)) {
+    if (await pathExists(targetPath)) {
       throw new Error("NAMESPACE_EXISTS");
     }
 
-    const now = new Date().toISOString();
     const record: NamespaceRecord = {
       namespace,
       tokenHash,
-      createdAt: now,
+      createdAt: new Date().toISOString(),
     };
 
-    await writeJson(namespacePath, record);
+    await writeJson(targetPath, record);
   }
 
-  async getNamespace(namespace: string): Promise<NamespaceRecord | null> {
-    await this.ensureDirectories();
+  async function getNamespace(
+    namespace: string,
+  ): Promise<NamespaceRecord | null> {
+    await ensureDirectories();
 
-    const filePath = this.namespacePath(namespace);
+    const targetPath = namespacePath(namespace);
 
-    if (!(await pathExists(filePath))) {
+    if (!(await pathExists(targetPath))) {
       return null;
     }
 
-    return NamespaceRecordSchema.parse(await readJson(filePath));
+    return NamespaceRecordSchema.parse(await readJson(targetPath));
   }
 
-  async touchNamespace(
+  async function touchNamespace(
     namespace: string,
     lastPublishAt: string,
   ): Promise<void> {
-    const current = await this.getNamespace(namespace);
+    const current = await getNamespace(namespace);
 
     if (current === null) {
       throw new Error("NAMESPACE_NOT_FOUND");
     }
 
-    await writeJson(this.namespacePath(namespace), {
+    await writeJson(namespacePath(namespace), {
       ...current,
       lastPublishAt,
     });
   }
 
-  async listPages(namespace: string): Promise<StoredPage[]> {
-    await this.ensureDirectories();
+  async function listPages(namespace: string): Promise<StoredPage[]> {
+    await ensureDirectories();
 
-    const entries = await readdir(this.pagesDir);
+    const entries = await readdir(pagesDir);
     const pages: StoredPage[] = [];
 
     for (const entry of entries) {
-      const filePath = path.join(this.pagesDir, entry);
+      const filePath = path.join(pagesDir, entry);
       const page = StoredPageSchema.parse(await readJson(filePath));
 
       if (page.namespace === namespace) {
@@ -100,76 +96,89 @@ export class FileStore implements PublishRepository {
     );
   }
 
-  async findPageById(pageId: string): Promise<StoredPage | null> {
-    await this.ensureDirectories();
+  async function findPageById(pageId: string): Promise<StoredPage | null> {
+    await ensureDirectories();
 
-    const filePath = this.pagePath(pageId);
+    const targetPath = pagePath(pageId);
 
-    if (!(await pathExists(filePath))) {
+    if (!(await pathExists(targetPath))) {
       return null;
     }
 
-    return StoredPageSchema.parse(await readJson(filePath));
+    return StoredPageSchema.parse(await readJson(targetPath));
   }
 
-  async findPageBySlug(
+  async function findPageBySlug(
     namespace: string,
     slug: string,
   ): Promise<StoredPage | null> {
-    const pages = await this.listPages(namespace);
+    const pages = await listPages(namespace);
     return pages.find((page) => page.slug === slug) ?? null;
   }
 
-  async savePage(
+  async function savePage(
     page: StoredPage,
     markdown: FilePayload,
     html: FilePayload,
   ): Promise<void> {
-    await this.ensureDirectories();
+    await ensureDirectories();
 
     await writeFile(
-      path.join(this.blobsDir, markdown.key),
+      path.join(blobsDir, markdown.key),
       markdown.content,
       "utf8",
     );
-    await writeFile(path.join(this.blobsDir, html.key), html.content, "utf8");
-    await writeJson(this.pagePath(page.pageId), page);
+    await writeFile(path.join(blobsDir, html.key), html.content, "utf8");
+    await writeJson(pagePath(page.pageId), page);
   }
 
-  async deletePage(page: StoredPage): Promise<void> {
-    await this.ensureDirectories();
+  async function deletePage(page: StoredPage): Promise<void> {
+    await ensureDirectories();
 
-    if ((await this.findPageById(page.pageId)) === null) {
+    if ((await findPageById(page.pageId)) === null) {
       throw new PageNotFoundError(page.namespace, page.slug);
     }
 
-    await unlinkIfExists(path.join(this.blobsDir, page.markdownBlobKey));
-    await unlinkIfExists(path.join(this.blobsDir, page.htmlBlobKey));
-    await unlinkIfExists(this.pagePath(page.pageId));
+    await unlinkIfExists(path.join(blobsDir, page.markdownBlobKey));
+    await unlinkIfExists(path.join(blobsDir, page.htmlBlobKey));
+    await unlinkIfExists(pagePath(page.pageId));
   }
 
-  async readMarkdown(key: string): Promise<string> {
-    return readFile(path.join(this.blobsDir, key), "utf8");
+  async function readMarkdown(key: string): Promise<string> {
+    return readFile(path.join(blobsDir, key), "utf8");
   }
 
-  async readHtml(key: string): Promise<string> {
-    return readFile(path.join(this.blobsDir, key), "utf8");
+  async function readHtml(key: string): Promise<string> {
+    return readFile(path.join(blobsDir, key), "utf8");
   }
 
-  private async ensureDirectories(): Promise<void> {
-    await mkdir(this.rootDir, { recursive: true });
-    await mkdir(this.namespacesDir, { recursive: true });
-    await mkdir(this.pagesDir, { recursive: true });
-    await mkdir(this.blobsDir, { recursive: true });
+  async function ensureDirectories(): Promise<void> {
+    await mkdir(rootDir, { recursive: true });
+    await mkdir(namespacesDir, { recursive: true });
+    await mkdir(pagesDir, { recursive: true });
+    await mkdir(blobsDir, { recursive: true });
   }
 
-  private namespacePath(namespace: string): string {
-    return path.join(this.namespacesDir, `${namespace}.json`);
+  function namespacePath(namespace: string): string {
+    return path.join(namespacesDir, `${namespace}.json`);
   }
 
-  private pagePath(pageId: string): string {
-    return path.join(this.pagesDir, `${pageId}.json`);
+  function pagePath(pageId: string): string {
+    return path.join(pagesDir, `${pageId}.json`);
   }
+
+  return {
+    claimNamespace,
+    deletePage,
+    findPageById,
+    findPageBySlug,
+    getNamespace,
+    listPages,
+    readHtml,
+    readMarkdown,
+    savePage,
+    touchNamespace,
+  };
 }
 
 async function pathExists(filePath: string): Promise<boolean> {

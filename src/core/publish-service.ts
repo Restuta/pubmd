@@ -42,19 +42,41 @@ export interface RemovePageInput {
   token: string;
 }
 
-export class PublishService {
-  constructor(private readonly repository: PublishRepository) {}
+export interface PublishService {
+  claimNamespace(namespace: string): Promise<ClaimNamespaceResponse>;
+  publishPage(input: PublishPageInput): Promise<PublishedPage>;
+  listPages(input: ListPagesInput): Promise<
+    Array<{
+      pageId: string;
+      namespace: string;
+      slug: string;
+      title: string;
+      description: string;
+      updatedAt: string;
+      url: string;
+    }>
+  >;
+  removePage(input: RemovePageInput): Promise<void>;
+  getPublicPage(namespace: string, slug: string): Promise<StoredPage | null>;
+  readHtml(page: StoredPage): Promise<string>;
+  readMarkdown(page: StoredPage): Promise<string>;
+}
 
-  async claimNamespace(namespace: string): Promise<ClaimNamespaceResponse> {
+export function createPublishService(
+  repository: PublishRepository,
+): PublishService {
+  async function claimNamespace(
+    namespace: string,
+  ): Promise<ClaimNamespaceResponse> {
     const safeNamespace = ensureName(namespace);
-    const existing = await this.repository.getNamespace(safeNamespace);
+    const existing = await repository.getNamespace(safeNamespace);
 
     if (existing !== null) {
       throw new NamespaceExistsError(safeNamespace);
     }
 
     const token = createToken();
-    await this.repository.claimNamespace(safeNamespace, sha256(token));
+    await repository.claimNamespace(safeNamespace, sha256(token));
 
     return {
       namespace: safeNamespace,
@@ -62,15 +84,15 @@ export class PublishService {
     };
   }
 
-  async publishPage(input: PublishPageInput): Promise<PublishedPage> {
+  async function publishPage(input: PublishPageInput): Promise<PublishedPage> {
     const safeNamespace = ensureName(input.namespace);
-    await this.authenticate(safeNamespace, input.token);
+    await authenticate(safeNamespace, input.token);
 
     const parsed = parseMarkdownDocument(input.markdown);
     const requestedSlug =
       input.requestedSlug ?? parsed.frontmatter.slug ?? slugify(parsed.title);
     const safeSlug = ensureName(slugify(requestedSlug));
-    const existingPage = await this.resolveExistingPage(
+    const existingPage = await resolveExistingPage(
       safeNamespace,
       safeSlug,
       input.pageId,
@@ -120,7 +142,7 @@ export class PublishService {
         htmlBlobKey,
       };
 
-      await this.repository.savePage(
+      await repository.savePage(
         page,
         {
           content: input.markdown,
@@ -132,7 +154,7 @@ export class PublishService {
         },
       );
 
-      await this.repository.touchNamespace(safeNamespace, now);
+      await repository.touchNamespace(safeNamespace, now);
     }
 
     return {
@@ -141,14 +163,14 @@ export class PublishService {
       slug,
       title: parsed.title,
       description: parsed.description,
-      url: this.buildPageUrl(input.origin, safeNamespace, slug),
+      url: buildPageUrl(input.origin, safeNamespace, slug),
       created: existingPage === null && !noOp,
       updated: existingPage !== null && !noOp,
       noOp,
     };
   }
 
-  async listPages(input: ListPagesInput): Promise<
+  async function listPages(input: ListPagesInput): Promise<
     Array<{
       pageId: string;
       namespace: string;
@@ -160,9 +182,9 @@ export class PublishService {
     }>
   > {
     const safeNamespace = ensureName(input.namespace);
-    await this.authenticate(safeNamespace, input.token);
+    await authenticate(safeNamespace, input.token);
 
-    const pages = await this.repository.listPages(safeNamespace);
+    const pages = await repository.listPages(safeNamespace);
     return pages.map((page) => ({
       pageId: page.pageId,
       namespace: page.namespace,
@@ -170,44 +192,41 @@ export class PublishService {
       title: page.title,
       description: page.description,
       updatedAt: page.updatedAt,
-      url: this.buildPageUrl(input.origin, page.namespace, page.slug),
+      url: buildPageUrl(input.origin, page.namespace, page.slug),
     }));
   }
 
-  async removePage(input: RemovePageInput): Promise<void> {
+  async function removePage(input: RemovePageInput): Promise<void> {
     const safeNamespace = ensureName(input.namespace);
     const safeSlug = ensureName(input.slug);
-    await this.authenticate(safeNamespace, input.token);
+    await authenticate(safeNamespace, input.token);
 
-    const page = await this.repository.findPageBySlug(safeNamespace, safeSlug);
+    const page = await repository.findPageBySlug(safeNamespace, safeSlug);
 
     if (page === null) {
       throw new PageNotFoundError(safeNamespace, safeSlug);
     }
 
-    await this.repository.deletePage(page);
+    await repository.deletePage(page);
   }
 
-  async getPublicPage(
+  async function getPublicPage(
     namespace: string,
     slug: string,
   ): Promise<StoredPage | null> {
-    return this.repository.findPageBySlug(
-      ensureName(namespace),
-      ensureName(slug),
-    );
+    return repository.findPageBySlug(ensureName(namespace), ensureName(slug));
   }
 
-  async readHtml(page: StoredPage): Promise<string> {
-    return this.repository.readHtml(page.htmlBlobKey);
+  async function readHtml(page: StoredPage): Promise<string> {
+    return repository.readHtml(page.htmlBlobKey);
   }
 
-  async readMarkdown(page: StoredPage): Promise<string> {
-    return this.repository.readMarkdown(page.markdownBlobKey);
+  async function readMarkdown(page: StoredPage): Promise<string> {
+    return repository.readMarkdown(page.markdownBlobKey);
   }
 
-  private async authenticate(namespace: string, token: string): Promise<void> {
-    const record = await this.repository.getNamespace(namespace);
+  async function authenticate(namespace: string, token: string): Promise<void> {
+    const record = await repository.getNamespace(namespace);
 
     if (record === null) {
       throw new NamespaceNotFoundError(namespace);
@@ -218,7 +237,7 @@ export class PublishService {
     }
   }
 
-  private buildPageUrl(
+  function buildPageUrl(
     origin: string,
     namespace: string,
     slug: string,
@@ -226,13 +245,13 @@ export class PublishService {
     return new URL(`/${namespace}/${slug}`, origin).toString();
   }
 
-  private async resolveExistingPage(
+  async function resolveExistingPage(
     namespace: string,
     slug: string,
     pageId: string | undefined,
   ): Promise<StoredPage | null> {
     if (pageId !== undefined) {
-      const byId = await this.repository.findPageById(pageId);
+      const byId = await repository.findPageById(pageId);
 
       if (byId === null) {
         return null;
@@ -242,7 +261,7 @@ export class PublishService {
         throw new AuthenticationError();
       }
 
-      const slugOwner = await this.repository.findPageBySlug(namespace, slug);
+      const slugOwner = await repository.findPageBySlug(namespace, slug);
 
       if (slugOwner !== null && slugOwner.pageId !== byId.pageId) {
         throw new SlugConflictError(namespace, slug);
@@ -251,6 +270,16 @@ export class PublishService {
       return byId;
     }
 
-    return this.repository.findPageBySlug(namespace, slug);
+    return repository.findPageBySlug(namespace, slug);
   }
+
+  return {
+    claimNamespace,
+    getPublicPage,
+    listPages,
+    publishPage,
+    readHtml,
+    readMarkdown,
+    removePage,
+  };
 }

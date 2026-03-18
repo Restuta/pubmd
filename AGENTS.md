@@ -25,4 +25,4 @@ Start here for any implementation work in this repository.
 - Preserve the distinction between durable `page_id` and public `slug`.
 - Keep markdown support intentionally narrow for MVP.
 - Prefer portable abstractions so the system can move from local/file-backed storage to hosted storage without rewriting the contract.
-
+- Prefer pure functions and factory-style modules over classes with `this` for core application code.

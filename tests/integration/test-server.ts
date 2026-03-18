@@ -2,8 +2,8 @@ import { once } from "node:events";
 import { createServer, type IncomingMessage, type Server } from "node:http";
 import path from "node:path";
 
-import { FileStore } from "../../src/core/file-store.js";
-import { PublishService } from "../../src/core/publish-service.js";
+import { createFileStore } from "../../src/core/file-store.js";
+import { createPublishService } from "../../src/core/publish-service.js";
 import { createApp } from "../../src/server/app.js";
 
 export interface StartedTestServer {
@@ -14,8 +14,8 @@ export interface StartedTestServer {
 export async function startTestServer(
   rootDir: string,
 ): Promise<StartedTestServer> {
-  const repository = new FileStore(path.join(rootDir, "data"));
-  const service = new PublishService(repository);
+  const repository = createFileStore(path.join(rootDir, "data"));
+  const service = createPublishService(repository);
   const app = createApp(service);
   const server = createServer(async (request, response) => {
     const address = server.address();

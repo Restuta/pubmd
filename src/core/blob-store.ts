@@ -1,5 +1,4 @@
 import { del, get, put } from "@vercel/blob";
-
 import { z } from "zod";
 
 import {
@@ -10,6 +9,7 @@ import {
 } from "./contract.js";
 import {
   type FilePayload,
+  NamespaceNotFoundError,
   PageNotFoundError,
   type PublishRepository,
 } from "./repository.js";
@@ -22,66 +22,67 @@ const NamespacePageIndexSchema = z.object({
   pages: z.array(StoredPageSchema),
 });
 
-export class BlobStore implements PublishRepository {
-  constructor(
-    private readonly contentToken: string,
-    private readonly metadataToken: string,
-  ) {}
-
-  async claimNamespace(namespace: string, tokenHash: string): Promise<void> {
+export function createBlobStore(
+  contentToken: string,
+  metadataToken: string,
+): PublishRepository {
+  async function claimNamespace(
+    namespace: string,
+    tokenHash: string,
+  ): Promise<void> {
     const record: NamespaceRecord = {
       namespace,
       tokenHash,
       createdAt: new Date().toISOString(),
     };
 
-    await this.writeJsonBlob(this.namespacePath(namespace), record, false);
+    await writeJsonBlob(namespacePath(namespace), record, false);
   }
 
-  async getNamespace(namespace: string): Promise<NamespaceRecord | null> {
-    return this.readJsonBlob(
-      this.namespacePath(namespace),
-      NamespaceRecordSchema,
-    );
+  async function getNamespace(
+    namespace: string,
+  ): Promise<NamespaceRecord | null> {
+    return readJsonBlob(namespacePath(namespace), NamespaceRecordSchema);
   }
 
-  async touchNamespace(
+  async function touchNamespace(
     namespace: string,
     lastPublishAt: string,
   ): Promise<void> {
-    const current = await this.getNamespace(namespace);
+    const current = await getNamespace(namespace);
 
     if (current === null) {
-      throw new Error("NAMESPACE_NOT_FOUND");
+      throw new NamespaceNotFoundError(namespace);
     }
 
-    await this.writeJsonBlob(this.namespacePath(namespace), {
+    await writeJsonBlob(namespacePath(namespace), {
       ...current,
       lastPublishAt,
     });
   }
 
-  async listPages(namespace: string): Promise<StoredPage[]> {
-    const index = await this.readJsonBlob(
-      this.namespaceIndexPath(namespace),
+  async function listPages(namespace: string): Promise<StoredPage[]> {
+    const index = await readJsonBlob(
+      namespaceIndexPath(namespace),
       NamespacePageIndexSchema,
     );
     const pages = index?.pages ?? [];
+
     return pages
       .filter((page) => page.namespace === namespace)
       .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   }
 
-  async findPageById(pageId: string): Promise<StoredPage | null> {
-    return this.readJsonBlob(this.pagePath(pageId), StoredPageSchema);
+  async function findPageById(pageId: string): Promise<StoredPage | null> {
+    return readJsonBlob(pagePath(pageId), StoredPageSchema);
   }
 
-  async findPageBySlug(
+  async function findPageBySlug(
     namespace: string,
     slug: string,
   ): Promise<StoredPage | null> {
-    const lookup = await this.readJsonBlob(
-      this.lookupPath(namespace, slug),
+    const lookup = await readJsonBlob(
+      lookupPath(namespace, slug),
       LookupRecordSchema,
     );
 
@@ -89,72 +90,69 @@ export class BlobStore implements PublishRepository {
       return null;
     }
 
-    return this.findPageById(lookup.pageId);
+    return findPageById(lookup.pageId);
   }
 
-  async savePage(
+  async function savePage(
     page: StoredPage,
     markdown: FilePayload,
     html: FilePayload,
   ): Promise<void> {
-    const previousPage = await this.findPageById(page.pageId);
+    const previousPage = await findPageById(page.pageId);
 
     await Promise.all([
       put(markdown.key, markdown.content, {
         access: "public",
         addRandomSuffix: false,
         allowOverwrite: true,
-        token: this.contentToken,
+        token: contentToken,
       }),
       put(html.key, html.content, {
         access: "public",
         addRandomSuffix: false,
         allowOverwrite: true,
-        token: this.contentToken,
+        token: contentToken,
       }),
-      this.writeJsonBlob(this.pagePath(page.pageId), page),
-      this.writeJsonBlob(this.lookupPath(page.namespace, page.slug), {
+      writeJsonBlob(pagePath(page.pageId), page),
+      writeJsonBlob(lookupPath(page.namespace, page.slug), {
         pageId: page.pageId,
       }),
-      this.writeNamespaceIndex(page.namespace, page),
+      writeNamespaceIndex(page.namespace, page),
     ]);
 
     if (previousPage !== null && previousPage.slug !== page.slug) {
-      await del(this.lookupPath(previousPage.namespace, previousPage.slug), {
-        token: this.metadataToken,
+      await del(lookupPath(previousPage.namespace, previousPage.slug), {
+        token: metadataToken,
       });
     }
   }
 
-  async deletePage(page: StoredPage): Promise<void> {
-    if ((await this.findPageById(page.pageId)) === null) {
+  async function deletePage(page: StoredPage): Promise<void> {
+    if ((await findPageById(page.pageId)) === null) {
       throw new PageNotFoundError(page.namespace, page.slug);
     }
 
-    await del(
-      [this.pagePath(page.pageId), this.lookupPath(page.namespace, page.slug)],
-      {
-        token: this.metadataToken,
-      },
-    );
-    await del([page.markdownBlobKey, page.htmlBlobKey], {
-      token: this.contentToken,
+    await del([pagePath(page.pageId), lookupPath(page.namespace, page.slug)], {
+      token: metadataToken,
     });
-    await this.removeFromNamespaceIndex(page.namespace, page.pageId);
+    await del([page.markdownBlobKey, page.htmlBlobKey], {
+      token: contentToken,
+    });
+    await removeFromNamespaceIndex(page.namespace, page.pageId);
   }
 
-  async readMarkdown(key: string): Promise<string> {
-    return this.readTextBlob(key);
+  async function readMarkdown(key: string): Promise<string> {
+    return readTextBlob(key);
   }
 
-  async readHtml(key: string): Promise<string> {
-    return this.readTextBlob(key);
+  async function readHtml(key: string): Promise<string> {
+    return readTextBlob(key);
   }
 
-  private async readTextBlob(pathname: string): Promise<string> {
+  async function readTextBlob(pathname: string): Promise<string> {
     const result = await get(pathname, {
       access: "public",
-      token: this.contentToken,
+      token: contentToken,
     });
 
     if (result === null || result.statusCode !== 200) {
@@ -164,13 +162,13 @@ export class BlobStore implements PublishRepository {
     return streamToString(result.stream);
   }
 
-  private async readJsonBlob<T>(
+  async function readJsonBlob<T>(
     pathname: string,
     schema: { parse(input: unknown): T },
   ): Promise<T | null> {
     const result = await get(pathname, {
       access: "private",
-      token: this.metadataToken,
+      token: metadataToken,
       useCache: false,
     });
 
@@ -183,7 +181,7 @@ export class BlobStore implements PublishRepository {
     );
   }
 
-  private async writeJsonBlob(
+  async function writeJsonBlob(
     pathname: string,
     value: unknown,
     allowOverwrite = true,
@@ -192,32 +190,32 @@ export class BlobStore implements PublishRepository {
       access: "private",
       addRandomSuffix: false,
       allowOverwrite,
-      token: this.metadataToken,
+      token: metadataToken,
     });
   }
 
-  private namespacePath(namespace: string): string {
+  function namespacePath(namespace: string): string {
     return `namespaces/${namespace}.json`;
   }
 
-  private namespaceIndexPath(namespace: string): string {
+  function namespaceIndexPath(namespace: string): string {
     return `indexes/${namespace}.json`;
   }
 
-  private pagePath(pageId: string): string {
+  function pagePath(pageId: string): string {
     return `pages/${pageId}.json`;
   }
 
-  private lookupPath(namespace: string, slug: string): string {
+  function lookupPath(namespace: string, slug: string): string {
     return `lookups/${namespace}/${slug}.json`;
   }
 
-  private async writeNamespaceIndex(
+  async function writeNamespaceIndex(
     namespace: string,
     page: StoredPage,
   ): Promise<void> {
-    const current = await this.readJsonBlob(
-      this.namespaceIndexPath(namespace),
+    const current = await readJsonBlob(
+      namespaceIndexPath(namespace),
       NamespacePageIndexSchema,
     );
     const nextPages = [...(current?.pages ?? [])];
@@ -231,17 +229,17 @@ export class BlobStore implements PublishRepository {
       nextPages[existingIndex] = page;
     }
 
-    await this.writeJsonBlob(this.namespaceIndexPath(namespace), {
+    await writeJsonBlob(namespaceIndexPath(namespace), {
       pages: nextPages,
     });
   }
 
-  private async removeFromNamespaceIndex(
+  async function removeFromNamespaceIndex(
     namespace: string,
     pageId: string,
   ): Promise<void> {
-    const current = await this.readJsonBlob(
-      this.namespaceIndexPath(namespace),
+    const current = await readJsonBlob(
+      namespaceIndexPath(namespace),
       NamespacePageIndexSchema,
     );
 
@@ -249,10 +247,23 @@ export class BlobStore implements PublishRepository {
       return;
     }
 
-    await this.writeJsonBlob(this.namespaceIndexPath(namespace), {
+    await writeJsonBlob(namespaceIndexPath(namespace), {
       pages: current.pages.filter((page) => page.pageId !== pageId),
     });
   }
+
+  return {
+    claimNamespace,
+    deletePage,
+    findPageById,
+    findPageBySlug,
+    getNamespace,
+    listPages,
+    readHtml,
+    readMarkdown,
+    savePage,
+    touchNamespace,
+  };
 }
 
 async function streamToString(

@@ -15,6 +15,8 @@
 - Domain logic should live in `src/core/`, not inside route handlers or CLI commands.
 - Treat `page_id` as the durable identity. `slug` is a mutable public alias.
 - Keep storage pluggable. File-backed storage is acceptable for local development and tests. Hosted backends can come later.
+- Prefer pure functions and factory/closure modules over classes with instance state.
+- Avoid `this`-driven code for application logic unless a framework API requires it or there is a clear technical payoff.
 
 ## TypeScript Rules
 - Never use `any`.
@@ -42,4 +44,3 @@ Then perform a brief self-review:
 - check for missing tests
 - check for accidental API/contract drift
 - check for docs/progress updates when relevant
-

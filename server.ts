@@ -1,7 +1,7 @@
-import { Hono } from "hono";
+import "hono";
 
 import { createConfiguredApp } from "./src/server/configured-app.js";
 
-const app: Hono = createConfiguredApp();
+const app = createConfiguredApp();
 
 export default app;
