@@ -96,6 +96,15 @@ This is the body.`,
     const htmlResponse = await fetch(published.url);
     const html = await htmlResponse.text();
     expect(htmlResponse.status).toBe(200);
+    expect(htmlResponse.headers.get("cache-control")).toBe(
+      "public, max-age=0, must-revalidate",
+    );
+    expect(htmlResponse.headers.get("cdn-cache-control")).toBe(
+      "public, s-maxage=60, stale-while-revalidate=86400",
+    );
+    expect(htmlResponse.headers.get("vercel-cdn-cache-control")).toBe(
+      "public, s-maxage=60, stale-while-revalidate=86400",
+    );
     expect(html).toContain("<title>Launch Post</title>");
     expect(html).toContain("This is the body.");
 

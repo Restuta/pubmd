@@ -105,7 +105,13 @@ export function createApp(service: PublishService): Hono {
         });
       }
 
-      return context.html(await service.readHtml(page));
+      return context.html(await service.readHtml(page), 200, {
+        "cache-control": "public, max-age=0, must-revalidate",
+        "cdn-cache-control":
+          "public, s-maxage=60, stale-while-revalidate=86400",
+        "vercel-cdn-cache-control":
+          "public, s-maxage=60, stale-while-revalidate=86400",
+      });
     } catch (error) {
       throw toHttpException(error);
     }
