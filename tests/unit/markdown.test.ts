@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  autolinkBareUrls,
   buildHtmlDocument,
   parseMarkdownDocument,
   renderMarkdownToHtml,
@@ -46,9 +47,7 @@ const answer = 42;
     expect(html).toContain('meta name="robots" content="noindex,nofollow"');
     expect(html).toContain('rel="icon"');
     expect(html).toContain("--link:");
-    expect(html).toContain(
-      "box-shadow: inset 0 -0.35em 0 var(--link-highlight)",
-    );
+    expect(html).toContain("text-underline-offset");
   });
 
   it("renders real-world mixed markdown structures cleanly", async () => {
@@ -88,5 +87,76 @@ Stores raw .md + pre-rendered .html
     expect(rendered.html).toContain("<code>inline code</code>");
     expect(rendered.html).toContain("<pre><code>CLI or curl");
     expect(rendered.html).toContain("Edge Function (Hono)");
+  });
+});
+
+describe("autolinkBareUrls", () => {
+  it("links bare domain URLs", () => {
+    expect(autolinkBareUrls("check github.com/foo/bar for details")).toBe(
+      "check [github.com/foo/bar](https://github.com/foo/bar) for details",
+    );
+  });
+
+  it("links bare domain without path", () => {
+    expect(autolinkBareUrls("visit hono.dev")).toBe(
+      "visit [hono.dev](https://hono.dev)",
+    );
+  });
+
+  it("handles multiple bare URLs on one line", () => {
+    const input = "see github.com/a and npmjs.com/b";
+    const result = autolinkBareUrls(input);
+    expect(result).toContain("[github.com/a](https://github.com/a)");
+    expect(result).toContain("[npmjs.com/b](https://npmjs.com/b)");
+  });
+
+  it("does not double-link existing markdown links", () => {
+    const input = "[Quartz](https://github.com/jackyzha0/quartz)";
+    expect(autolinkBareUrls(input)).toBe(input);
+  });
+
+  it("does not link URLs that already have a protocol", () => {
+    const input = "see https://github.com/foo/bar";
+    expect(autolinkBareUrls(input)).toBe(input);
+  });
+
+  it("does not link URLs inside inline code", () => {
+    const input = "use `github.com/foo/bar` for this";
+    expect(autolinkBareUrls(input)).toBe(input);
+  });
+
+  it("does not link URLs inside code blocks", () => {
+    const input = "text\n```\ngithub.com/foo/bar\n```\nmore text";
+    expect(autolinkBareUrls(input)).toBe(input);
+  });
+
+  it("links URLs with various TLDs", () => {
+    for (const url of ["example.io/path", "tool.sh", "app.dev/docs", "site.co/page", "telegra.ph", "paste.rs", "listed.to"]) {
+      const result = autolinkBareUrls(url);
+      expect(result).toBe(`[${url}](https://${url})`);
+    }
+  });
+
+  it("renders bare URLs as clickable links in HTML output", async () => {
+    const rendered = await renderMarkdownToHtml(
+      "Quartz source: github.com/jackyzha0/quartz",
+    );
+    expect(rendered.html).toContain('href="https://github.com/jackyzha0/quartz"');
+  });
+
+  it("strips wikilinks and autolinks URLs inside them", async () => {
+    const rendered = await renderMarkdownToHtml(
+      "like [[telegra.ph]] but for the terminal era",
+    );
+    expect(rendered.html).toContain('href="https://telegra.ph"');
+    expect(rendered.html).not.toContain("[[");
+  });
+
+  it("strips wikilinks that are not URLs", async () => {
+    const rendered = await renderMarkdownToHtml(
+      "see [[jotbird-analysis]] for details",
+    );
+    expect(rendered.html).not.toContain("[[");
+    expect(rendered.html).toContain("jotbird-analysis");
   });
 });

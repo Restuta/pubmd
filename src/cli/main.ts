@@ -306,10 +306,10 @@ async function readStdin(): Promise<string> {
 
 function printHelp(): void {
   console.log(`Usage:
-  pub claim <namespace> [--api-base <url>]
-  pub publish [file] [--namespace <namespace>] [--slug <slug>] [--api-base <url>]
-  pub list [--namespace <namespace>] [--api-base <url>]
-  pub remove <slug> [--namespace <namespace>] [--api-base <url>]`);
+  pubmd claim <namespace> [--api-base <url>]
+  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--api-base <url>]
+  pubmd list [--namespace <namespace>] [--api-base <url>]
+  pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]`);
 }
 
 main().catch((error: unknown) => {

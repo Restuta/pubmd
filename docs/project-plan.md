@@ -83,6 +83,7 @@ Reader hits URL → CDN serves pre-rendered .html directly from object storage
 - Zero JS, zero external requests — just HTML + inlined CSS
 - **System fonts only**: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif` — no Google Fonts, no font files, no extra HTTP requests. Mono: `ui-monospace, "SF Mono", Menlo, Consolas, monospace`
 
+
 ## Rendering Pipeline (runs once at publish time)
 
 ```
@@ -191,7 +192,7 @@ Local .pub mapping:
 - [ ] **Name**: `pub`? `md.pub`? `mdpost`? `pushmd`? Need a good domain.
 - [ ] **Free tier limits**: unlimited pages? Rate limit only? Storage cap?
 - [ ] **Subdomain vs path**: `namespace.domain` vs `domain/namespace` — start with path, add subdomain later?
-- [ ] **Markdown flavor**: strict GFM or also support Obsidian-flavored ([[wikilinks]], ==highlights==, callouts)?
+- [ ] **Markdown flavor**: strict GFM or also support Obsidian-flavored ([[wikilinks]], ==highlights==,  callouts)?
 - [ ] **Default visibility**: unlisted (noindex) or public?
 
 ## Links & References

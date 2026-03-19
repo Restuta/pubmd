@@ -5,6 +5,7 @@ import {
   ListPagesResponseSchema,
   PublishPageRequestSchema,
 } from "../core/contract.js";
+import { buildHtmlDocument, renderMarkdownToHtml } from "../core/markdown.js";
 import type { PublishService } from "../core/publish-service.js";
 import {
   AuthenticationError,
@@ -19,6 +20,51 @@ export function createApp(service: PublishService): Hono {
 
   app.get("/health", (context) => {
     return context.json({ ok: true });
+  });
+
+  let cachedHomepage: string | null = null;
+  app.get("/", async (context) => {
+    if (!cachedHomepage) {
+      const md = `# bul.sh
+
+Publish markdown. Get a URL.
+
+\`\`\`
+$ pubmd publish report.md
+→ https://bul.sh/myname/report
+\`\`\`
+
+Works from any terminal. AI agents, scripts, CI — anything that can run a command.
+
+\`\`\`
+# Install
+curl -fsSL https://bul.sh/install | sh
+
+# Claim your namespace
+pubmd claim myname
+
+# Publish
+pubmd publish notes.md
+
+# Re-publish (same URL updates)
+pubmd publish notes.md
+
+# Or just curl it
+curl -X POST -H "Authorization: Bearer $TOKEN" --data-binary @file.md https://bul.sh/api/namespaces/myname/pages/publish
+\`\`\`
+
+---
+
+Open source — [github.com/Restuta/publish-it](https://github.com/Restuta/publish-it)`;
+      const rendered = await renderMarkdownToHtml(md);
+      cachedHomepage = buildHtmlDocument({
+        title: "bul.sh — publish markdown, get a URL",
+        description: "Publish markdown from the command line to a stable URL. Built for AI agents, usable by humans.",
+        noindex: false,
+        bodyHtml: rendered.html,
+      });
+    }
+    return context.html(cachedHomepage);
   });
 
   app.get("/install", (context) => {
