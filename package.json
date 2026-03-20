@@ -4,11 +4,12 @@
   "private": true,
   "type": "module",
   "bin": {
-    "pubmd": "./dist/cli/main.js"
+    "pubmd": "./dist/src/cli/main.js"
   },
   "scripts": {
     "dev": "tsx watch src/server/index.ts",
     "build": "tsc -p tsconfig.json",
+    "build:binary": "bun build src/cli/main.ts --compile --outfile pubmd",
     "vercel-build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
