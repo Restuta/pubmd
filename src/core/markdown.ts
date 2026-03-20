@@ -79,7 +79,7 @@ export function buildHtmlDocument(input: {
 }): string {
   const robots = input.noindex ? "noindex,nofollow" : "index,follow";
   const favicon = encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#111111"/><path fill="#ffffff" d="M18 18h10c11 0 18 6 18 16 0 10-7 16-18 16H18zm10 24c7 0 11-3.5 11-8s-4-8-11-8h-3v16z"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M24 12v40M40 12v40M12 24h40M12 40h40" stroke="#998a78" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
   );
 
   return `<!doctype html>
