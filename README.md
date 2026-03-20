@@ -1,4 +1,4 @@
-# Publish It
+# pubmd
 
 > `stdout` for the web — one command, one URL, done.
 

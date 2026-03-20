@@ -512,7 +512,7 @@ function extractDescription(body: string): string {
     return line.slice(0, 160);
   }
 
-  return "Published with Publish It.";
+  return "Published with pubmd.";
 }
 
 /**

@@ -63,9 +63,7 @@ function startServer(fetchHandler: typeof app.fetch, listenPort: number): void {
   });
 
   server.listen(listenPort, "127.0.0.1", () => {
-    console.log(
-      `Publish It server listening on http://127.0.0.1:${listenPort}`,
-    );
+    console.log(`pubmd server listening on http://127.0.0.1:${listenPort}`);
   });
 }
 
