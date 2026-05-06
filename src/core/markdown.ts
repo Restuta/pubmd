@@ -12,6 +12,7 @@ import {
   FrontmatterSchema,
   type Visibility,
 } from "./contract.js";
+import { slugify } from "./slug.js";
 
 export interface ParsedMarkdownDocument {
   body: string;
@@ -36,8 +37,13 @@ interface HtmlRootNode {
 interface HtmlElementNode {
   type: "element";
   tagName: string;
-  properties?: Record<string, unknown>;
+  properties?: HtmlElementProperties;
   children: HtmlNode[];
+}
+
+interface HtmlElementProperties {
+  id?: unknown;
+  [property: string]: unknown;
 }
 
 interface HtmlTextNode {
@@ -124,6 +130,7 @@ export async function renderMarkdownToHtml(
       .use(remarkRehype)
       .use(rehypeSanitize)
       .use(rehypeObsidianCallouts)
+      .use(rehypeHeadingIds)
       .use(rehypeHighlight)
       .use(rehypeStringify)
       .process(renderedMarkdown),
@@ -621,7 +628,30 @@ export function buildHtmlDocument(input: {
       });
 
       if (headings.length >= 3) {
-        headings.forEach((h, i) => { if (!h.id) h.id = 'h-' + i; });
+        const slugifyHeading = (text) =>
+          text
+            .normalize('NFKD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .replace(/-{2,}/g, '-') || 'note';
+        const fallbackIdCounts = new Map();
+        const uniqueFallbackId = (heading) => {
+          const base = slugifyHeading(heading.textContent || '');
+          const count = fallbackIdCounts.get(base) ?? 0;
+          fallbackIdCounts.set(base, count + 1);
+          return count === 0 ? base : base + '-' + count;
+        };
+        headings.forEach(h => {
+          if (h.id) {
+            fallbackIdCounts.set(
+              h.id,
+              Math.max(fallbackIdCounts.get(h.id) ?? 0, 1),
+            );
+          }
+        });
+        headings.forEach(h => { if (!h.id) h.id = uniqueFallbackId(h); });
         const wrap = document.createElement('div');
         wrap.className = 'toc-wrap';
         const lines = document.createElement('div');
@@ -666,6 +696,33 @@ export function buildHtmlDocument(input: {
     </script>
   </body>
 </html>`;
+}
+
+function rehypeHeadingIds() {
+  return (tree: HtmlRootNode): void => {
+    const slugCounts = new Map<string, number>();
+
+    visitElements(tree, (node) => {
+      if (!isHeadingElement(node)) {
+        return;
+      }
+
+      const existingId = node.properties?.id;
+      if (typeof existingId === "string" && existingId.length > 0) {
+        slugCounts.set(
+          existingId,
+          Math.max(slugCounts.get(existingId) ?? 0, 1),
+        );
+        return;
+      }
+
+      node.properties ??= {};
+      const baseSlug = slugify(collectNodeText(node));
+      const count = slugCounts.get(baseSlug) ?? 0;
+      slugCounts.set(baseSlug, count + 1);
+      node.properties.id = count === 0 ? baseSlug : `${baseSlug}-${count}`;
+    });
+  };
 }
 
 function extractTitle(body: string): string | null {
@@ -969,6 +1026,27 @@ function collectNodeText(node: HtmlNode): string {
   }
 
   return node.children.map((child) => collectNodeText(child)).join("");
+}
+
+function visitElements(
+  node: HtmlNode,
+  visitor: (node: HtmlElementNode) => void,
+) {
+  if (isHtmlElement(node)) {
+    visitor(node);
+  }
+
+  if (!("children" in node)) {
+    return;
+  }
+
+  for (const child of node.children) {
+    visitElements(child, visitor);
+  }
+}
+
+function isHeadingElement(node: HtmlElementNode): boolean {
+  return /^h[1-6]$/.test(node.tagName);
 }
 
 function createCalloutIcon(calloutType: string): HtmlElementNode {

@@ -50,6 +50,29 @@ const answer = 42;
     expect(html).toContain("text-underline-offset");
   });
 
+  it("renders deterministic heading ids and de-dupes repeated headings", async () => {
+    const rendered = await renderMarkdownToHtml(`
+## AI And Predictive Health
+
+### Why It Matters
+
+## AI And Predictive Health
+
+## Привет 👋
+`);
+
+    expect(rendered.html).toContain(
+      '<h2 id="ai-and-predictive-health">AI And Predictive Health</h2>',
+    );
+    expect(rendered.html).toContain(
+      '<h3 id="why-it-matters">Why It Matters</h3>',
+    );
+    expect(rendered.html).toContain(
+      '<h2 id="ai-and-predictive-health-1">AI And Predictive Health</h2>',
+    );
+    expect(rendered.html).toContain('<h2 id="note">');
+  });
+
   it("builds adaptive TOC logic for documents that use body h1 headings", () => {
     const html = buildHtmlDocument({
       title: "Doc Title",
@@ -61,6 +84,9 @@ const answer = 42;
 
     expect(html).toContain("article h1, article h2, article h3, article h4");
     expect(html).toContain('const pageTitle = "Doc Title";');
+    expect(html).toContain("const slugifyHeading =");
+    expect(html).toContain("fallbackIdCounts.set(");
+    expect(html).not.toContain("h-' + i");
     expect(html).toContain("depth-root");
     expect(html).toContain("depth-child");
   });
@@ -94,7 +120,9 @@ Stores raw .md + pre-rendered .html
 \`\`\`
 `);
 
-    expect(rendered.html).toContain("<h1>Publish-It");
+    expect(rendered.html).toContain(
+      '<h1 id="publish-it-project-plan">Publish-It',
+    );
     expect(rendered.html).toContain('<a href="https://telegra.ph">');
     expect(rendered.html).toContain("<blockquote>");
     expect(rendered.html).toContain("<ul>");
