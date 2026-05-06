@@ -12,6 +12,12 @@ import {
   FrontmatterSchema,
   type Visibility,
 } from "./contract.js";
+import {
+  slugify,
+  slugifyFunctionSource,
+  uniqueSlug,
+  uniqueSlugFunctionSource,
+} from "./slug.js";
 
 export interface ParsedMarkdownDocument {
   body: string;
@@ -36,8 +42,13 @@ interface HtmlRootNode {
 interface HtmlElementNode {
   type: "element";
   tagName: string;
-  properties?: Record<string, unknown>;
+  properties?: HtmlElementProperties;
   children: HtmlNode[];
+}
+
+interface HtmlElementProperties {
+  id?: unknown;
+  [property: string]: unknown;
 }
 
 interface HtmlTextNode {
@@ -124,6 +135,7 @@ export async function renderMarkdownToHtml(
       .use(remarkRehype)
       .use(rehypeSanitize)
       .use(rehypeObsidianCallouts)
+      .use(rehypeHeadingIds)
       .use(rehypeHighlight)
       .use(rehypeStringify)
       .process(renderedMarkdown),
@@ -147,6 +159,8 @@ export function buildHtmlDocument(input: {
   const favicon = encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M24 12v40M40 12v40M12 24h40M12 40h40" stroke="#998a78" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
   );
+  const tocSlugifyFunction = slugifyFunctionSource("slugifyHeading");
+  const tocUniqueSlugFunction = uniqueSlugFunctionSource("uniqueHeadingId");
 
   return `<!doctype html>
 <html lang="en">
@@ -621,7 +635,22 @@ export function buildHtmlDocument(input: {
       });
 
       if (headings.length >= 3) {
-        headings.forEach((h, i) => { if (!h.id) h.id = 'h-' + i; });
+        ${tocSlugifyFunction}
+        ${tocUniqueSlugFunction}
+        const usedHeadingIds = new Set();
+        headings.forEach(h => {
+          if (h.id) {
+            usedHeadingIds.add(h.id);
+          }
+        });
+        headings.forEach(h => {
+          if (!h.id) {
+            h.id = uniqueHeadingId(
+              slugifyHeading(h.textContent || ''),
+              usedHeadingIds,
+            );
+          }
+        });
         const wrap = document.createElement('div');
         wrap.className = 'toc-wrap';
         const lines = document.createElement('div');
@@ -666,6 +695,41 @@ export function buildHtmlDocument(input: {
     </script>
   </body>
 </html>`;
+}
+
+function rehypeHeadingIds() {
+  return (tree: HtmlRootNode): void => {
+    const headings: HtmlElementNode[] = [];
+    const usedHeadingIds = new Set<string>();
+
+    visitElements(tree, (node) => {
+      if (!isHeadingElement(node)) {
+        return;
+      }
+
+      headings.push(node);
+    });
+
+    for (const node of headings) {
+      const existingId = node.properties?.id;
+      if (typeof existingId === "string" && existingId.length > 0) {
+        usedHeadingIds.add(existingId);
+      }
+    }
+
+    for (const node of headings) {
+      const existingId = node.properties?.id;
+      if (typeof existingId === "string" && existingId.length > 0) {
+        continue;
+      }
+
+      node.properties ??= {};
+      node.properties.id = uniqueSlug(
+        slugify(collectNodeText(node)),
+        usedHeadingIds,
+      );
+    }
+  };
 }
 
 function extractTitle(body: string): string | null {
@@ -969,6 +1033,27 @@ function collectNodeText(node: HtmlNode): string {
   }
 
   return node.children.map((child) => collectNodeText(child)).join("");
+}
+
+function visitElements(
+  node: HtmlNode,
+  visitor: (node: HtmlElementNode) => void,
+) {
+  if (isHtmlElement(node)) {
+    visitor(node);
+  }
+
+  if (!("children" in node)) {
+    return;
+  }
+
+  for (const child of node.children) {
+    visitElements(child, visitor);
+  }
+}
+
+function isHeadingElement(node: HtmlElementNode): boolean {
+  return /^h[1-6]$/.test(node.tagName);
 }
 
 function createCalloutIcon(calloutType: string): HtmlElementNode {
