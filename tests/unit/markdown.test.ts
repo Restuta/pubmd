@@ -163,7 +163,7 @@ const answer = 42;
     expect(html).toContain("text-underline-offset");
   });
 
-  it("renders deterministic heading ids and de-dupes repeated headings", async () => {
+  it("renders deterministic heading ids and de-dupes slug collisions", async () => {
     const rendered = await renderMarkdownToHtml(`
 ## AI And Predictive Health
 
@@ -174,6 +174,12 @@ const answer = 42;
 ## AI And Predictive Health 1
 
 ## Привет 👋
+
+## Foo
+
+## Foo 1
+
+## Foo
 `);
 
     expect(rendered.html).toContain(
@@ -189,6 +195,9 @@ const answer = 42;
       '<h2 id="ai-and-predictive-health-1-1">AI And Predictive Health 1</h2>',
     );
     expect(rendered.html).toContain('<h2 id="note">');
+    expect(rendered.html).toContain('<h2 id="foo">Foo</h2>');
+    expect(rendered.html).toContain('<h2 id="foo-1">Foo 1</h2>');
+    expect(rendered.html).toContain('<h2 id="foo-2">Foo</h2>');
   });
 
   it("assigns deterministic TOC fallback ids for raw body headings", () => {
@@ -208,6 +217,9 @@ const answer = 42;
       new TestElement("h1", "AI And Predictive Health"),
       new TestElement("h1", "Привет 👋"),
       alreadyLinked,
+      new TestElement("h1", "Foo"),
+      new TestElement("h1", "Foo 1"),
+      new TestElement("h1", "Foo"),
     ];
 
     const document = new TestDocument(headings);
@@ -221,6 +233,9 @@ const answer = 42;
       "ai-and-predictive-health-2",
       "note",
       "custom-existing",
+      "foo",
+      "foo-1",
+      "foo-2",
     ]);
     expect(
       document.body.querySelectorAll("a").map((link) => link.href),
@@ -231,6 +246,9 @@ const answer = 42;
       "#ai-and-predictive-health-2",
       "#note",
       "#custom-existing",
+      "#foo",
+      "#foo-1",
+      "#foo-2",
     ]);
   });
 
