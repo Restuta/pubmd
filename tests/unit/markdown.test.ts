@@ -171,6 +171,8 @@ const answer = 42;
 
 ## AI And Predictive Health
 
+## AI And Predictive Health 1
+
 ## Привет 👋
 `);
 
@@ -182,6 +184,9 @@ const answer = 42;
     );
     expect(rendered.html).toContain(
       '<h2 id="ai-and-predictive-health-1">AI And Predictive Health</h2>',
+    );
+    expect(rendered.html).toContain(
+      '<h2 id="ai-and-predictive-health-1-1">AI And Predictive Health 1</h2>',
     );
     expect(rendered.html).toContain('<h2 id="note">');
   });
@@ -198,6 +203,7 @@ const answer = 42;
     const headings = [
       new TestElement("h1", "Doc Title"),
       new TestElement("h1", "AI And Predictive Health"),
+      new TestElement("h2", "AI And Predictive Health 1"),
       new TestElement("h2", "Café Health 💡"),
       new TestElement("h1", "AI And Predictive Health"),
       new TestElement("h1", "Привет 👋"),
@@ -210,8 +216,9 @@ const answer = 42;
     expect(headings.map((heading) => heading.id)).toEqual([
       "",
       "ai-and-predictive-health",
-      "cafe-health",
       "ai-and-predictive-health-1",
+      "cafe-health",
+      "ai-and-predictive-health-2",
       "note",
       "custom-existing",
     ]);
@@ -219,8 +226,9 @@ const answer = 42;
       document.body.querySelectorAll("a").map((link) => link.href),
     ).toEqual([
       "#ai-and-predictive-health",
-      "#cafe-health",
       "#ai-and-predictive-health-1",
+      "#cafe-health",
+      "#ai-and-predictive-health-2",
       "#note",
       "#custom-existing",
     ]);

@@ -12,14 +12,42 @@ export function slugify(input: string): string {
   return slug.length > 0 ? slug : "note";
 }
 
+export function uniqueSlug(baseSlug: string, usedSlugs: Set<string>): string {
+  let candidate = baseSlug;
+  let suffix = 1;
+
+  while (usedSlugs.has(candidate)) {
+    candidate = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
+
+  usedSlugs.add(candidate);
+  return candidate;
+}
+
 export function slugifyFunctionSource(functionName: string): string {
+  return namedFunctionSource(slugify, "slugify", functionName);
+}
+
+export function uniqueSlugFunctionSource(functionName: string): string {
+  return namedFunctionSource(uniqueSlug, "uniqueSlug", functionName);
+}
+
+function namedFunctionSource(
+  source: { toString(): string },
+  originalName: string,
+  functionName: string,
+): string {
   if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(functionName)) {
     throw new Error(`Invalid function name: ${functionName}`);
   }
 
-  return slugify
+  return source
     .toString()
-    .replace(/^function\s+slugify\s*\(/, `function ${functionName}(`);
+    .replace(
+      new RegExp(`^function\\s+${originalName}\\s*\\(`),
+      `function ${functionName}(`,
+    );
 }
 
 export function ensureName(value: string): string {

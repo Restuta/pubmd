@@ -12,7 +12,12 @@ import {
   FrontmatterSchema,
   type Visibility,
 } from "./contract.js";
-import { slugify, slugifyFunctionSource } from "./slug.js";
+import {
+  slugify,
+  slugifyFunctionSource,
+  uniqueSlug,
+  uniqueSlugFunctionSource,
+} from "./slug.js";
 
 export interface ParsedMarkdownDocument {
   body: string;
@@ -155,6 +160,7 @@ export function buildHtmlDocument(input: {
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M24 12v40M40 12v40M12 24h40M12 40h40" stroke="#998a78" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
   );
   const tocSlugifyFunction = slugifyFunctionSource("slugifyHeading");
+  const tocUniqueSlugFunction = uniqueSlugFunctionSource("uniqueHeadingId");
 
   return `<!doctype html>
 <html lang="en">
@@ -630,22 +636,21 @@ export function buildHtmlDocument(input: {
 
       if (headings.length >= 3) {
         ${tocSlugifyFunction}
-        const fallbackIdCounts = new Map();
-        const uniqueFallbackId = (heading) => {
-          const base = slugifyHeading(heading.textContent || '');
-          const count = fallbackIdCounts.get(base) ?? 0;
-          fallbackIdCounts.set(base, count + 1);
-          return count === 0 ? base : base + '-' + count;
-        };
+        ${tocUniqueSlugFunction}
+        const usedHeadingIds = new Set();
         headings.forEach(h => {
           if (h.id) {
-            fallbackIdCounts.set(
-              h.id,
-              Math.max(fallbackIdCounts.get(h.id) ?? 0, 1),
+            usedHeadingIds.add(h.id);
+          }
+        });
+        headings.forEach(h => {
+          if (!h.id) {
+            h.id = uniqueHeadingId(
+              slugifyHeading(h.textContent || ''),
+              usedHeadingIds,
             );
           }
         });
-        headings.forEach(h => { if (!h.id) h.id = uniqueFallbackId(h); });
         const wrap = document.createElement('div');
         wrap.className = 'toc-wrap';
         const lines = document.createElement('div');
@@ -694,28 +699,36 @@ export function buildHtmlDocument(input: {
 
 function rehypeHeadingIds() {
   return (tree: HtmlRootNode): void => {
-    const slugCounts = new Map<string, number>();
+    const headings: HtmlElementNode[] = [];
+    const usedHeadingIds = new Set<string>();
 
     visitElements(tree, (node) => {
       if (!isHeadingElement(node)) {
         return;
       }
 
+      headings.push(node);
+    });
+
+    for (const node of headings) {
       const existingId = node.properties?.id;
       if (typeof existingId === "string" && existingId.length > 0) {
-        slugCounts.set(
-          existingId,
-          Math.max(slugCounts.get(existingId) ?? 0, 1),
-        );
-        return;
+        usedHeadingIds.add(existingId);
+      }
+    }
+
+    for (const node of headings) {
+      const existingId = node.properties?.id;
+      if (typeof existingId === "string" && existingId.length > 0) {
+        continue;
       }
 
       node.properties ??= {};
-      const baseSlug = slugify(collectNodeText(node));
-      const count = slugCounts.get(baseSlug) ?? 0;
-      slugCounts.set(baseSlug, count + 1);
-      node.properties.id = count === 0 ? baseSlug : `${baseSlug}-${count}`;
-    });
+      node.properties.id = uniqueSlug(
+        slugify(collectNodeText(node)),
+        usedHeadingIds,
+      );
+    }
   };
 }
 
