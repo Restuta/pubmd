@@ -12,7 +12,7 @@ import {
   FrontmatterSchema,
   type Visibility,
 } from "./contract.js";
-import { slugify } from "./slug.js";
+import { slugify, slugifyFunctionSource } from "./slug.js";
 
 export interface ParsedMarkdownDocument {
   body: string;
@@ -154,6 +154,7 @@ export function buildHtmlDocument(input: {
   const favicon = encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M24 12v40M40 12v40M12 24h40M12 40h40" stroke="#998a78" stroke-width="5" stroke-linecap="round" fill="none"/></svg>`,
   );
+  const tocSlugifyFunction = slugifyFunctionSource("slugifyHeading");
 
   return `<!doctype html>
 <html lang="en">
@@ -628,14 +629,7 @@ export function buildHtmlDocument(input: {
       });
 
       if (headings.length >= 3) {
-        const slugifyHeading = (text) =>
-          text
-            .normalize('NFKD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '')
-            .replace(/-{2,}/g, '-') || 'note';
+        ${tocSlugifyFunction}
         const fallbackIdCounts = new Map();
         const uniqueFallbackId = (heading) => {
           const base = slugifyHeading(heading.textContent || '');

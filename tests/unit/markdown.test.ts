@@ -1,3 +1,4 @@
+import { runInNewContext } from "node:vm";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -6,6 +7,118 @@ import {
   parseMarkdownDocument,
   renderMarkdownToHtml,
 } from "../../src/core/markdown.js";
+
+class TestClassList {
+  private readonly classes = new Set<string>();
+
+  add(className: string): void {
+    this.classes.add(className);
+  }
+
+  toggle(className: string, force?: boolean): void {
+    if (force ?? !this.classes.has(className)) {
+      this.classes.add(className);
+      return;
+    }
+
+    this.classes.delete(className);
+  }
+}
+
+class TestElement {
+  readonly tagName: string;
+  readonly children: TestElement[] = [];
+  readonly classList = new TestClassList();
+  readonly dataset: Record<string, string> = {};
+  readonly style: Record<string, string> = {};
+  className = "";
+  href = "";
+  id = "";
+  innerHTML = "";
+  textContent: string;
+  private readonly attributes = new Map<string, string>();
+
+  constructor(tagName: string, textContent = "") {
+    this.tagName = tagName.toUpperCase();
+    this.textContent = textContent;
+  }
+
+  appendChild(child: TestElement): TestElement {
+    this.children.push(child);
+    return child;
+  }
+
+  addEventListener(_eventName: string, _listener: unknown): void {}
+
+  getAttribute(name: string): string | null {
+    if (name === "href") {
+      return this.href;
+    }
+
+    return this.attributes.get(name) ?? null;
+  }
+
+  querySelector(_selector: string): TestElement | null {
+    return null;
+  }
+
+  querySelectorAll(selector: string): TestElement[] {
+    if (selector !== "a") {
+      return [];
+    }
+
+    return this.children.flatMap((child) => [
+      ...(child.tagName === "A" ? [child] : []),
+      ...child.querySelectorAll(selector),
+    ]);
+  }
+
+  scrollIntoView(_options: unknown): void {}
+
+  setAttribute(name: string, value: string): void {
+    this.attributes.set(name, value);
+  }
+}
+
+class TestDocument {
+  readonly body = new TestElement("body");
+
+  constructor(private readonly headings: TestElement[]) {}
+
+  createElement(tagName: string): TestElement {
+    return new TestElement(tagName);
+  }
+
+  querySelectorAll(selector: string): TestElement[] {
+    if (selector === "pre") {
+      return [];
+    }
+
+    if (selector === "article h1, article h2, article h3, article h4") {
+      return this.headings;
+    }
+
+    return this.body.querySelectorAll(selector);
+  }
+}
+
+class TestIntersectionObserver {
+  observe(_target: TestElement): void {}
+}
+
+function runDocumentScript(html: string, document: TestDocument): void {
+  const script = html.match(/<script>\n([\s\S]*?)\n {4}<\/script>/)?.[1];
+  if (!script) {
+    throw new Error("Expected generated document to include a script");
+  }
+
+  runInNewContext(script, {
+    document,
+    IntersectionObserver: TestIntersectionObserver,
+    navigator: { clipboard: { writeText: () => undefined } },
+    setTimeout: () => undefined,
+  });
+}
 
 describe("markdown pipeline", () => {
   it("extracts frontmatter and sensible defaults", () => {
@@ -73,22 +186,44 @@ const answer = 42;
     expect(rendered.html).toContain('<h2 id="note">');
   });
 
-  it("builds adaptive TOC logic for documents that use body h1 headings", () => {
+  it("assigns deterministic TOC fallback ids for raw body headings", () => {
     const html = buildHtmlDocument({
       title: "Doc Title",
       description: "Example",
       noindex: true,
-      bodyHtml:
-        "<h1>Doc Title</h1><h1>Section</h1><h2>Child</h2><h1>Another</h1>",
+      bodyHtml: "",
     });
+    const alreadyLinked = new TestElement("h2", "Already Linked");
+    alreadyLinked.id = "custom-existing";
+    const headings = [
+      new TestElement("h1", "Doc Title"),
+      new TestElement("h1", "AI And Predictive Health"),
+      new TestElement("h2", "Café Health 💡"),
+      new TestElement("h1", "AI And Predictive Health"),
+      new TestElement("h1", "Привет 👋"),
+      alreadyLinked,
+    ];
 
-    expect(html).toContain("article h1, article h2, article h3, article h4");
-    expect(html).toContain('const pageTitle = "Doc Title";');
-    expect(html).toContain("const slugifyHeading =");
-    expect(html).toContain("fallbackIdCounts.set(");
-    expect(html).not.toContain("h-' + i");
-    expect(html).toContain("depth-root");
-    expect(html).toContain("depth-child");
+    const document = new TestDocument(headings);
+    runDocumentScript(html, document);
+
+    expect(headings.map((heading) => heading.id)).toEqual([
+      "",
+      "ai-and-predictive-health",
+      "cafe-health",
+      "ai-and-predictive-health-1",
+      "note",
+      "custom-existing",
+    ]);
+    expect(
+      document.body.querySelectorAll("a").map((link) => link.href),
+    ).toEqual([
+      "#ai-and-predictive-health",
+      "#cafe-health",
+      "#ai-and-predictive-health-1",
+      "#note",
+      "#custom-existing",
+    ]);
   });
 
   it("renders real-world mixed markdown structures cleanly", async () => {

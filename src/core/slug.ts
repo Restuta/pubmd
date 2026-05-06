@@ -12,6 +12,16 @@ export function slugify(input: string): string {
   return slug.length > 0 ? slug : "note";
 }
 
+export function slugifyFunctionSource(functionName: string): string {
+  if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(functionName)) {
+    throw new Error(`Invalid function name: ${functionName}`);
+  }
+
+  return slugify
+    .toString()
+    .replace(/^function\s+slugify\s*\(/, `function ${functionName}(`);
+}
+
 export function ensureName(value: string): string {
   return NameSchema.parse(value);
 }
