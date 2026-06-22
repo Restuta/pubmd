@@ -8,8 +8,15 @@
 > headers (`CSP: sandbox` + `Permissions-Policy` + `nosniff` + `X-Robots-Tag`).
 > Deferred from v1: `--inline-remote` / `--no-scripts` CLI flags (the inliner supports the
 > options; the CLI uses defaults), remote-asset fetching, and multi-page folder hosting
-> (§11 v2). Domain: pages are served from the app origin until `u.bul.sh` is assigned —
-> `CSP: sandbox` makes the isolation work regardless (§9).
+> (§11 v2).
+>
+> **Domain wiring (`u.bul.sh`):** the content origin is the `USER_CONTENT_ORIGIN` env var
+> (read in `configured-app.ts`, threaded through `createApp`). When set, published HTML
+> URLs use it and an apex request for an HTML page `301`s to it; markdown stays on the
+> apex. When unset, HTML serves from the request origin (no behavior change). So
+> "assigning the domain" = point `u.bul.sh` DNS at the app + set
+> `USER_CONTENT_ORIGIN=https://u.bul.sh`. `CSP: sandbox` makes the isolation hold either
+> way (§9).
 
 ## 1. Goal
 

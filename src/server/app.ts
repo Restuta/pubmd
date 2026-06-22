@@ -18,8 +18,21 @@ import {
   SlugConflictError,
 } from "../core/repository.js";
 
-export function createApp(service: PublishService): Hono {
+export interface AppOptions {
+  /**
+   * Origin to serve user-published HTML from (e.g. `https://u.bul.sh`). When set, HTML
+   * page URLs use it and apex requests for an HTML page 301 to it. Markdown stays on the
+   * request origin. When unset, HTML is served from the request origin (apex).
+   */
+  userContentOrigin?: string;
+}
+
+export function createApp(
+  service: PublishService,
+  options: AppOptions = {},
+): Hono {
   const app = new Hono();
+  const userContentOrigin = options.userContentOrigin?.replace(/\/+$/, "");
 
   app.get("/health", (context) => {
     return context.json({ ok: true });
@@ -118,6 +131,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
             ? {
                 ...common,
                 kind: "html",
+                ...(userContentOrigin === undefined
+                  ? {}
+                  : { origin: userContentOrigin }),
                 source: body.source,
                 ...(body.document === undefined
                   ? {}
@@ -157,7 +173,15 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
 
         input =
           context.req.query("kind") === "html"
-            ? { ...common, kind: "html", source: text, ...optional }
+            ? {
+                ...common,
+                kind: "html",
+                ...(userContentOrigin === undefined
+                  ? {}
+                  : { origin: userContentOrigin }),
+                source: text,
+                ...optional,
+              }
             : { ...common, kind: "markdown", markdown: text, ...optional };
       }
 
@@ -222,6 +246,18 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
               ? "text/plain; charset=utf-8"
               : "text/markdown; charset=utf-8",
         });
+      }
+
+      // Serve user HTML only from the dedicated content origin; redirect apex hits there.
+      if (
+        page.kind === "html" &&
+        userContentOrigin !== undefined &&
+        requestOrigin(context.req.url) !== userContentOrigin
+      ) {
+        return context.redirect(
+          `${userContentOrigin}/${page.namespace}/${page.slug}`,
+          301,
+        );
       }
 
       return context.html(await service.readHtml(page), 200, {

@@ -13,10 +13,11 @@ export interface StartedTestServer {
 
 export async function startTestServer(
   rootDir: string,
+  options: { userContentOrigin?: string } = {},
 ): Promise<StartedTestServer> {
   const repository = createFileStore(path.join(rootDir, "data"));
   const service = createPublishService(repository);
-  const app = createApp(service);
+  const app = createApp(service, options);
   const server = createServer(async (request, response) => {
     const address = server.address();
     const port =
