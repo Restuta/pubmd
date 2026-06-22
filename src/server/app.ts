@@ -3,10 +3,13 @@ import { HTTPException } from "hono/http-exception";
 
 import {
   ListPagesResponseSchema,
-  PublishPageRequestSchema,
+  PublishRequestSchema,
 } from "../core/contract.js";
 import { buildHtmlDocument, renderMarkdownToHtml } from "../core/markdown.js";
-import type { PublishService } from "../core/publish-service.js";
+import type {
+  PublishPageInput,
+  PublishService,
+} from "../core/publish-service.js";
 import {
   AuthenticationError,
   NamespaceExistsError,
@@ -98,35 +101,67 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
     const token = parseBearerToken(context.req.header("authorization"));
     const contentType = context.req.header("content-type") ?? "";
     const isJson = contentType.includes("application/json");
+    const common = {
+      namespace: context.req.param("namespace"),
+      token,
+      origin: requestOrigin(context.req.url),
+    };
 
     try {
-      let markdown: string;
-      let renderMarkdown: string | undefined;
-      let slug: string | undefined;
-      let pageId: string | undefined;
+      let input: PublishPageInput;
 
       if (isJson) {
-        const body = PublishPageRequestSchema.parse(await context.req.json());
-        markdown = body.markdown;
-        renderMarkdown = body.renderMarkdown;
-        slug = body.slug;
-        pageId = body.pageId;
+        const body = PublishRequestSchema.parse(await context.req.json());
+
+        input =
+          body.kind === "html"
+            ? {
+                ...common,
+                kind: "html",
+                source: body.source,
+                ...(body.document === undefined
+                  ? {}
+                  : { document: body.document }),
+                ...(body.title === undefined ? {} : { title: body.title }),
+                ...(body.description === undefined
+                  ? {}
+                  : { description: body.description }),
+                ...(body.noindex === undefined
+                  ? {}
+                  : { noindex: body.noindex }),
+                ...(body.slug === undefined
+                  ? {}
+                  : { requestedSlug: body.slug }),
+                ...(body.pageId === undefined ? {} : { pageId: body.pageId }),
+              }
+            : {
+                ...common,
+                kind: "markdown",
+                markdown: body.markdown,
+                ...(body.renderMarkdown === undefined
+                  ? {}
+                  : { renderMarkdown: body.renderMarkdown }),
+                ...(body.slug === undefined
+                  ? {}
+                  : { requestedSlug: body.slug }),
+                ...(body.pageId === undefined ? {} : { pageId: body.pageId }),
+              };
       } else {
-        markdown = await context.req.text();
-        slug = context.req.query("slug") ?? undefined;
-        pageId = context.req.query("pageId") ?? undefined;
+        const slug = context.req.query("slug") ?? undefined;
+        const pageId = context.req.query("pageId") ?? undefined;
+        const text = await context.req.text();
+        const optional = {
+          ...(slug === undefined ? {} : { requestedSlug: slug }),
+          ...(pageId === undefined ? {} : { pageId }),
+        };
+
+        input =
+          context.req.query("kind") === "html"
+            ? { ...common, kind: "html", source: text, ...optional }
+            : { ...common, kind: "markdown", markdown: text, ...optional };
       }
 
-      const publishInput = {
-        namespace: context.req.param("namespace"),
-        token,
-        markdown,
-        ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
-        origin: requestOrigin(context.req.url),
-        ...(pageId === undefined ? {} : { pageId }),
-        ...(slug === undefined ? {} : { requestedSlug: slug }),
-      };
-      const published = await service.publishPage(publishInput);
+      const published = await service.publishPage(input);
 
       return context.json(published, published.created ? 201 : 200);
     } catch (error) {
@@ -182,7 +217,10 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
 
       if (context.req.query("raw") !== undefined) {
         return context.text(await service.readMarkdown(page), 200, {
-          "content-type": "text/markdown; charset=utf-8",
+          "content-type":
+            page.kind === "html"
+              ? "text/plain; charset=utf-8"
+              : "text/markdown; charset=utf-8",
         });
       }
 
@@ -192,6 +230,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
           "public, s-maxage=60, stale-while-revalidate=86400",
         "vercel-cdn-cache-control":
           "public, s-maxage=60, stale-while-revalidate=86400",
+        ...(page.kind === "html" ? userHtmlSecurityHeaders(page.noindex) : {}),
       });
     } catch (error) {
       throw toHttpException(error);
@@ -217,6 +256,22 @@ function parseBearerToken(header: string | undefined): string {
 
 function requestOrigin(url: string): string {
   return new URL(url).origin;
+}
+
+/**
+ * Isolation headers for user-published HTML. `sandbox` loads the document in a unique
+ * opaque origin (scripts run, but with no access to bul.sh cookies/storage/API or other
+ * pages) — the load-bearing control, independent of which host serves it.
+ */
+function userHtmlSecurityHeaders(noindex: boolean): Record<string, string> {
+  return {
+    "content-security-policy":
+      "sandbox allow-scripts allow-forms allow-popups allow-modals",
+    "x-content-type-options": "nosniff",
+    "permissions-policy":
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+    ...(noindex ? { "x-robots-tag": "noindex, nofollow" } : {}),
+  };
 }
 
 function toHttpException(error: unknown): HTTPException {
