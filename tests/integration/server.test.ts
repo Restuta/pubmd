@@ -248,4 +248,61 @@ This is the body.`,
     const mdHit = await fetch(mdPage.url, { redirect: "manual" });
     expect(mdHit.status).toBe(200);
   });
+
+  it("rejects a pageId from another namespace (404) and an empty raw body (400)", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-edge-"));
+    server = await startTestServer(root);
+
+    const tokenFor = async (ns: string): Promise<string> => {
+      const res = await fetch(`${server?.origin}/api/namespaces/${ns}/claim`, {
+        method: "POST",
+      });
+      return ((await res.json()) as { token: string }).token;
+    };
+
+    const tokenA = await tokenFor("nsa");
+    const tokenB = await tokenFor("nsb");
+
+    // publish a page in namespace A, capture its pageId
+    const aPublish = await fetch(
+      `${server.origin}/api/namespaces/nsa/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${tokenA}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ markdown: "---\ntitle: A Page\n---\n\nHi." }),
+      },
+    );
+    const aPageId = ((await aPublish.json()) as { pageId: string }).pageId;
+
+    // namespace B tries to publish using A's pageId -> 404 (not 401)
+    const crossNs = await fetch(
+      `${server.origin}/api/namespaces/nsb/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${tokenB}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ markdown: "x", pageId: aPageId }),
+      },
+    );
+    expect(crossNs.status).toBe(404);
+
+    // an empty raw body is rejected (mirrors the JSON path's min(1))
+    const empty = await fetch(
+      `${server.origin}/api/namespaces/nsb/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${tokenB}`,
+          "content-type": "text/markdown",
+        },
+        body: "   \n  ",
+      },
+    );
+    expect(empty.status).toBe(400);
+  });
 });

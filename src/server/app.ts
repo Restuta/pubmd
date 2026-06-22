@@ -172,6 +172,13 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         const slug = context.req.query("slug") ?? undefined;
         const pageId = context.req.query("pageId") ?? undefined;
         const text = await context.req.text();
+
+        // The JSON path requires non-empty content; keep the raw-body path consistent
+        // so an empty publish can't silently create a blank page (slugged "note").
+        if (text.trim().length === 0) {
+          throw new HTTPException(400, { message: "Request body is empty." });
+        }
+
         const optional = {
           ...(slug === undefined ? {} : { requestedSlug: slug }),
           ...(pageId === undefined ? {} : { pageId }),
