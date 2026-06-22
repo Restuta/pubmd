@@ -190,4 +190,61 @@ This is the body.`,
     expect(mdResponse.headers.get("content-security-policy")).toBeNull();
     expect(mdResponse.headers.get("x-content-type-options")).toBeNull();
   });
+
+  it("serves html from the configured content origin and redirects apex hits", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-origin-"));
+    const userContentOrigin = "https://u.bul.sh";
+    server = await startTestServer(root, { userContentOrigin });
+
+    const claimed = (await (
+      await fetch(`${server.origin}/api/namespaces/restuta/claim`, {
+        method: "POST",
+      })
+    ).json()) as { token: string };
+    const headers = {
+      authorization: `Bearer ${claimed.token}`,
+      "content-type": "application/json",
+    };
+
+    const htmlPublish = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          kind: "html",
+          source: "<title>Routed</title><h1>hi</h1>",
+        }),
+      },
+    );
+    const htmlPage = (await htmlPublish.json()) as {
+      url: string;
+      slug: string;
+    };
+    // published URL points at the content origin, not the apex
+    expect(htmlPage.url).toBe(`${userContentOrigin}/restuta/${htmlPage.slug}`);
+
+    // requesting the html page on the apex 301s to the content origin
+    const apexHit = await fetch(`${server.origin}/restuta/${htmlPage.slug}`, {
+      redirect: "manual",
+    });
+    expect(apexHit.status).toBe(301);
+    expect(apexHit.headers.get("location")).toBe(
+      `${userContentOrigin}/restuta/${htmlPage.slug}`,
+    );
+
+    // a markdown page is still served on the apex (no redirect)
+    const mdPublish = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ markdown: "---\ntitle: Stay\n---\n\nBody." }),
+      },
+    );
+    const mdPage = (await mdPublish.json()) as { url: string };
+    expect(mdPage.url).toBe(`${server.origin}/restuta/stay`);
+    const mdHit = await fetch(mdPage.url, { redirect: "manual" });
+    expect(mdHit.status).toBe(200);
+  });
 });
