@@ -44,10 +44,7 @@ curl -fsSL https://bul.sh/install | sh
 irm https://bul.sh/install.ps1 | iex
 ```
 
-**npm (any platform):**
-```bash
-npx pubmd --help
-```
+Both installers download the latest prebuilt binary from GitHub Releases. (There is no npm package — `pubmd` on npm is an unrelated project.)
 
 Default behavior (macOS/Linux):
 - installs `pubmd` to `~/.local/bin`
@@ -142,17 +139,14 @@ To list published pages:
 
 ### Windows AI agents
 
-If running on Windows, use `npx`:
+Install once via PowerShell, then use the `pubmd` command:
 
-```
-npx pubmd publish <file.md> --api-base https://bul.sh
-```
-
-Or if installed via PowerShell:
-
-```
+```powershell
+irm https://bul.sh/install.ps1 | iex
 pubmd publish <file.md> --api-base https://bul.sh
 ```
+
+(No `npx` — there is no npm package.) Or skip install entirely with the curl/`Invoke-RestMethod` API below.
 
 ### Zero-dependency (curl)
 
