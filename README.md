@@ -2,9 +2,14 @@
 
 > `stdout` for the web — one command, one URL, done.
 
-Publish markdown to a stable URL. Built for AI agents, usable by humans.
+Publish markdown **or a self-contained HTML page** to a stable URL. Built for AI agents, usable by humans.
 
 **Live at [bul.sh](https://bul.sh)**
+
+> **New:** `pubmd` isn't markdown-only anymore. Point it at an `.html` file and it
+> packages the page's local CSS, JS, images and fonts into **one self-contained
+> document**, then serves it sandboxed from [`u.bul.sh`](https://u.bul.sh). See
+> [Publishing HTML](#publishing-html).
 
 ## Current Status
 
@@ -59,9 +64,13 @@ Default behavior (Windows):
 # Claim your namespace
 node dist/src/cli/main.js claim myname --api-base https://bul.sh
 
-# Publish
+# Publish markdown
 node dist/src/cli/main.js publish notes.md --api-base https://bul.sh
 # → https://bul.sh/myname/notes
+
+# Publish an HTML page (local CSS/JS/images/fonts are inlined into one self-contained page)
+node dist/src/cli/main.js publish dashboard.html --api-base https://bul.sh
+# → https://u.bul.sh/myname/dashboard
 
 # Re-publish (same URL, updated content)
 node dist/src/cli/main.js publish notes.md --api-base https://bul.sh
@@ -76,6 +85,28 @@ node dist/src/cli/main.js list --namespace myname --api-base https://bul.sh
 node dist/src/cli/main.js remove weekly-report --namespace myname --api-base https://bul.sh
 ```
 
+
+## Publishing HTML
+
+Point `pubmd` at an `.html` file and it makes the page self-contained before upload, then serves it **verbatim** — your markup, styles and scripts, untouched.
+
+```bash
+pubmd publish dashboard.html
+# → https://u.bul.sh/myname/dashboard
+```
+
+**What gets packaged into the single page:**
+
+- `<link rel="stylesheet">` → folded into `<style>` (nested `url(...)` and one-level `@import` resolved)
+- `<script src>` → inlined
+- `<img src>` / `srcset`, favicons, `<video>`/`<audio>`/`<source>` → inlined as `data:` URLs
+- fonts referenced from CSS `url(...)` → inlined
+
+Remote references (`https://…`, protocol-relative) and existing `data:` URLs are left alone. Assets over a size cap and site-absolute paths (`/foo.png`) are left as references and reported.
+
+**Where it's served:** user HTML is served from the dedicated origin [`u.bul.sh`](https://u.bul.sh) with `Content-Security-Policy: sandbox` — scripts run, but in an opaque origin with no access to `bul.sh` cookies/storage or other pages. A request to the `bul.sh` apex for an HTML page redirects to `u.bul.sh`. Markdown keeps rendering and serving from `bul.sh`.
+
+> Multi-page sites (a folder of `.html` files) aren't hosted yet — v1 publishes one self-contained page per `publish`.
 
 ## For AI Agents
 
@@ -165,8 +196,9 @@ Today:
 ## How It Works
 
 ```
-PUBLISH: CLI posts markdown -> server renders HTML once -> stores raw markdown + HTML in Blob
-READ:    Browser hits URL -> app serves pre-rendered HTML with aggressive Vercel edge caching
+PUBLISH (md):   CLI posts markdown -> server renders HTML once -> stores raw markdown + HTML
+PUBLISH (html): CLI inlines local assets into one document -> server stores it -> serves verbatim
+READ:           Browser hits URL -> app serves stored HTML with aggressive Vercel edge caching
 ```
 
 Pages are pre-rendered on publish. On Vercel, the first read may hit the app, but subsequent reads are served from edge cache for the cache window. Zero JS, system fonts, small HTML payloads.
@@ -182,7 +214,7 @@ Pages are pre-rendered on publish. On Vercel, the first read may hit the app, bu
 
 ```
 node dist/src/cli/main.js claim <namespace>                                 Claim a namespace, get API token
-node dist/src/cli/main.js publish [file] [--slug <s>] [--namespace <n>]     Publish or update a page
+node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>]  Publish or update a page
 node dist/src/cli/main.js list [--namespace <n>]                             List your published pages
 node dist/src/cli/main.js remove <slug> [--namespace <n>]                    Delete a page
 ```
@@ -225,8 +257,8 @@ npm run verify       # test + lint + typecheck + build
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/api/namespaces/:ns/claim` | none | Claim namespace, returns token |
-| POST | `/api/namespaces/:ns/pages/publish` | Bearer | Publish/update a page |
+| POST | `/api/namespaces/:ns/pages/publish` | Bearer | Publish/update a page (markdown, or `{ "kind": "html", "source": "…" }`) |
 | GET | `/api/namespaces/:ns/pages` | Bearer | List pages |
 | DELETE | `/api/namespaces/:ns/pages/:slug` | Bearer | Delete a page |
-| GET | `/:ns/:slug` | none | Read published page (HTML) |
-| GET | `/:ns/:slug?raw` | none | Read raw markdown |
+| GET | `/:ns/:slug` | none | Read published page (HTML pages serve from `u.bul.sh`, sandboxed) |
+| GET | `/:ns/:slug?raw` | none | Read the source (markdown, or HTML for html pages) |

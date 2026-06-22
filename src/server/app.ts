@@ -43,12 +43,17 @@ export function createApp(
     if (!cachedHomepage) {
       const md = `# bul.sh
 
-Publish markdown. Get a URL.
+Publish markdown — or a whole HTML page. Get a URL.
 
 \`\`\`bash
 $ pubmd publish report.md
 → https://bul.sh/myname/report
+
+$ pubmd publish dashboard.html
+→ https://u.bul.sh/myname/dashboard
 \`\`\`
+
+An HTML file is packaged into one self-contained page — its local CSS, JS, images and fonts are inlined — and served sandboxed. Markdown renders to a clean page.
 
 Works from any terminal. AI agents, scripts, CI — anything that can run a command.
 
@@ -62,8 +67,9 @@ curl -fsSL https://bul.sh/install | sh
 # Claim your namespace
 pubmd claim myname
 
-# Publish
+# Publish markdown or HTML
 pubmd publish notes.md
+pubmd publish page.html
 
 # Re-publish (same URL updates)
 pubmd publish notes.md
@@ -77,9 +83,9 @@ curl -X POST -H "Authorization: Bearer $TOKEN" --data-binary @file.md https://bu
 Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
       const rendered = await renderMarkdownToHtml(md);
       cachedHomepage = buildHtmlDocument({
-        title: "bul.sh — publish markdown, get a URL",
+        title: "bul.sh — publish markdown or HTML, get a URL",
         description:
-          "Publish markdown from the command line to a stable URL. Built for AI agents, usable by humans.",
+          "Publish markdown or a self-contained HTML page from the command line to a stable URL. Built for AI agents, usable by humans.",
         noindex: false,
         bodyHtml: rendered.html,
       });
