@@ -6,6 +6,7 @@ import type {
   StoredPage,
 } from "./contract.js";
 import { constantTimeEqual, createToken, sha256 } from "./hash.js";
+import { extractHtmlMeta } from "./html-meta.js";
 import {
   buildHtmlDocument,
   parseMarkdownDocument,
@@ -22,8 +23,17 @@ import {
 import { ensureName, slugify } from "./slug.js";
 
 export interface PublishPageInput {
-  markdown: string;
+  kind?: "markdown" | "html";
+  // markdown pages
+  markdown?: string;
   renderMarkdown?: string;
+  // html pages
+  source?: string;
+  document?: string;
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+  // common
   namespace: string;
   pageId?: string;
   requestedSlug?: string;
@@ -89,7 +99,12 @@ export function createPublishService(
     const safeNamespace = ensureName(input.namespace);
     await authenticate(safeNamespace, input.token);
 
-    const parsed = parseMarkdownDocument(input.markdown);
+    if (input.kind === "html") {
+      return publishHtmlPage(safeNamespace, input);
+    }
+
+    const markdown = input.markdown ?? "";
+    const parsed = parseMarkdownDocument(markdown);
     const renderMarkdown = input.renderMarkdown ?? parsed.body;
     const requestedSlug =
       input.requestedSlug ?? parsed.frontmatter.slug ?? slugify(parsed.title);
@@ -113,7 +128,7 @@ export function createPublishService(
     });
     const contentHash = sha256(
       JSON.stringify({
-        markdown: input.markdown,
+        markdown,
         renderMarkdown,
         slug,
         title: parsed.title,
@@ -133,6 +148,7 @@ export function createPublishService(
         pageId,
         namespace: safeNamespace,
         slug,
+        kind: "markdown",
         title: parsed.title,
         description: parsed.description,
         visibility: parsed.visibility,
@@ -148,7 +164,7 @@ export function createPublishService(
       await repository.savePage(
         page,
         {
-          content: input.markdown,
+          content: markdown,
           key: markdownBlobKey,
         },
         {
@@ -167,6 +183,82 @@ export function createPublishService(
       title: parsed.title,
       description: parsed.description,
       url: buildPageUrl(input.origin, safeNamespace, slug),
+      created: existingPage === null && !noOp,
+      updated: existingPage !== null && !noOp,
+      noOp,
+    };
+  }
+
+  async function publishHtmlPage(
+    safeNamespace: string,
+    input: PublishPageInput,
+  ): Promise<PublishedPage> {
+    const source = input.source ?? "";
+    const htmlDocument = input.document ?? source;
+    const meta = extractHtmlMeta(htmlDocument);
+    const title = input.title ?? meta.title ?? "Untitled";
+    const description = input.description ?? meta.description ?? "";
+    const noindex = input.noindex ?? true;
+    const requestedSlug = input.requestedSlug ?? slugify(title);
+    const safeSlug = ensureName(slugify(requestedSlug));
+    const existingPage = await resolveExistingPage(
+      safeNamespace,
+      safeSlug,
+      input.pageId,
+    );
+    const pageId = existingPage?.pageId ?? randomUUID();
+    const now = new Date().toISOString();
+    const sourceBlobKey = `${pageId}.html.src`;
+    const htmlBlobKey = `${pageId}.html`;
+    const contentHash = sha256(
+      JSON.stringify({
+        kind: "html",
+        document: htmlDocument,
+        slug: safeSlug,
+        title,
+        description,
+        noindex,
+      }),
+    );
+    const noOp =
+      existingPage !== null &&
+      existingPage.contentHash === contentHash &&
+      existingPage.slug === safeSlug;
+
+    if (!noOp) {
+      const page: StoredPage = {
+        pageId,
+        namespace: safeNamespace,
+        slug: safeSlug,
+        kind: "html",
+        title,
+        description,
+        visibility: "unlisted",
+        draft: false,
+        noindex,
+        contentHash,
+        createdAt: existingPage?.createdAt ?? now,
+        updatedAt: now,
+        markdownBlobKey: sourceBlobKey,
+        htmlBlobKey,
+      };
+
+      await repository.savePage(
+        page,
+        { content: source, key: sourceBlobKey },
+        { content: htmlDocument, key: htmlBlobKey },
+      );
+
+      await repository.touchNamespace(safeNamespace, now);
+    }
+
+    return {
+      pageId,
+      namespace: safeNamespace,
+      slug: safeSlug,
+      title,
+      description,
+      url: buildPageUrl(input.origin, safeNamespace, safeSlug),
       created: existingPage === null && !noOp,
       updated: existingPage !== null && !noOp,
       noOp,

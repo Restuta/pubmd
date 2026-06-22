@@ -187,6 +187,7 @@ function makePage(overrides: Partial<StoredPage>): StoredPage {
     pageId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
     namespace: "demo",
     slug: "page",
+    kind: "markdown",
     title: "Page",
     description: "Description",
     visibility: "unlisted",

@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { buildDataUrl } from "./data-url.js";
+
 export interface PrepareMarkdownBodyOptions {
   sourcePath?: string;
 }
@@ -217,30 +219,6 @@ async function resolveExcalidrawExportPath(
   }
 
   return null;
-}
-
-function buildDataUrl(content: Buffer, extension: string): string {
-  return `data:${mimeTypeForExtension(extension)};base64,${content.toString("base64")}`;
-}
-
-function mimeTypeForExtension(extension: string): string {
-  switch (extension) {
-    case ".png":
-      return "image/png";
-    case ".jpg":
-    case ".jpeg":
-      return "image/jpeg";
-    case ".gif":
-      return "image/gif";
-    case ".webp":
-      return "image/webp";
-    case ".svg":
-      return "image/svg+xml";
-    case ".avif":
-      return "image/avif";
-    default:
-      return "application/octet-stream";
-  }
 }
 
 function escapeMarkdownLabel(value: string): string {

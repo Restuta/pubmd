@@ -126,4 +126,68 @@ This is the body.`,
     expect(listed.pages).toHaveLength(1);
     expect(listed.pages[0]?.slug).toBe("launch-post");
   });
+
+  it("serves published html verbatim with sandbox isolation, while markdown stays unsandboxed", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-html-"));
+    server = await startTestServer(root);
+
+    const claimed = (await (
+      await fetch(`${server.origin}/api/namespaces/restuta/claim`, {
+        method: "POST",
+      })
+    ).json()) as { token: string };
+    const headers = {
+      authorization: `Bearer ${claimed.token}`,
+      "content-type": "application/json",
+    };
+
+    const htmlDocument =
+      "<!doctype html><html><head><title>Raw HTML</title></head><body><h1>verbatim</h1><script>window.x = 1;</script></body></html>";
+    const publishResponse = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ kind: "html", source: htmlDocument }),
+      },
+    );
+    expect(publishResponse.status).toBe(201);
+    const published = (await publishResponse.json()) as {
+      slug: string;
+      url: string;
+    };
+    // slug derives from the <title>
+    expect(published.slug).toBe("raw-html");
+
+    const pageResponse = await fetch(published.url);
+    expect(pageResponse.status).toBe(200);
+    expect(pageResponse.headers.get("content-type")).toContain("text/html");
+    expect(pageResponse.headers.get("content-security-policy")).toContain(
+      "sandbox",
+    );
+    expect(pageResponse.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(pageResponse.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    // served byte-for-byte: no bul.sh template wrapping
+    expect(await pageResponse.text()).toBe(htmlDocument);
+
+    const rawResponse = await fetch(`${published.url}?raw=1`);
+    expect(rawResponse.headers.get("content-type")).toContain("text/plain");
+    expect(await rawResponse.text()).toBe(htmlDocument);
+
+    // a markdown page on the same server must NOT carry the sandbox headers
+    const mdPublish = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          markdown: "---\ntitle: Plain Note\n---\n\nBody.",
+        }),
+      },
+    );
+    const mdPage = (await mdPublish.json()) as { url: string };
+    const mdResponse = await fetch(mdPage.url);
+    expect(mdResponse.headers.get("content-security-policy")).toBeNull();
+    expect(mdResponse.headers.get("x-content-type-options")).toBeNull();
+  });
 });

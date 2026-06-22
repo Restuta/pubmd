@@ -309,6 +309,85 @@ Updated body.
     const pageResponse = await fetch(firstUrl);
     expect(await pageResponse.text()).toContain("Updated body.");
   });
+
+  it("publishes a multi-file HTML page, inlining css/js/images into one self-contained page", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-html-"));
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const pagePath = path.join(cwd, "page.html");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(path.join(cwd, "css"), { recursive: true });
+    await mkdir(path.join(cwd, "img"), { recursive: true });
+    await writeFile(
+      path.join(cwd, "img", "bg.svg"),
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 4"><rect width="4" height="4" fill="purple"/></svg>',
+      "utf8",
+    );
+    await writeFile(
+      path.join(cwd, "css", "app.css"),
+      ".hero { background: url(../img/bg.svg); }",
+      "utf8",
+    );
+    await writeFile(
+      path.join(cwd, "app.js"),
+      "window.__loaded = 'INLINE_JS_MARKER';",
+      "utf8",
+    );
+    await writeFile(
+      pagePath,
+      `<!doctype html>
+<html>
+  <head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/app.css">
+  </head>
+  <body>
+    <h1 class="hero">HEADING_MARKER</h1>
+    <script src="app.js"></script>
+  </body>
+</html>
+`,
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publishResult = await runCli(
+      ["publish", pagePath, "--api-base", server.origin],
+      { cwd, env },
+    );
+    const pageUrl = publishResult.stdout.trim();
+    expect(pageUrl).toContain("/restuta/page");
+
+    const response = await fetch(pageUrl);
+    expect(response.headers.get("content-type")).toContain("text/html");
+    expect(response.headers.get("content-security-policy")).toContain(
+      "sandbox",
+    );
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+
+    const html = await response.text();
+    expect(html).toContain("HEADING_MARKER");
+    expect(html).toContain("INLINE_JS_MARKER");
+    expect(html).toContain('url("data:image/svg+xml;base64,');
+    expect(html).not.toContain('href="css/app.css"');
+    expect(html).not.toContain('src="app.js"');
+
+    const rawResponse = await fetch(`${pageUrl}?raw=1`);
+    expect(rawResponse.headers.get("content-type")).toContain("text/plain");
+    expect(await rawResponse.text()).toContain(
+      '<link rel="stylesheet" href="css/app.css">',
+    );
+  });
 });
 
 async function runCli(

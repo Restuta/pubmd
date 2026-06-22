@@ -8,8 +8,10 @@ import {
   ListPagesResponseSchema,
   PublishedPageSchema,
 } from "../core/contract.js";
+import { inlineHtmlAssets } from "../core/inline-html.js";
 import { parseMarkdownDocument } from "../core/markdown.js";
 import { prepareMarkdownBodyForPublish } from "../core/publish-markdown.js";
+import { slugify } from "../core/slug.js";
 import {
   loadConfig,
   loadMapping,
@@ -145,14 +147,14 @@ async function runPublish(context: CommandContext): Promise<void> {
     throw new Error(`No token configured for namespace "${namespace}".`);
   }
 
-  const markdown =
-    absoluteFilePath === undefined
-      ? await readStdin()
-      : await readFile(absoluteFilePath, "utf8");
-  const renderMarkdown =
-    absoluteFilePath === undefined
-      ? undefined
-      : await buildRenderMarkdown(markdown, absoluteFilePath);
+  const slug = options.slug ?? existingPage?.slug;
+  const pageIdPart =
+    existingPage?.pageId === undefined ? {} : { pageId: existingPage.pageId };
+  const requestBody =
+    absoluteFilePath !== undefined && /\.html?$/i.test(absoluteFilePath)
+      ? await buildHtmlRequestBody(absoluteFilePath, slug, pageIdPart)
+      : await buildMarkdownRequestBody(absoluteFilePath, slug, pageIdPart);
+
   const response = await fetch(
     `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages/publish`,
     {
@@ -161,16 +163,7 @@ async function runPublish(context: CommandContext): Promise<void> {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify({
-        markdown,
-        ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
-        ...((options.slug ?? existingPage?.slug) === undefined
-          ? {}
-          : { slug: options.slug ?? existingPage?.slug }),
-        ...(existingPage?.pageId === undefined
-          ? {}
-          : { pageId: existingPage.pageId }),
-      }),
+      body: JSON.stringify(requestBody),
     },
   );
 
@@ -220,6 +213,55 @@ async function buildRenderMarkdown(
   });
 
   return renderMarkdown === parsed.body ? undefined : renderMarkdown;
+}
+
+async function buildMarkdownRequestBody(
+  absoluteFilePath: string | undefined,
+  slug: string | undefined,
+  pageIdPart: { pageId?: string },
+): Promise<Record<string, unknown>> {
+  const markdown =
+    absoluteFilePath === undefined
+      ? await readStdin()
+      : await readFile(absoluteFilePath, "utf8");
+  const renderMarkdown =
+    absoluteFilePath === undefined
+      ? undefined
+      : await buildRenderMarkdown(markdown, absoluteFilePath);
+
+  return {
+    markdown,
+    ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
+    ...(slug === undefined ? {} : { slug }),
+    ...pageIdPart,
+  };
+}
+
+async function buildHtmlRequestBody(
+  absoluteFilePath: string,
+  slug: string | undefined,
+  pageIdPart: { pageId?: string },
+): Promise<Record<string, unknown>> {
+  const source = await readFile(absoluteFilePath, "utf8");
+  const inlined = await inlineHtmlAssets(source, {
+    baseDir: path.dirname(absoluteFilePath),
+  });
+
+  for (const item of inlined.skipped) {
+    console.error(`skipped ${item.ref} (${item.reason})`);
+  }
+
+  const fallbackSlug = slugify(
+    path.basename(absoluteFilePath).replace(/\.html?$/i, ""),
+  );
+
+  return {
+    kind: "html",
+    source,
+    document: inlined.html,
+    slug: slug ?? fallbackSlug,
+    ...pageIdPart,
+  };
 }
 
 async function runList(context: CommandContext): Promise<void> {
@@ -400,7 +442,10 @@ function printHelp(): void {
   pubmd claim <namespace> [--api-base <url>]
   pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
-  pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]`);
+  pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
+
+  publish accepts a .md or .html file. HTML pages have their local CSS, JS,
+  images and fonts inlined into a single self-contained page before upload.`);
 }
 
 main().catch((error: unknown) => {

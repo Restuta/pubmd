@@ -9,6 +9,8 @@ export const NameSchema = z
 
 export const VisibilitySchema = z.enum(["public", "unlisted", "private"]);
 
+export const PageKindSchema = z.enum(["markdown", "html"]);
+
 export const FrontmatterSchema = z
   .object({
     title: z.string().trim().min(1).max(200).optional(),
@@ -26,11 +28,31 @@ export const ClaimNamespaceResponseSchema = z.object({
 });
 
 export const PublishPageRequestSchema = z.object({
+  kind: z.literal("markdown").optional(),
   markdown: z.string().min(1),
   renderMarkdown: z.string().min(1).optional(),
   slug: NameSchema.optional(),
   pageId: z.string().uuid().optional(),
 });
+
+export const PublishHtmlRequestSchema = z.object({
+  kind: z.literal("html"),
+  /** The HTML as authored (kept for `?raw` and re-editing). */
+  source: z.string().min(1),
+  /** Self-contained HTML to serve. When omitted, `source` is served verbatim. */
+  document: z.string().min(1).optional(),
+  title: z.string().trim().min(1).max(200).optional(),
+  description: z.string().trim().min(1).max(300).optional(),
+  noindex: z.boolean().optional(),
+  slug: NameSchema.optional(),
+  pageId: z.string().uuid().optional(),
+});
+
+/** A publish request is either markdown (default) or html, discriminated by `kind`. */
+export const PublishRequestSchema = z.union([
+  PublishHtmlRequestSchema,
+  PublishPageRequestSchema,
+]);
 
 export const PublishedPageSchema = z.object({
   pageId: z.string().uuid(),
@@ -48,6 +70,8 @@ export const StoredPageSchema = z.object({
   pageId: z.string().uuid(),
   namespace: NameSchema,
   slug: NameSchema,
+  // Pages stored before HTML publishing existed have no `kind`; treat them as markdown.
+  kind: PageKindSchema.default("markdown"),
   title: z.string().min(1),
   description: z.string(),
   visibility: VisibilitySchema,
@@ -89,5 +113,8 @@ export type ListPagesResponse = z.infer<typeof ListPagesResponseSchema>;
 export type NamespaceRecord = z.infer<typeof NamespaceRecordSchema>;
 export type PublishedPage = z.infer<typeof PublishedPageSchema>;
 export type PublishPageRequest = z.infer<typeof PublishPageRequestSchema>;
+export type PublishHtmlRequest = z.infer<typeof PublishHtmlRequestSchema>;
+export type PublishRequest = z.infer<typeof PublishRequestSchema>;
+export type PageKind = z.infer<typeof PageKindSchema>;
 export type StoredPage = z.infer<typeof StoredPageSchema>;
 export type Visibility = z.infer<typeof VisibilitySchema>;
