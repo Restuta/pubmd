@@ -34,6 +34,40 @@ export interface RenderedPageDocument {
   renderedMarkdown: string;
 }
 
+export interface HeadingPosition {
+  id: string;
+  top: number;
+}
+
+export const TOC_ACTIVE_OFFSET_PX = 120;
+
+export function getActiveHeadingId(
+  headings: ReadonlyArray<HeadingPosition>,
+  activationOffset = TOC_ACTIVE_OFFSET_PX,
+  isNearPageEnd = false,
+): string {
+  if (headings.length === 0) {
+    return "";
+  }
+
+  if (isNearPageEnd) {
+    return headings.at(-1)?.id ?? "";
+  }
+
+  let activeId = headings[0]?.id ?? "";
+
+  for (const heading of headings) {
+    if (heading.top <= activationOffset) {
+      activeId = heading.id;
+      continue;
+    }
+
+    break;
+  }
+
+  return activeId;
+}
+
 interface HtmlRootNode {
   type: "root";
   children: HtmlNode[];
@@ -629,7 +663,9 @@ export function buildHtmlDocument(input: {
           (heading.textContent || '').trim() === pageTitle
         );
       });
-      const headingLevels = bodyHeadings.map((heading) => Number(heading.tagName.slice(1)));
+      const headingLevels = bodyHeadings.map((heading) =>
+        Number(heading.tagName.slice(1)),
+      );
       const rootLevel =
         headingLevels.length > 0 ? Math.min(...headingLevels) : null;
       const childLevel =
@@ -690,14 +726,45 @@ export function buildHtmlDocument(input: {
         wrap.appendChild(nav);
         document.body.appendChild(wrap);
         let activeId = '';
-        const obs = new IntersectionObserver(entries => {
-          entries.forEach(e => { if (e.isIntersecting) activeId = e.target.id; });
+        let syncFrame = 0;
+        const setActive = id => {
+          if (!id || id === activeId) return;
+          activeId = id;
           lineEls.forEach(l => l.classList.toggle('active', l.dataset.id === activeId));
           nav.querySelectorAll('a').forEach(a => {
             a.classList.toggle('active', a.getAttribute('href') === '#' + activeId);
           });
-        }, { rootMargin: '-10% 0px -80% 0px' });
-        headings.forEach(h => obs.observe(h));
+        };
+        const syncActiveHeading = () => {
+          syncFrame = 0;
+          const isNearPageEnd =
+            window.innerHeight + window.scrollY >=
+            document.documentElement.scrollHeight - 4;
+          let nextActiveId = isNearPageEnd
+            ? headings.at(-1)?.id ?? ''
+            : headings[0]?.id ?? '';
+          if (!isNearPageEnd) {
+            headings.forEach(h => {
+              if (h.getBoundingClientRect().top <= ${TOC_ACTIVE_OFFSET_PX}) {
+                nextActiveId = h.id;
+              }
+            });
+          }
+          setActive(nextActiveId);
+        };
+        const queueActiveSync = () => {
+          if (syncFrame !== 0) return;
+          syncFrame = window.requestAnimationFrame(syncActiveHeading);
+        };
+        nav.querySelectorAll('a').forEach(a => {
+          a.addEventListener('click', () => {
+            const targetId = a.getAttribute('href')?.slice(1);
+            if (targetId) setActive(targetId);
+          });
+        });
+        window.addEventListener('scroll', queueActiveSync, { passive: true });
+        window.addEventListener('resize', queueActiveSync);
+        queueActiveSync();
       }
     </script>
   </body>
