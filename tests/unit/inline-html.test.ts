@@ -218,4 +218,17 @@ describe("inlineHtmlAssets", () => {
     // exactly one real closing tag remains (the wrapper's)
     expect(html.match(/<\/script>/g) ?? []).toHaveLength(1);
   });
+
+  it("stops inlining once the total byte cap is reached", async () => {
+    const baseDir = await workspace({ "a.svg": SVG, "b.svg": SVG });
+    const { html, skipped } = await inlineHtmlAssets(
+      '<img src="a.svg"><img src="b.svg">',
+      { baseDir, maxTotalBytes: SVG.length + 10 },
+    );
+
+    // first fits under the cap; the second pushes over it and is left as a reference
+    expect(html.match(/data:image\/svg\+xml;base64,/g) ?? []).toHaveLength(1);
+    expect(html).toContain('src="b.svg"');
+    expect(skipped).toEqual([{ ref: "b.svg", reason: "total-cap" }]);
+  });
 });

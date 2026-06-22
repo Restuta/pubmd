@@ -3,6 +3,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import pkg from "../../package.json" with { type: "json" };
 import {
   ClaimNamespaceResponseSchema,
   ListPagesResponseSchema,
@@ -44,6 +45,11 @@ async function main(): Promise<void> {
 
   if (argv.length === 0 || argv[0] === "help" || argv[0] === "--help") {
     printHelp();
+    return;
+  }
+
+  if (argv[0] === "version" || argv[0] === "--version" || argv[0] === "-v") {
+    console.log(pkg.version);
     return;
   }
 
@@ -443,6 +449,7 @@ function printHelp(): void {
   pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
   pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
+  pubmd version
 
   publish accepts a .md or .html file. HTML pages have their local CSS, JS,
   images and fonts inlined into a single self-contained page before upload.`);

@@ -172,6 +172,7 @@ This is the body.`,
 
     const rawResponse = await fetch(`${published.url}?raw=1`);
     expect(rawResponse.headers.get("content-type")).toContain("text/plain");
+    expect(rawResponse.headers.get("x-content-type-options")).toBe("nosniff");
     expect(await rawResponse.text()).toBe(htmlDocument);
 
     // a markdown page on the same server must NOT carry the sandbox headers

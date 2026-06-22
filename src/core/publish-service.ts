@@ -214,6 +214,9 @@ export function createPublishService(
       JSON.stringify({
         kind: "html",
         document: htmlDocument,
+        // include source so a republish that changes the raw source (served at ?raw)
+        // is never treated as a no-op even if the rendered document is unchanged
+        source,
         slug: safeSlug,
         title,
         description,

@@ -58,29 +58,31 @@ Default behavior (Windows):
 ## Quick Start
 
 ```bash
-# Claim your namespace
-node dist/src/cli/main.js claim myname --api-base https://bul.sh
+# Claim your namespace (saves the API base to your config, so later commands don't need it)
+pubmd claim myname --api-base https://bul.sh
 
 # Publish markdown
-node dist/src/cli/main.js publish notes.md --api-base https://bul.sh
+pubmd publish notes.md
 # → https://bul.sh/myname/notes
 
 # Publish an HTML page (local CSS/JS/images/fonts are inlined into one self-contained page)
-node dist/src/cli/main.js publish dashboard.html --api-base https://bul.sh
+pubmd publish dashboard.html
 # → https://u.bul.sh/myname/dashboard
 
 # Re-publish (same URL, updated content)
-node dist/src/cli/main.js publish notes.md --api-base https://bul.sh
+pubmd publish notes.md
 
 # Pipe from stdin
-cat report.md | node dist/src/cli/main.js publish --slug weekly-report --namespace myname --api-base https://bul.sh
+cat report.md | pubmd publish --slug weekly-report --namespace myname
 
 # List your pages
-node dist/src/cli/main.js list --namespace myname --api-base https://bul.sh
+pubmd list --namespace myname
 
 # Delete a page
-node dist/src/cli/main.js remove weekly-report --namespace myname --api-base https://bul.sh
+pubmd remove weekly-report --namespace myname
 ```
+
+> Running from source instead of an install? Swap `pubmd` for `node dist/src/cli/main.js`.
 
 
 ## Publishing HTML

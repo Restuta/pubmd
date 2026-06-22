@@ -251,6 +251,8 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
             page.kind === "html"
               ? "text/plain; charset=utf-8"
               : "text/markdown; charset=utf-8",
+          // never let a browser sniff raw user source into an executable type
+          "x-content-type-options": "nosniff",
         });
       }
 
