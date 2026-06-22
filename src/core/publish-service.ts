@@ -355,8 +355,11 @@ export function createPublishService(
         return null;
       }
 
+      // A pageId that belongs to another namespace is "not found" for this caller —
+      // 404, not 401. (401 would both imply the caller's token failed and let anyone
+      // probe which pageIds exist across namespaces by status code.)
       if (byId.namespace !== namespace) {
-        throw new AuthenticationError();
+        throw new PageNotFoundError(namespace, slug);
       }
 
       const slugOwner = await repository.findPageBySlug(namespace, slug);
