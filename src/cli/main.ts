@@ -17,6 +17,15 @@ import {
   saveConfig,
   saveMapping,
 } from "./config.js";
+import {
+  findVaultManifestEntry,
+  findVaultRoot,
+  getVaultManifestPath,
+  loadVaultManifest,
+  normalizeVaultRelativePath,
+  saveVaultManifest,
+  upsertVaultManifestEntry,
+} from "./vault-manifest.js";
 
 interface CommandContext {
   args: string[];
@@ -91,17 +100,38 @@ async function runClaim(context: CommandContext): Promise<void> {
 async function runPublish(context: CommandContext): Promise<void> {
   const { positional, options } = splitArgs(context.args);
   const filePath = positional[0];
+  const absoluteFilePath =
+    filePath === undefined ? undefined : path.resolve(filePath);
   const config = await loadConfig();
   const apiBase = resolveApiBase(config, options["api-base"]);
   const mapping = await loadMapping();
-  const mappingKey =
-    filePath === undefined
+  const vaultRoot =
+    absoluteFilePath === undefined
+      ? null
+      : await findVaultRoot(path.dirname(absoluteFilePath));
+  const vaultManifestPath =
+    vaultRoot === null ? null : getVaultManifestPath(vaultRoot);
+  const vaultSourcePath =
+    absoluteFilePath === undefined || vaultRoot === null
       ? undefined
-      : path.relative(process.cwd(), path.resolve(filePath));
+      : normalizeVaultRelativePath(path.relative(vaultRoot, absoluteFilePath));
+  const vaultManifest =
+    vaultManifestPath === null
+      ? null
+      : await loadVaultManifest(vaultManifestPath);
+  const manifestEntry =
+    vaultManifest === null || vaultSourcePath === undefined
+      ? undefined
+      : findVaultManifestEntry(vaultManifest, vaultSourcePath);
+  const mappingKey =
+    absoluteFilePath === undefined
+      ? undefined
+      : path.relative(process.cwd(), absoluteFilePath);
   const existingMapping =
     mappingKey === undefined ? undefined : mapping.files[mappingKey];
+  const existingPage = manifestEntry ?? existingMapping;
   const namespace =
-    options.namespace ?? existingMapping?.namespace ?? config.defaultNamespace;
+    options.namespace ?? existingPage?.namespace ?? config.defaultNamespace;
 
   if (namespace === undefined) {
     throw new Error(
@@ -116,13 +146,13 @@ async function runPublish(context: CommandContext): Promise<void> {
   }
 
   const markdown =
-    filePath === undefined
+    absoluteFilePath === undefined
       ? await readStdin()
-      : await readFile(path.resolve(filePath), "utf8");
+      : await readFile(absoluteFilePath, "utf8");
   const renderMarkdown =
-    filePath === undefined
+    absoluteFilePath === undefined
       ? undefined
-      : await buildRenderMarkdown(markdown, path.resolve(filePath));
+      : await buildRenderMarkdown(markdown, absoluteFilePath);
   const response = await fetch(
     `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages/publish`,
     {
@@ -134,10 +164,12 @@ async function runPublish(context: CommandContext): Promise<void> {
       body: JSON.stringify({
         markdown,
         ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
-        ...(options.slug === undefined ? {} : { slug: options.slug }),
-        ...(existingMapping?.pageId === undefined
+        ...((options.slug ?? existingPage?.slug) === undefined
           ? {}
-          : { pageId: existingMapping.pageId }),
+          : { slug: options.slug ?? existingPage?.slug }),
+        ...(existingPage?.pageId === undefined
+          ? {}
+          : { pageId: existingPage.pageId }),
       }),
     },
   );
@@ -156,6 +188,23 @@ async function runPublish(context: CommandContext): Promise<void> {
       url: published.url,
     };
     await saveMapping(mapping);
+  }
+
+  if (
+    vaultManifest !== null &&
+    vaultManifestPath !== null &&
+    vaultSourcePath !== undefined
+  ) {
+    const nextManifest = upsertVaultManifestEntry(vaultManifest, {
+      namespace: published.namespace,
+      pageId: published.pageId,
+      slug: published.slug,
+      source: vaultSourcePath,
+      title: published.title,
+      updatedAt: new Date().toISOString(),
+      url: published.url,
+    });
+    await saveVaultManifest(nextManifest, vaultManifestPath);
   }
 
   console.log(published.url);
