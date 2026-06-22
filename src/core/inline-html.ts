@@ -8,13 +8,15 @@ export interface InlineHtmlOptions {
   baseDir: string;
   /** Largest single asset (raw bytes, pre-base64) to inline. Defaults to 2 MiB. */
   maxAssetBytes?: number;
+  /** Total raw bytes to inline across the whole page. Defaults to 10 MiB. */
+  maxTotalBytes?: number;
   /** Inline local `<script src>` contents. Defaults to true; false strips all scripts. */
   allowScripts?: boolean;
 }
 
 export interface SkippedAsset {
   ref: string;
-  reason: "absolute-path" | "not-found" | "too-large";
+  reason: "absolute-path" | "not-found" | "too-large" | "total-cap";
 }
 
 export interface InlineHtmlResult {
@@ -28,12 +30,15 @@ export interface InlineHtmlResult {
 interface InlineContext {
   baseDir: string;
   maxAssetBytes: number;
+  maxTotalBytes: number;
   allowScripts: boolean;
   inlinedCount: number;
+  totalBytes: number;
   skipped: SkippedAsset[];
 }
 
 const DEFAULT_MAX_ASSET_BYTES = 2 * 1024 * 1024;
+const DEFAULT_MAX_TOTAL_BYTES = 10 * 1024 * 1024;
 const MAX_IMPORT_DEPTH = 3;
 
 /**
@@ -49,8 +54,10 @@ export async function inlineHtmlAssets(
   const context: InlineContext = {
     baseDir: options.baseDir,
     maxAssetBytes: options.maxAssetBytes ?? DEFAULT_MAX_ASSET_BYTES,
+    maxTotalBytes: options.maxTotalBytes ?? DEFAULT_MAX_TOTAL_BYTES,
     allowScripts: options.allowScripts ?? true,
     inlinedCount: 0,
+    totalBytes: 0,
     skipped: [],
   };
 
@@ -412,6 +419,12 @@ async function readBinaryAsset(
       return null;
     }
 
+    if (context.totalBytes + buffer.byteLength > context.maxTotalBytes) {
+      record(context, ref, "total-cap");
+      return null;
+    }
+
+    context.totalBytes += buffer.byteLength;
     return buffer;
   } catch {
     record(context, ref, "not-found");
