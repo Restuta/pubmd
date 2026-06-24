@@ -1,5 +1,6 @@
 import matter from "gray-matter";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
@@ -169,11 +170,17 @@ export async function renderMarkdownToHtml(
       src: [...(defaultSchema.protocols?.["src"] ?? []), "data"],
     },
   };
+  // Raw HTML authored in the markdown (e.g. <details>/<summary>) is parsed back
+  // into real hast elements by rehypeRaw, then immediately sanitized down to the
+  // safe GitHub subset. The raw -> sanitize ordering is load-bearing: rehypeRaw
+  // must run before rehypeSanitize so that unsafe tags/attributes are stripped
+  // after parsing, never served verbatim.
   const rawHtml = String(
     await unified()
       .use(remarkParse)
       .use(remarkGfm)
-      .use(remarkRehype)
+      .use(remarkRehype, { allowDangerousHtml: true })
+      .use(rehypeRaw)
       .use(rehypeSanitize, sanitizeSchema)
       .use(rehypeObsidianCallouts)
       .use(rehypeHeadingIds)
@@ -355,6 +362,23 @@ export function buildHtmlDocument(input: {
       blockquote p:first-child { margin-top: 0; }
       blockquote p:last-child { margin-bottom: 0; }
       blockquote strong { color: inherit; font-style: normal; }
+
+      /* Author-written <details>/<summary> collapsibles (not Obsidian callouts) */
+      details:not(.callout) {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.4rem 1rem;
+        background: var(--surface);
+      }
+      details:not(.callout) > summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--fg-heading);
+      }
+      details:not(.callout)[open] > summary {
+        margin-bottom: 0.75rem;
+      }
+      details:not(.callout) > :last-child { margin-bottom: 0; }
 
       .callout {
         --callout-color: 68, 138, 255;
