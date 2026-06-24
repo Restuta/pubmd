@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { runInNewContext } from "node:vm";
 import { describe, expect, it } from "vitest";
 
@@ -385,6 +387,76 @@ Stores raw .md + pre-rendered .html
     expect(rendered.html).toContain("<strong>strong formatting</strong>");
     expect(rendered.html).toContain("<ul>");
     expect(rendered.html).toContain("<li>first item</li>");
+  });
+});
+
+describe("raw HTML in markdown", () => {
+  it("preserves author-written <details>/<summary> with nested markdown (fixture)", async () => {
+    const fixture = await readFile(
+      fileURLToPath(new URL("../fixtures/details-summary.md", import.meta.url)),
+      "utf8",
+    );
+    const rendered = await renderMarkdownToHtml(fixture);
+
+    // Collapsible wrapper survives rendering.
+    expect(rendered.html).toContain("<details>");
+    expect(rendered.html).toContain("</details>");
+    expect(rendered.html).toContain("<summary>Click me</summary>");
+    // Markdown inside the details block still renders.
+    expect(rendered.html).toMatch(
+      /<h2 id="nested-heading">Nested heading<\/h2>/,
+    );
+    expect(rendered.html).toContain("<li>Bullet</li>");
+    expect(rendered.html).toContain("<li>Another bullet</li>");
+  });
+
+  it("keeps the safe open attribute on <details>", async () => {
+    const rendered = await renderMarkdownToHtml(`
+<details open>
+<summary>Already expanded</summary>
+
+Body copy.
+
+</details>
+`);
+
+    expect(rendered.html).toContain("<details open>");
+    expect(rendered.html).toContain("<summary>Already expanded</summary>");
+  });
+
+  it("strips unsafe tags and attributes while keeping safe HTML", async () => {
+    const rendered = await renderMarkdownToHtml(`
+# Heading
+
+<details onclick="steal()">
+<summary>Trustworthy</summary>
+
+<script>alert('xss')</script>
+<iframe src="https://evil.example"></iframe>
+<img src="x" onerror="alert(1)">
+
+Safe paragraph with <kbd>Ctrl</kbd>.
+
+</details>
+`);
+
+    // Safe subset is preserved.
+    expect(rendered.html).toContain("<details>");
+    expect(rendered.html).toContain("<summary>Trustworthy</summary>");
+    expect(rendered.html).toContain("<kbd>Ctrl</kbd>");
+    // Unsafe tags/attributes are removed.
+    expect(rendered.html).not.toContain("<script");
+    expect(rendered.html).not.toContain("<iframe");
+    expect(rendered.html).not.toContain("onclick");
+    expect(rendered.html).not.toContain("onerror");
+  });
+
+  it("neutralizes javascript: protocol links written as raw HTML", async () => {
+    const rendered = await renderMarkdownToHtml(
+      `<a href="javascript:alert(1)">click</a>`,
+    );
+
+    expect(rendered.html).not.toContain("javascript:");
   });
 });
 

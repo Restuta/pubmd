@@ -189,6 +189,36 @@ Today:
 - `title`, `slug`, `description`, and `noindex` affect rendered output/metadata
 - `visibility` and `draft` are stored as page metadata, but are not yet enforced in listing/access rules
 
+## Inline HTML
+
+pubmd renders GFM markdown and also supports a **safe subset of raw HTML** written
+directly in your markdown — the same allowlist GitHub uses (via `rehype-sanitize`).
+This means common authoring tags survive rendering, including collapsible sections:
+
+```markdown
+<details>
+<summary>Click to expand</summary>
+
+## Markdown still works in here
+
+- nested lists
+- **bold**, `code`, links
+
+</details>
+```
+
+Leave a blank line after `<summary>` so the content between the tags is parsed as
+markdown. Tags such as `<details>`, `<summary>`, `<kbd>`, `<sub>`, `<sup>`, `<mark>`,
+`<abbr>`, and basic block/inline formatting are preserved.
+
+Anything outside the safe subset is stripped on render, by design:
+- Unsafe tags (`<script>`, `<style>`, `<iframe>`, `<object>`, …) are removed.
+- Inline event handlers (`onclick`, `onerror`, …) and `javascript:` URLs are removed.
+- Only known-safe attributes are kept (e.g. `open` on `<details>`).
+
+The raw markdown you publish is stored verbatim; sanitization applies only to the
+rendered HTML that is served.
+
 ## How It Works
 
 ```
