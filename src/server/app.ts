@@ -144,6 +144,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                 ...(body.document === undefined
                   ? {}
                   : { document: body.document }),
+                ...(body.reviewAnnotations === undefined
+                  ? {}
+                  : { reviewAnnotations: body.reviewAnnotations }),
                 ...(body.title === undefined ? {} : { title: body.title }),
                 ...(body.description === undefined
                   ? {}
@@ -163,6 +166,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                 ...(body.renderMarkdown === undefined
                   ? {}
                   : { renderMarkdown: body.renderMarkdown }),
+                ...(body.reviewAnnotations === undefined
+                  ? {}
+                  : { reviewAnnotations: body.reviewAnnotations }),
                 ...(body.slug === undefined
                   ? {}
                   : { requestedSlug: body.slug }),

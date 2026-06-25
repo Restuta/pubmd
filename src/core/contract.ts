@@ -31,6 +31,7 @@ export const PublishPageRequestSchema = z.object({
   kind: z.literal("markdown").optional(),
   markdown: z.string().min(1),
   renderMarkdown: z.string().min(1).optional(),
+  reviewAnnotations: z.boolean().optional(),
   slug: NameSchema.optional(),
   pageId: z.string().uuid().optional(),
 });
@@ -41,6 +42,7 @@ export const PublishHtmlRequestSchema = z.object({
   source: z.string().min(1),
   /** Self-contained HTML to serve. When omitted, `source` is served verbatim. */
   document: z.string().min(1).optional(),
+  reviewAnnotations: z.boolean().optional(),
   title: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().min(1).max(300).optional(),
   noindex: z.boolean().optional(),

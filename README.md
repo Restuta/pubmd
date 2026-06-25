@@ -69,6 +69,9 @@ pubmd publish notes.md
 pubmd publish dashboard.html
 # → https://u.bul.sh/myname/dashboard
 
+# Publish a reviewable page with inline comments and an export prompt
+pubmd publish report.html --review
+
 # Re-publish (same URL, updated content)
 pubmd publish notes.md
 
@@ -106,6 +109,32 @@ Remote references (`https://…`, protocol-relative) and existing `data:` URLs a
 **Where it's served:** user HTML is served from the dedicated origin [`u.bul.sh`](https://u.bul.sh) with `Content-Security-Policy: sandbox` — scripts run, but in an opaque origin with no access to `bul.sh` cookies/storage or other pages. A request to the `bul.sh` apex for an HTML page redirects to `u.bul.sh`. Markdown keeps rendering and serving from `bul.sh`.
 
 > Multi-page sites (a folder of `.html` files) aren't hosted yet — v1 publishes one self-contained page per `publish`.
+
+## Review Annotations
+
+Use review mode when you want to share a page, let someone comment directly on
+paragraphs or selected text, then copy one prompt that contains every annotation
+and enough location context to apply the feedback later.
+
+```bash
+pubmd publish report.html --review
+pubmd publish report.md --review
+```
+
+You can also opt in from the document itself:
+
+```yaml
+---
+review: true
+---
+```
+
+```html
+<meta name="pubmd:review" content="true">
+```
+
+Review mode is injected only into the served page. The raw markdown or HTML
+available through `?raw` stays unchanged.
 
 ## For AI Agents
 
@@ -240,7 +269,7 @@ Pages are pre-rendered on publish. On Vercel, the first read may hit the app, bu
 
 ```
 node dist/src/cli/main.js claim <namespace>                                 Claim a namespace, get API token
-node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>]  Publish or update a page
+node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>] [--review]  Publish or update a page
 node dist/src/cli/main.js list [--namespace <n>]                             List your published pages
 node dist/src/cli/main.js remove <slug> [--namespace <n>]                    Delete a page
 ```
