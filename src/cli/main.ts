@@ -12,6 +12,10 @@ import {
 import { inlineHtmlAssets } from "../core/inline-html.js";
 import { parseMarkdownDocument } from "../core/markdown.js";
 import { prepareMarkdownBodyForPublish } from "../core/publish-markdown.js";
+import {
+  hasReviewAnnotationsOptIn,
+  injectReviewAnnotations,
+} from "../core/review-annotations.js";
 import { slugify } from "../core/slug.js";
 import {
   loadConfig,
@@ -37,6 +41,7 @@ interface CommandContext {
 interface CliOptions {
   "api-base"?: string;
   namespace?: string;
+  review?: boolean;
   slug?: string;
 }
 
@@ -156,10 +161,21 @@ async function runPublish(context: CommandContext): Promise<void> {
   const slug = options.slug ?? existingPage?.slug;
   const pageIdPart =
     existingPage?.pageId === undefined ? {} : { pageId: existingPage.pageId };
+  const reviewAnnotations = options.review === true;
   const requestBody =
     absoluteFilePath !== undefined && /\.html?$/i.test(absoluteFilePath)
-      ? await buildHtmlRequestBody(absoluteFilePath, slug, pageIdPart)
-      : await buildMarkdownRequestBody(absoluteFilePath, slug, pageIdPart);
+      ? await buildHtmlRequestBody(
+          absoluteFilePath,
+          slug,
+          pageIdPart,
+          reviewAnnotations,
+        )
+      : await buildMarkdownRequestBody(
+          absoluteFilePath,
+          slug,
+          pageIdPart,
+          reviewAnnotations,
+        );
 
   const response = await fetch(
     `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages/publish`,
@@ -225,6 +241,7 @@ async function buildMarkdownRequestBody(
   absoluteFilePath: string | undefined,
   slug: string | undefined,
   pageIdPart: { pageId?: string },
+  reviewAnnotations: boolean,
 ): Promise<Record<string, unknown>> {
   const markdown =
     absoluteFilePath === undefined
@@ -238,6 +255,7 @@ async function buildMarkdownRequestBody(
   return {
     markdown,
     ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
+    ...(reviewAnnotations ? { reviewAnnotations: true } : {}),
     ...(slug === undefined ? {} : { slug }),
     ...pageIdPart,
   };
@@ -247,11 +265,19 @@ async function buildHtmlRequestBody(
   absoluteFilePath: string,
   slug: string | undefined,
   pageIdPart: { pageId?: string },
+  reviewAnnotations: boolean,
 ): Promise<Record<string, unknown>> {
   const source = await readFile(absoluteFilePath, "utf8");
   const inlined = await inlineHtmlAssets(source, {
     baseDir: path.dirname(absoluteFilePath),
   });
+  const shouldInjectReview =
+    reviewAnnotations ||
+    hasReviewAnnotationsOptIn(source) ||
+    hasReviewAnnotationsOptIn(inlined.html);
+  const document = shouldInjectReview
+    ? injectReviewAnnotations(inlined.html)
+    : inlined.html;
 
   for (const item of inlined.skipped) {
     console.error(`skipped ${item.ref} (${item.reason})`);
@@ -264,7 +290,8 @@ async function buildHtmlRequestBody(
   return {
     kind: "html",
     source,
-    document: inlined.html,
+    document,
+    ...(shouldInjectReview ? { reviewAnnotations: true } : {}),
     slug: slug ?? fallbackSlug,
     ...pageIdPart,
   };
@@ -418,6 +445,11 @@ function splitArgs(argumentsList: string[]): {
       throw new Error(`Unknown option: --${key}`);
     }
 
+    if (key === "review") {
+      options.review = true;
+      continue;
+    }
+
     if (value === undefined || value.startsWith("--")) {
       throw new Error(`Expected value after ${current}`);
     }
@@ -430,7 +462,12 @@ function splitArgs(argumentsList: string[]): {
 }
 
 function isCliOptionKey(value: string): value is keyof CliOptions {
-  return value === "api-base" || value === "namespace" || value === "slug";
+  return (
+    value === "api-base" ||
+    value === "namespace" ||
+    value === "review" ||
+    value === "slug"
+  );
 }
 
 async function readStdin(): Promise<string> {
@@ -446,7 +483,7 @@ async function readStdin(): Promise<string> {
 function printHelp(): void {
   console.log(`Usage:
   pubmd claim <namespace> [--api-base <url>]
-  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--api-base <url>]
+  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--review] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
   pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
   pubmd version

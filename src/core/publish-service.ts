@@ -20,6 +20,10 @@ import {
   type PublishRepository,
   SlugConflictError,
 } from "./repository.js";
+import {
+  hasReviewAnnotationsOptIn,
+  injectReviewAnnotations,
+} from "./review-annotations.js";
 import { ensureName, slugify } from "./slug.js";
 
 export interface PublishPageInput {
@@ -30,6 +34,7 @@ export interface PublishPageInput {
   // html pages
   source?: string;
   document?: string;
+  reviewAnnotations?: boolean;
   title?: string;
   description?: string;
   noindex?: boolean;
@@ -126,10 +131,16 @@ export function createPublishService(
       noindex: parsed.noindex,
       bodyHtml: rendered.html,
     });
+    const servedHtmlDocument =
+      input.reviewAnnotations === true ||
+      isReviewFrontmatterOptIn(parsed.frontmatter)
+        ? injectReviewAnnotations(htmlDocument)
+        : htmlDocument;
     const contentHash = sha256(
       JSON.stringify({
         markdown,
         renderMarkdown,
+        htmlDocument: servedHtmlDocument,
         slug,
         title: parsed.title,
         description: parsed.description,
@@ -168,7 +179,7 @@ export function createPublishService(
           key: markdownBlobKey,
         },
         {
-          content: htmlDocument,
+          content: servedHtmlDocument,
           key: htmlBlobKey,
         },
       );
@@ -194,7 +205,14 @@ export function createPublishService(
     input: PublishPageInput,
   ): Promise<PublishedPage> {
     const source = input.source ?? "";
-    const htmlDocument = input.document ?? source;
+    const document = input.document ?? source;
+    const shouldInjectReview =
+      input.reviewAnnotations === true ||
+      hasReviewAnnotationsOptIn(source) ||
+      hasReviewAnnotationsOptIn(document);
+    const htmlDocument = shouldInjectReview
+      ? injectReviewAnnotations(document)
+      : document;
     const meta = extractHtmlMeta(htmlDocument);
     const title = input.title ?? meta.title ?? "Untitled";
     const description = input.description ?? meta.description ?? "";
@@ -383,4 +401,14 @@ export function createPublishService(
     readMarkdown,
     removePage,
   };
+}
+
+function isReviewFrontmatterOptIn(
+  frontmatter: Record<string, unknown>,
+): boolean {
+  const review = frontmatter["review"];
+  return (
+    review === true ||
+    (typeof review === "string" && review.toLowerCase() === "true")
+  );
 }

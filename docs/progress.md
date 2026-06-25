@@ -17,3 +17,4 @@
 - 2026-03-19: Adopted the pragmatic Vercel production read path: serve pre-rendered HTML through Hono with aggressive edge-cache headers so subsequent reads are CDN hits while content remains stored in Blob.
 - 2026-03-27: Added vault-aware publish state for Obsidian repos. `pubmd publish` now detects the nearest `.obsidian/` root, writes `.pubmd/pages.toml` with vault-relative source mappings, and reuses that manifest to keep republish behavior stable across working directories.
 - 2026-04-03: Added Obsidian-style callout rendering with aliases, collapsible `+`/`-` support, and type-specific styling. Verified with `npm run verify` and local browser QA screenshots.
+- 2026-06-25: Added opt-in review annotations for published markdown/HTML pages. `--review`, markdown `review: true`, or HTML `<meta name="pubmd:review" content="true">` injects inline comments, hover targeting, per-comment deletion, and a copyable feedback prompt while preserving raw source.

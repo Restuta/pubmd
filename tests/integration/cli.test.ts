@@ -388,6 +388,151 @@ Updated body.
       '<link rel="stylesheet" href="css/app.css">',
     );
   });
+
+  it("publishes HTML with opt-in review annotations while preserving raw source", async () => {
+    const root = await mkdtemp(
+      path.join(os.tmpdir(), "publish-it-cli-review-html-"),
+    );
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const pagePath = path.join(cwd, "review.html");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(
+      pagePath,
+      `<!doctype html>
+<html>
+  <head><title>Review HTML</title></head>
+  <body><main><p>Original HTML paragraph.</p></main></body>
+</html>
+`,
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publishResult = await runCli(
+      ["publish", pagePath, "--review", "--api-base", server.origin],
+      { cwd, env },
+    );
+    const pageUrl = publishResult.stdout.trim();
+
+    const htmlResponse = await fetch(pageUrl);
+    const html = await htmlResponse.text();
+    expect(html).toContain("data-pubmd-review-annotations");
+    expect(html).toContain('id="pubmdReviewToolbar"');
+    expect(html).toContain(">Clear all<");
+    expect(html).not.toContain("modeToggle");
+
+    const rawResponse = await fetch(`${pageUrl}?raw=1`);
+    const rawHtml = await rawResponse.text();
+    expect(rawHtml).toContain("Original HTML paragraph.");
+    expect(rawHtml).not.toContain("data-pubmd-review-annotations");
+  });
+
+  it("publishes HTML meta opt-in review annotations", async () => {
+    const root = await mkdtemp(
+      path.join(os.tmpdir(), "publish-it-cli-review-meta-"),
+    );
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const pagePath = path.join(cwd, "review-meta.html");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(
+      pagePath,
+      `<!doctype html>
+<html>
+  <head>
+    <title>Review Meta</title>
+    <meta name="pubmd:review" content="true">
+  </head>
+  <body><main><p>Meta opt-in paragraph.</p></main></body>
+</html>
+`,
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publishResult = await runCli(
+      ["publish", pagePath, "--api-base", server.origin],
+      { cwd, env },
+    );
+    const pageUrl = publishResult.stdout.trim();
+
+    const htmlResponse = await fetch(pageUrl);
+    const html = await htmlResponse.text();
+    expect(html).toContain("data-pubmd-review-annotations");
+    expect(html).toContain('id="pubmdReviewDrawer"');
+  });
+
+  it("publishes markdown frontmatter opt-in review annotations", async () => {
+    const root = await mkdtemp(
+      path.join(os.tmpdir(), "publish-it-cli-review-md-"),
+    );
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const notePath = path.join(cwd, "review-note.md");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(
+      notePath,
+      `---
+title: Review Note
+review: true
+---
+
+# Review Note
+
+Markdown paragraph for comments.
+`,
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publishResult = await runCli(
+      ["publish", notePath, "--api-base", server.origin],
+      { cwd, env },
+    );
+    const pageUrl = publishResult.stdout.trim();
+
+    const htmlResponse = await fetch(pageUrl);
+    const html = await htmlResponse.text();
+    expect(html).toContain("data-pubmd-review-annotations");
+    expect(html).toContain('id="pubmdReviewPopup"');
+
+    const rawResponse = await fetch(`${pageUrl}?raw=1`);
+    expect(await rawResponse.text()).toContain("review: true");
+  });
 });
 
 async function runCli(
