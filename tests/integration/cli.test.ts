@@ -389,7 +389,7 @@ Updated body.
     );
   });
 
-  it("publishes HTML with opt-in review annotations while preserving raw source", async () => {
+  it("publishes HTML with opt-in comments while preserving the clean URL and raw source", async () => {
     const root = await mkdtemp(
       path.join(os.tmpdir(), "publish-it-cli-review-html-"),
     );
@@ -421,19 +421,30 @@ Updated body.
     });
 
     const publishResult = await runCli(
-      ["publish", pagePath, "--review", "--api-base", server.origin],
+      ["publish", pagePath, "--comments", "--api-base", server.origin],
       { cwd, env },
     );
-    const pageUrl = publishResult.stdout.trim();
+    const commentsUrl = publishResult.stdout.trim();
+    const cleanUrl = cleanPublishedUrl(commentsUrl);
 
-    const htmlResponse = await fetch(pageUrl);
+    expect(commentsUrl).toBe(`${cleanUrl}?comments=1`);
+
+    const htmlResponse = await fetch(commentsUrl);
     const html = await htmlResponse.text();
     expect(html).toContain("data-pubmd-review-annotations");
     expect(html).toContain('id="pubmdReviewToolbar"');
+    expect(html).toContain("commentsEnabled()");
     expect(html).toContain(">Clear all<");
     expect(html).not.toContain("modeToggle");
 
-    const rawResponse = await fetch(`${pageUrl}?raw=1`);
+    const mapping = JSON.parse(await readFile(mappingPath, "utf8")) as {
+      files: Record<string, { url: string }>;
+    };
+    const mappedUrls = Object.values(mapping.files).map((entry) => entry.url);
+    expect(mappedUrls).toContain(cleanUrl);
+    expect(mappedUrls).not.toContain(commentsUrl);
+
+    const rawResponse = await fetch(`${cleanUrl}?raw=1`);
     const rawHtml = await rawResponse.text();
     expect(rawHtml).toContain("Original HTML paragraph.");
     expect(rawHtml).not.toContain("data-pubmd-review-annotations");
@@ -460,7 +471,7 @@ Updated body.
 <html>
   <head>
     <title>Review Meta</title>
-    <meta name="pubmd:review" content="true">
+    <meta name="pubmd:comments" content="true">
   </head>
   <body><main><p>Meta opt-in paragraph.</p></main></body>
 </html>
@@ -477,9 +488,12 @@ Updated body.
       ["publish", pagePath, "--api-base", server.origin],
       { cwd, env },
     );
-    const pageUrl = publishResult.stdout.trim();
+    const commentsUrl = publishResult.stdout.trim();
+    const cleanUrl = cleanPublishedUrl(commentsUrl);
 
-    const htmlResponse = await fetch(pageUrl);
+    expect(commentsUrl).toBe(`${cleanUrl}?comments=1`);
+
+    const htmlResponse = await fetch(commentsUrl);
     const html = await htmlResponse.text();
     expect(html).toContain("data-pubmd-review-annotations");
     expect(html).toContain('id="pubmdReviewDrawer"');
@@ -504,7 +518,7 @@ Updated body.
       notePath,
       `---
 title: Review Note
-review: true
+comments: true
 ---
 
 # Review Note
@@ -523,17 +537,26 @@ Markdown paragraph for comments.
       ["publish", notePath, "--api-base", server.origin],
       { cwd, env },
     );
-    const pageUrl = publishResult.stdout.trim();
+    const commentsUrl = publishResult.stdout.trim();
+    const cleanUrl = cleanPublishedUrl(commentsUrl);
 
-    const htmlResponse = await fetch(pageUrl);
+    expect(commentsUrl).toBe(`${cleanUrl}?comments=1`);
+
+    const htmlResponse = await fetch(commentsUrl);
     const html = await htmlResponse.text();
     expect(html).toContain("data-pubmd-review-annotations");
     expect(html).toContain('id="pubmdReviewPopup"');
 
-    const rawResponse = await fetch(`${pageUrl}?raw=1`);
-    expect(await rawResponse.text()).toContain("review: true");
+    const rawResponse = await fetch(`${cleanUrl}?raw=1`);
+    expect(await rawResponse.text()).toContain("comments: true");
   });
 });
+
+function cleanPublishedUrl(url: string): string {
+  const parsed = new URL(url);
+  parsed.search = "";
+  return parsed.toString();
+}
 
 async function runCli(
   args: string[],

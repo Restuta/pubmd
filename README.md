@@ -69,8 +69,9 @@ pubmd publish notes.md
 pubmd publish dashboard.html
 # → https://u.bul.sh/myname/dashboard
 
-# Publish a reviewable page with inline comments and an export prompt
-pubmd publish report.html --review
+# Publish a commentable page for review
+pubmd publish report.html --comments
+# → https://u.bul.sh/myname/report?comments=1
 
 # Re-publish (same URL, updated content)
 pubmd publish notes.md
@@ -110,31 +111,41 @@ Remote references (`https://…`, protocol-relative) and existing `data:` URLs a
 
 > Multi-page sites (a folder of `.html` files) aren't hosted yet — v1 publishes one self-contained page per `publish`.
 
-## Review Annotations
+## Review Comments
 
-Use review mode when you want to share a page, let someone comment directly on
-paragraphs or selected text, then copy one prompt that contains every annotation
-and enough location context to apply the feedback later.
+Use comment mode when you want to share a page, let someone comment directly on
+paragraphs or selected text, then copy one prompt that contains every comment and
+enough location context to apply the feedback later.
 
 ```bash
-pubmd publish report.html --review
-pubmd publish report.md --review
+pubmd publish report.html --comments
+pubmd publish report.md --comments
 ```
+
+When comments are enabled, the CLI prints a share URL with `?comments=1`.
+That URL opens the comment UI. Remove the query string and the same page reads
+normally, without the comment drawer or bottom controls.
 
 You can also opt in from the document itself:
 
 ```yaml
 ---
-review: true
+comments: true
 ---
 ```
 
 ```html
-<meta name="pubmd:review" content="true">
+<meta name="pubmd:comments" content="true">
 ```
 
-Review mode is injected only into the served page. The raw markdown or HTML
-available through `?raw` stays unchanged.
+Document opt-in is useful when the file itself should always be published as
+commentable. `review: true`, `<meta name="pubmd:review" content="true">`, and
+`--review` still work as legacy aliases, but `comments: true`,
+`pubmd:comments`, and `--comments` are preferred.
+
+Comment mode is injected only into the served page. The raw markdown or HTML
+available through `?raw` stays unchanged, and local `.pub` mappings keep the
+clean base URL.
 
 ## For AI Agents
 
@@ -147,6 +158,7 @@ A `/publish` skill is available. Usage:
 ```
 /publish report.md
 /publish report.md --slug weekly-report
+/publish report.md --comments
 ```
 
 Or add this to your project's `CLAUDE.md`:
@@ -154,6 +166,8 @@ Or add this to your project's `CLAUDE.md`:
 ```
 To share long-form output as a URL, use:
   pubmd publish <file.md> --api-base https://bul.sh
+For feedback/review docs where the recipient should leave inline comments, use:
+  pubmd publish <file.md> --comments --api-base https://bul.sh
 The command prints the live URL to stdout.
 ```
 
@@ -164,6 +178,8 @@ Add to `AGENTS.md` or system prompt:
 ```
 To publish markdown to a shareable URL:
   pubmd publish <file.md> --api-base https://bul.sh
+To publish a commentable review doc:
+  pubmd publish <file.md> --comments --api-base https://bul.sh
 To list published pages:
   pubmd list --api-base https://bul.sh
 ```
@@ -269,7 +285,7 @@ Pages are pre-rendered on publish. On Vercel, the first read may hit the app, bu
 
 ```
 node dist/src/cli/main.js claim <namespace>                                 Claim a namespace, get API token
-node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>] [--review]  Publish or update a page
+node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>] [--comments]  Publish or update a page
 node dist/src/cli/main.js list [--namespace <n>]                             List your published pages
 node dist/src/cli/main.js remove <slug> [--namespace <n>]                    Delete a page
 ```

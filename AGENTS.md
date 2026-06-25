@@ -26,6 +26,13 @@ To publish markdown to a shareable URL:
 pubmd publish <file.md> --api-base https://bul.sh
 ```
 
+To publish a feedback/review document where the recipient should leave inline comments:
+```bash
+pubmd publish <file.md> --comments --api-base https://bul.sh
+```
+
+Share the printed `?comments=1` URL for commenting. Removing the query string opens the same page without comment UI.
+
 To list published pages:
 ```bash
 pubmd list --api-base https://bul.sh

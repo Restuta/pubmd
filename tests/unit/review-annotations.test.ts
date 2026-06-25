@@ -23,7 +23,7 @@ describe("review annotations", () => {
   it("detects HTML meta opt-in", () => {
     expect(
       hasReviewAnnotationsOptIn(
-        '<html><head><meta name="pubmd:review" content="true"></head></html>',
+        '<html><head><meta name="pubmd:comments" content="true"></head></html>',
       ),
     ).toBe(true);
     expect(
@@ -48,6 +48,19 @@ describe("review annotations", () => {
     expect(html).toContain('id="pubmdReviewExport"');
     expect(html).toContain("What should change?");
     expect(html).toContain("window.name");
+    expect(html).toContain("function commentsEnabled()");
+    expect(html).toContain('var value = params.get("comments");');
+    expect(html).toContain("if (!commentsEnabled())");
+  });
+
+  it("hides comment chrome until the URL has comments=1", () => {
+    const html = injectReviewAnnotations(BASIC_HTML);
+
+    expect(html).toContain(".pubmd-review-root,");
+    expect(html).toContain(".pubmd-review-export {");
+    expect(html).toContain("display: none;");
+    expect(html).toContain("body.pubmd-review-active .pubmd-review-root");
+    expect(html).toContain('value === "1"');
   });
 
   it("does nothing when disabled by the caller", () => {
@@ -99,7 +112,7 @@ describe("review annotations", () => {
   it("initializes the in-memory fallback before loading annotations", () => {
     const html = injectReviewAnnotations(BASIC_HTML);
     const fallbackIndex = html.indexOf("var memoryAnnotations = [];");
-    const loadIndex = html.indexOf("var annotations = loadAnnotations();");
+    const loadIndex = html.indexOf("annotations = loadAnnotations();");
 
     expect(fallbackIndex).toBeGreaterThan(-1);
     expect(loadIndex).toBeGreaterThan(-1);

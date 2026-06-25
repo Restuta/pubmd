@@ -4,7 +4,10 @@ export function hasReviewAnnotationsOptIn(html: string): boolean {
   for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
     const name = getHtmlAttr(tag[0], "name");
 
-    if (name?.toLowerCase() !== "pubmd:review") {
+    if (
+      name?.toLowerCase() !== "pubmd:comments" &&
+      name?.toLowerCase() !== "pubmd:review"
+    ) {
       continue;
     }
 
@@ -99,6 +102,14 @@ function getHtmlAttr(tag: string, attrName: string): string | null {
 }
 
 const REVIEW_STYLES = `<style data-pubmd-review-style>
+  .pubmd-review-root,
+  .pubmd-review-export {
+    display: none;
+  }
+  body.pubmd-review-active .pubmd-review-root,
+  body.pubmd-review-active .pubmd-review-export {
+    display: block;
+  }
   body.pubmd-review-active main {
     cursor: crosshair;
   }
@@ -495,6 +506,13 @@ const REVIEW_STYLES = `<style data-pubmd-review-style>
     color: #66706b;
     font-size: 13px;
   }
+  @media (min-width: 961px) {
+    body.pubmd-review-drawer-space .pubmd-review-export {
+      margin-right: 394px;
+      margin-left: auto;
+      width: min(760px, calc(100vw - 460px));
+    }
+  }
   @media (max-width: 960px) {
     body.pubmd-review-drawer-space main {
       margin-right: auto;
@@ -522,8 +540,8 @@ const REVIEW_STYLES = `<style data-pubmd-review-style>
 </style>`;
 
 const REVIEW_EXPORT_SECTION = `<section class="pubmd-review-export" id="pubmdReviewExport" data-pubmd-review-export>
-  <h2>Review export</h2>
-  <p>Copy this prompt after adding comments. It includes the annotation JSON and target provenance.</p>
+  <h2>Comment export</h2>
+  <p>Copy this prompt after adding comments. It includes the comment JSON and target provenance.</p>
   <textarea id="pubmdReviewExportPrompt" readonly></textarea>
   <div class="pubmd-review-export-actions">
     <button id="pubmdReviewCopyPrompt" type="button">Copy prompt</button>
@@ -535,7 +553,7 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
 (function () {
   var STORAGE_KEY = "pubmd-review-annotations-v1";
   var memoryAnnotations = [];
-  var annotations = loadAnnotations();
+  var annotations = [];
   var pendingAnnotation = null;
   var editingId = null;
   var suppressClickUntil = 0;
@@ -568,6 +586,16 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
 
   function annotationArray(value) {
     return Array.isArray(value) ? value : [];
+  }
+
+  function commentsEnabled() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var value = params.get("comments");
+      return value === "1" || value === "true" || value === "yes";
+    } catch (error) {
+      return false;
+    }
   }
 
   function loadAnnotations() {
@@ -1023,14 +1051,14 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
 
   function buildPrompt() {
     return [
-      "Use these review annotations to update the published page.",
+      "Use these comments to update the published page.",
       "",
-      "Review page: " + pageUrl(),
-      "Annotation count: " + annotations.length,
+      "Comment page: " + pageUrl(),
+      "Comment count: " + annotations.length,
       "",
-      "Each annotation includes comment, selectedText when present, selection quote/prefix/suffix/offsets, targetSelector, elementPath, nearbyText, boundingBox, x/y, publishedAnchor, pageUrl, createdAt, and updatedAt.",
+      "Each comment includes comment text, selectedText when present, selection quote/prefix/suffix/offsets, targetSelector, elementPath, nearbyText, boundingBox, x/y, publishedAnchor, pageUrl, createdAt, and updatedAt.",
       "",
-      "Annotations JSON:",
+      "Comments JSON:",
       JSON.stringify(annotations, null, 2),
       "",
       "Requested next action:",
@@ -1087,6 +1115,12 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
     renderComments();
     renderPrompt();
   }
+
+  if (!commentsEnabled()) {
+    return;
+  }
+
+  annotations = loadAnnotations();
 
   document.addEventListener("mouseup", function () {
     setTimeout(function () {
