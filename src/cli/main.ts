@@ -40,6 +40,7 @@ interface CommandContext {
 
 interface CliOptions {
   "api-base"?: string;
+  comments?: boolean;
   namespace?: string;
   review?: boolean;
   slug?: string;
@@ -161,7 +162,8 @@ async function runPublish(context: CommandContext): Promise<void> {
   const slug = options.slug ?? existingPage?.slug;
   const pageIdPart =
     existingPage?.pageId === undefined ? {} : { pageId: existingPage.pageId };
-  const reviewAnnotations = options.review === true;
+  const reviewAnnotations =
+    options.review === true || options.comments === true;
   const requestBody =
     absoluteFilePath !== undefined && /\.html?$/i.test(absoluteFilePath)
       ? await buildHtmlRequestBody(
@@ -194,6 +196,10 @@ async function runPublish(context: CommandContext): Promise<void> {
   }
 
   const published = PublishedPageSchema.parse(await response.json());
+  const outputUrl =
+    requestBody["reviewAnnotations"] === true
+      ? withCommentsQuery(published.url)
+      : published.url;
 
   if (mappingKey !== undefined) {
     mapping.files[mappingKey] = {
@@ -222,19 +228,18 @@ async function runPublish(context: CommandContext): Promise<void> {
     await saveVaultManifest(nextManifest, vaultManifestPath);
   }
 
-  console.log(published.url);
+  console.log(outputUrl);
 }
 
-async function buildRenderMarkdown(
-  markdown: string,
+async function buildRenderMarkdownFromBody(
+  body: string,
   sourcePath: string,
 ): Promise<string | undefined> {
-  const parsed = parseMarkdownDocument(markdown);
-  const renderMarkdown = await prepareMarkdownBodyForPublish(parsed.body, {
+  const renderMarkdown = await prepareMarkdownBodyForPublish(body, {
     sourcePath,
   });
 
-  return renderMarkdown === parsed.body ? undefined : renderMarkdown;
+  return renderMarkdown === body ? undefined : renderMarkdown;
 }
 
 async function buildMarkdownRequestBody(
@@ -247,15 +252,18 @@ async function buildMarkdownRequestBody(
     absoluteFilePath === undefined
       ? await readStdin()
       : await readFile(absoluteFilePath, "utf8");
+  const parsed = parseMarkdownDocument(markdown);
   const renderMarkdown =
     absoluteFilePath === undefined
       ? undefined
-      : await buildRenderMarkdown(markdown, absoluteFilePath);
+      : await buildRenderMarkdownFromBody(parsed.body, absoluteFilePath);
+  const shouldInjectReview =
+    reviewAnnotations || isReviewFrontmatterOptIn(parsed.frontmatter);
 
   return {
     markdown,
     ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
-    ...(reviewAnnotations ? { reviewAnnotations: true } : {}),
+    ...(shouldInjectReview ? { reviewAnnotations: true } : {}),
     ...(slug === undefined ? {} : { slug }),
     ...pageIdPart,
   };
@@ -295,6 +303,25 @@ async function buildHtmlRequestBody(
     slug: slug ?? fallbackSlug,
     ...pageIdPart,
   };
+}
+
+function isReviewFrontmatterOptIn(
+  frontmatter: Record<string, unknown>,
+): boolean {
+  const review = frontmatter["review"];
+  const comments = frontmatter["comments"];
+  return (
+    comments === true ||
+    (typeof comments === "string" && comments.toLowerCase() === "true") ||
+    review === true ||
+    (typeof review === "string" && review.toLowerCase() === "true")
+  );
+}
+
+function withCommentsQuery(url: string): string {
+  const parsed = new URL(url);
+  parsed.searchParams.set("comments", "1");
+  return parsed.toString();
 }
 
 async function runList(context: CommandContext): Promise<void> {
@@ -445,6 +472,11 @@ function splitArgs(argumentsList: string[]): {
       throw new Error(`Unknown option: --${key}`);
     }
 
+    if (key === "comments") {
+      options.comments = true;
+      continue;
+    }
+
     if (key === "review") {
       options.review = true;
       continue;
@@ -464,6 +496,7 @@ function splitArgs(argumentsList: string[]): {
 function isCliOptionKey(value: string): value is keyof CliOptions {
   return (
     value === "api-base" ||
+    value === "comments" ||
     value === "namespace" ||
     value === "review" ||
     value === "slug"
@@ -483,7 +516,7 @@ async function readStdin(): Promise<string> {
 function printHelp(): void {
   console.log(`Usage:
   pubmd claim <namespace> [--api-base <url>]
-  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--review] [--api-base <url>]
+  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--comments] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
   pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
   pubmd version

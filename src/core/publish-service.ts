@@ -407,7 +407,10 @@ function isReviewFrontmatterOptIn(
   frontmatter: Record<string, unknown>,
 ): boolean {
   const review = frontmatter["review"];
+  const comments = frontmatter["comments"];
   return (
+    comments === true ||
+    (typeof comments === "string" && comments.toLowerCase() === "true") ||
     review === true ||
     (typeof review === "string" && review.toLowerCase() === "true")
   );
