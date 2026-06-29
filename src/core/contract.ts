@@ -45,6 +45,8 @@ export const PublishPageRequestSchema = z.object({
   renderMarkdown: z.string().min(1).optional(),
   reviewAnnotations: z.boolean().optional(),
   expires: ExpirationSettingSchema.optional(),
+  /** Lower-priority fallback than `expires`/frontmatter (the publisher's config default). */
+  defaultExpires: ExpirationSettingSchema.optional(),
   slug: NameSchema.optional(),
   pageId: z.string().uuid().optional(),
 });
@@ -57,6 +59,8 @@ export const PublishHtmlRequestSchema = z.object({
   document: z.string().min(1).optional(),
   reviewAnnotations: z.boolean().optional(),
   expires: ExpirationSettingSchema.optional(),
+  /** Lower-priority fallback than `expires`/`<meta>` (the publisher's config default). */
+  defaultExpires: ExpirationSettingSchema.optional(),
   title: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().min(1).max(300).optional(),
   noindex: z.boolean().optional(),

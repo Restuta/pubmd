@@ -19,7 +19,6 @@ import {
   parseMarkdownDocument,
   renderMarkdownToHtml,
 } from "./markdown.js";
-import type { NamespaceExpirationResolver } from "./namespace-config.js";
 import {
   AuthenticationError,
   NamespaceExistsError,
@@ -47,6 +46,8 @@ export interface PublishPageInput {
   description?: string;
   noindex?: boolean;
   expires?: ExpirationSetting;
+  /** Lower-priority fallback than `expires` and the document's own setting. */
+  defaultExpires?: ExpirationSetting;
   // common
   namespace: string;
   pageId?: string;
@@ -90,8 +91,6 @@ export interface PublishService {
 export interface PublishServiceOptions {
   /** Clock injection for testability; defaults to `Date.now`. */
   now?: () => number;
-  /** Per-namespace expiration policy; defaults to "no policy". */
-  resolveNamespaceExpiration?: NamespaceExpirationResolver;
 }
 
 export function createPublishService(
@@ -99,17 +98,6 @@ export function createPublishService(
   options: PublishServiceOptions = {},
 ): PublishService {
   const now = options.now ?? (() => Date.now());
-  const resolveNamespaceExpiration =
-    options.resolveNamespaceExpiration ?? (() => undefined);
-
-  function resolvePageExpirationMs(
-    namespace: string,
-    pageSetting: ExpirationSetting,
-  ): number | null {
-    return resolveExpirationMs(
-      coalesceExpiration(pageSetting, resolveNamespaceExpiration(namespace)),
-    );
-  }
 
   async function claimNamespace(
     namespace: string,
@@ -153,9 +141,14 @@ export function createPublishService(
     const slug = safeSlug;
     const nowMs = now();
     const nowIso = new Date(nowMs).toISOString();
-    const expirationMs = resolvePageExpirationMs(
-      safeNamespace,
-      coalesceExpiration(input.expires, parsed.frontmatter.expires),
+    // Precedence: explicit per-publish `expires` → document frontmatter →
+    // the publisher's config default. Most specific wins.
+    const expirationMs = resolveExpirationMs(
+      coalesceExpiration(
+        input.expires,
+        parsed.frontmatter.expires,
+        input.defaultExpires,
+      ),
     );
     const markdownBlobKey = `${pageId}.md`;
     const htmlBlobKey = `${pageId}.html`;
@@ -271,11 +264,13 @@ export function createPublishService(
     const pageId = existingPage?.pageId ?? randomUUID();
     const nowMs = now();
     const nowIso = new Date(nowMs).toISOString();
-    const expirationMs = resolvePageExpirationMs(
-      safeNamespace,
+    // Precedence: explicit per-publish `expires` → document `<meta>` → the
+    // publisher's config default. Most specific wins.
+    const expirationMs = resolveExpirationMs(
       coalesceExpiration(
         input.expires,
         meta.expires === null ? undefined : meta.expires,
+        input.defaultExpires,
       ),
     );
     const sourceBlobKey = `${pageId}.html.src`;

@@ -165,7 +165,7 @@ Local .pub mapping:
 - [ ] Page renames with redirects — data model already supports this
 - [ ] View count analytics
 - [ ] Page collections with auto-generated index
-- [x] Expiring pages (TTL) — per-page (flag/frontmatter/meta), per-namespace policy, 14-day default
+- [x] Expiring pages (TTL) — per-page (flag/frontmatter/meta) + consumer config default, 14-day default
 - [ ] Custom domains (namespace.pub.domain)
 - [ ] Web editor (CodeMirror with markdown + live preview)
 - [ ] Batch publish API
