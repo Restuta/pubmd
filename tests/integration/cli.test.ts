@@ -110,6 +110,40 @@ Updated body.
     expect(Object.keys(mapping.files)).toHaveLength(0);
   });
 
+  it("publishes with an --expires TTL and reports the deadline on stderr", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-exp-"));
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const notePath = path.join(cwd, "note.md");
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(notePath, "---\ntitle: TTL Note\n---\n\nBody.\n", "utf8");
+
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const published = await runCli(
+      ["publish", notePath, "--api-base", server.origin, "--expires", "7d"],
+      { cwd, env },
+    );
+
+    // stdout stays a bare URL; the deadline goes to stderr.
+    expect(published.stdout.trim()).toContain("/restuta/ttl-note");
+    expect(published.stderr).toContain("Expires");
+
+    const served = await fetch(published.stdout.trim());
+    expect(served.status).toBe(200);
+  });
+
   it("renders local image embeds while preserving the original raw markdown", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-img-"));
     const configDir = path.join(root, "config");

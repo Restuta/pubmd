@@ -3,7 +3,10 @@ import { createServer, type IncomingMessage, type Server } from "node:http";
 import path from "node:path";
 
 import { createFileStore } from "../../src/core/file-store.js";
-import { createPublishService } from "../../src/core/publish-service.js";
+import {
+  createPublishService,
+  type PublishServiceOptions,
+} from "../../src/core/publish-service.js";
 import { createApp } from "../../src/server/app.js";
 
 export interface StartedTestServer {
@@ -13,11 +16,22 @@ export interface StartedTestServer {
 
 export async function startTestServer(
   rootDir: string,
-  options: { userContentOrigin?: string } = {},
+  options: {
+    userContentOrigin?: string;
+    serviceOptions?: PublishServiceOptions;
+  } = {},
 ): Promise<StartedTestServer> {
   const repository = createFileStore(path.join(rootDir, "data"));
-  const service = createPublishService(repository);
-  const app = createApp(service, options);
+  const service = createPublishService(
+    repository,
+    options.serviceOptions ?? {},
+  );
+  const app = createApp(
+    service,
+    options.userContentOrigin === undefined
+      ? {}
+      : { userContentOrigin: options.userContentOrigin },
+  );
   const server = createServer(async (request, response) => {
     const address = server.address();
     const port =

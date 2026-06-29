@@ -5,6 +5,13 @@ import type {
   PublishedPage,
   StoredPage,
 } from "./contract.js";
+import {
+  coalesceExpiration,
+  type ExpirationSetting,
+  expiresAtFrom,
+  isExpired,
+  resolveExpirationMs,
+} from "./expiration.js";
 import { constantTimeEqual, createToken, sha256 } from "./hash.js";
 import { extractHtmlMeta } from "./html-meta.js";
 import {
@@ -12,6 +19,7 @@ import {
   parseMarkdownDocument,
   renderMarkdownToHtml,
 } from "./markdown.js";
+import type { NamespaceExpirationResolver } from "./namespace-config.js";
 import {
   AuthenticationError,
   NamespaceExistsError,
@@ -38,6 +46,7 @@ export interface PublishPageInput {
   title?: string;
   description?: string;
   noindex?: boolean;
+  expires?: ExpirationSetting;
   // common
   namespace: string;
   pageId?: string;
@@ -78,9 +87,30 @@ export interface PublishService {
   readMarkdown(page: StoredPage): Promise<string>;
 }
 
+export interface PublishServiceOptions {
+  /** Clock injection for testability; defaults to `Date.now`. */
+  now?: () => number;
+  /** Per-namespace expiration policy; defaults to "no policy". */
+  resolveNamespaceExpiration?: NamespaceExpirationResolver;
+}
+
 export function createPublishService(
   repository: PublishRepository,
+  options: PublishServiceOptions = {},
 ): PublishService {
+  const now = options.now ?? (() => Date.now());
+  const resolveNamespaceExpiration =
+    options.resolveNamespaceExpiration ?? (() => undefined);
+
+  function resolvePageExpirationMs(
+    namespace: string,
+    pageSetting: ExpirationSetting,
+  ): number | null {
+    return resolveExpirationMs(
+      coalesceExpiration(pageSetting, resolveNamespaceExpiration(namespace)),
+    );
+  }
+
   async function claimNamespace(
     namespace: string,
   ): Promise<ClaimNamespaceResponse> {
@@ -121,7 +151,12 @@ export function createPublishService(
     );
     const pageId = existingPage?.pageId ?? randomUUID();
     const slug = safeSlug;
-    const now = new Date().toISOString();
+    const nowMs = now();
+    const nowIso = new Date(nowMs).toISOString();
+    const expirationMs = resolvePageExpirationMs(
+      safeNamespace,
+      coalesceExpiration(input.expires, parsed.frontmatter.expires),
+    );
     const markdownBlobKey = `${pageId}.md`;
     const htmlBlobKey = `${pageId}.html`;
     const rendered = await renderMarkdownToHtml(renderMarkdown);
@@ -147,12 +182,19 @@ export function createPublishService(
         noindex: parsed.noindex,
         visibility: parsed.visibility,
         draft: parsed.draft,
+        // The duration, not the absolute timestamp: republishing identical
+        // content keeps the original deadline (no-op), but changing the policy
+        // forces a republish and resets the clock.
+        expirationMs,
       }),
     );
     const noOp =
       existingPage !== null &&
       existingPage.contentHash === contentHash &&
       existingPage.slug === slug;
+    const expiresAt = noOp
+      ? (existingPage?.expiresAt ?? null)
+      : expiresAtFrom(expirationMs, nowMs);
 
     if (!noOp) {
       const page: StoredPage = {
@@ -166,8 +208,9 @@ export function createPublishService(
         draft: parsed.draft,
         noindex: parsed.noindex,
         contentHash,
-        createdAt: existingPage?.createdAt ?? now,
-        updatedAt: now,
+        createdAt: existingPage?.createdAt ?? nowIso,
+        updatedAt: nowIso,
+        expiresAt,
         markdownBlobKey,
         htmlBlobKey,
       };
@@ -184,7 +227,7 @@ export function createPublishService(
         },
       );
 
-      await repository.touchNamespace(safeNamespace, now);
+      await repository.touchNamespace(safeNamespace, nowIso);
     }
 
     return {
@@ -197,6 +240,7 @@ export function createPublishService(
       created: existingPage === null && !noOp,
       updated: existingPage !== null && !noOp,
       noOp,
+      expiresAt,
     };
   }
 
@@ -225,7 +269,15 @@ export function createPublishService(
       input.pageId,
     );
     const pageId = existingPage?.pageId ?? randomUUID();
-    const now = new Date().toISOString();
+    const nowMs = now();
+    const nowIso = new Date(nowMs).toISOString();
+    const expirationMs = resolvePageExpirationMs(
+      safeNamespace,
+      coalesceExpiration(
+        input.expires,
+        meta.expires === null ? undefined : meta.expires,
+      ),
+    );
     const sourceBlobKey = `${pageId}.html.src`;
     const htmlBlobKey = `${pageId}.html`;
     const contentHash = sha256(
@@ -239,12 +291,17 @@ export function createPublishService(
         title,
         description,
         noindex,
+        // The duration, not the timestamp — see the markdown path for rationale.
+        expirationMs,
       }),
     );
     const noOp =
       existingPage !== null &&
       existingPage.contentHash === contentHash &&
       existingPage.slug === safeSlug;
+    const expiresAt = noOp
+      ? (existingPage?.expiresAt ?? null)
+      : expiresAtFrom(expirationMs, nowMs);
 
     if (!noOp) {
       const page: StoredPage = {
@@ -258,8 +315,9 @@ export function createPublishService(
         draft: false,
         noindex,
         contentHash,
-        createdAt: existingPage?.createdAt ?? now,
-        updatedAt: now,
+        createdAt: existingPage?.createdAt ?? nowIso,
+        updatedAt: nowIso,
+        expiresAt,
         markdownBlobKey: sourceBlobKey,
         htmlBlobKey,
       };
@@ -270,7 +328,7 @@ export function createPublishService(
         { content: htmlDocument, key: htmlBlobKey },
       );
 
-      await repository.touchNamespace(safeNamespace, now);
+      await repository.touchNamespace(safeNamespace, nowIso);
     }
 
     return {
@@ -283,6 +341,7 @@ export function createPublishService(
       created: existingPage === null && !noOp,
       updated: existingPage !== null && !noOp,
       noOp,
+      expiresAt,
     };
   }
 
@@ -300,16 +359,19 @@ export function createPublishService(
     const safeNamespace = ensureName(input.namespace);
     await authenticate(safeNamespace, input.token);
 
+    const nowMs = now();
     const pages = await repository.listPages(safeNamespace);
-    return pages.map((page) => ({
-      pageId: page.pageId,
-      namespace: page.namespace,
-      slug: page.slug,
-      title: page.title,
-      description: page.description,
-      updatedAt: page.updatedAt,
-      url: buildPageUrl(input.origin, page.namespace, page.slug),
-    }));
+    return pages
+      .filter((page) => !isExpired(page.expiresAt, nowMs))
+      .map((page) => ({
+        pageId: page.pageId,
+        namespace: page.namespace,
+        slug: page.slug,
+        title: page.title,
+        description: page.description,
+        updatedAt: page.updatedAt,
+        url: buildPageUrl(input.origin, page.namespace, page.slug),
+      }));
   }
 
   async function removePage(input: RemovePageInput): Promise<void> {
@@ -330,7 +392,20 @@ export function createPublishService(
     namespace: string,
     slug: string,
   ): Promise<StoredPage | null> {
-    return repository.findPageBySlug(ensureName(namespace), ensureName(slug));
+    const page = await repository.findPageBySlug(
+      ensureName(namespace),
+      ensureName(slug),
+    );
+
+    // Expired pages are hidden lazily (treated as 404 here and filtered from
+    // listings) rather than deleted, so reads stay side-effect-free and
+    // cacheable. The record lingers in storage until it is overwritten by a
+    // republish to the same slug or explicitly removed.
+    if (page === null || isExpired(page.expiresAt, now())) {
+      return null;
+    }
+
+    return page;
   }
 
   async function readHtml(page: StoredPage): Promise<string> {

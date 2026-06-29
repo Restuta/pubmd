@@ -2,6 +2,7 @@ import path from "node:path";
 
 import { createBlobStore } from "../core/blob-store.js";
 import { createFileStore } from "../core/file-store.js";
+import { loadNamespaceExpirationResolver } from "../core/namespace-config.js";
 import { createPublishService } from "../core/publish-service.js";
 import { createApp } from "./app.js";
 
@@ -23,7 +24,12 @@ export function createConfiguredApp(config: AppConfig = {}) {
             getEnv("PUB_DATA_DIR") ??
             path.resolve(process.cwd(), ".tmp/pubmd-data"),
         );
-  const service = createPublishService(repository);
+  const resolveNamespaceExpiration = loadNamespaceExpirationResolver(
+    getEnv("PUB_NAMESPACE_CONFIG"),
+  );
+  const service = createPublishService(repository, {
+    resolveNamespaceExpiration,
+  });
   const userContentOrigin = getEnv("USER_CONTENT_ORIGIN");
 
   return createApp(
@@ -37,6 +43,7 @@ function getEnv(
     | "BLOB_READ_WRITE_TOKEN"
     | "METADATA_BLOB_READ_WRITE_TOKEN"
     | "PUB_DATA_DIR"
+    | "PUB_NAMESPACE_CONFIG"
     | "USER_CONTENT_ORIGIN",
 ): string | undefined {
   return process.env[name];
