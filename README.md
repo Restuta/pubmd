@@ -301,6 +301,10 @@ With this config, every page published to `secret` expires after the default
 14 days and everything in `scratch` after 7 days — unless the page sets its own
 `expires` (including `expires: never` to pin it).
 
+Expired pages are hidden lazily — they return `404` and drop out of `list`
+immediately, but the underlying record stays in storage until the slug is
+republished or the page is removed with `pubmd remove`.
+
 ## Inline HTML
 
 pubmd renders GFM markdown and also supports a **safe subset of raw HTML** written

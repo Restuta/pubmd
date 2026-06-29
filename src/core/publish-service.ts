@@ -397,6 +397,10 @@ export function createPublishService(
       ensureName(slug),
     );
 
+    // Expired pages are hidden lazily (treated as 404 here and filtered from
+    // listings) rather than deleted, so reads stay side-effect-free and
+    // cacheable. The record lingers in storage until it is overwritten by a
+    // republish to the same slug or explicitly removed.
     if (page === null || isExpired(page.expiresAt, now())) {
       return null;
     }
