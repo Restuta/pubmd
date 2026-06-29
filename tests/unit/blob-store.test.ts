@@ -196,6 +196,7 @@ function makePage(overrides: Partial<StoredPage>): StoredPage {
     contentHash: "hash",
     createdAt: "2026-03-19T00:00:00.000Z",
     updatedAt: "2026-03-19T00:00:00.000Z",
+    expiresAt: null,
     markdownBlobKey: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.md",
     htmlBlobKey: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.html",
     ...overrides,

@@ -41,6 +41,7 @@ interface CommandContext {
 interface CliOptions {
   "api-base"?: string;
   comments?: boolean;
+  expires?: string;
   namespace?: string;
   review?: boolean;
   slug?: string;
@@ -164,6 +165,7 @@ async function runPublish(context: CommandContext): Promise<void> {
     existingPage?.pageId === undefined ? {} : { pageId: existingPage.pageId };
   const reviewAnnotations =
     options.review === true || options.comments === true;
+  const expires = options.expires;
   const requestBody =
     absoluteFilePath !== undefined && /\.html?$/i.test(absoluteFilePath)
       ? await buildHtmlRequestBody(
@@ -171,12 +173,14 @@ async function runPublish(context: CommandContext): Promise<void> {
           slug,
           pageIdPart,
           reviewAnnotations,
+          expires,
         )
       : await buildMarkdownRequestBody(
           absoluteFilePath,
           slug,
           pageIdPart,
           reviewAnnotations,
+          expires,
         );
 
   const response = await fetch(
@@ -228,6 +232,10 @@ async function runPublish(context: CommandContext): Promise<void> {
     await saveVaultManifest(nextManifest, vaultManifestPath);
   }
 
+  if (published.expiresAt !== null) {
+    console.error(`Expires ${published.expiresAt}`);
+  }
+
   console.log(outputUrl);
 }
 
@@ -247,6 +255,7 @@ async function buildMarkdownRequestBody(
   slug: string | undefined,
   pageIdPart: { pageId?: string },
   reviewAnnotations: boolean,
+  expires: string | undefined,
 ): Promise<Record<string, unknown>> {
   const markdown =
     absoluteFilePath === undefined
@@ -264,6 +273,7 @@ async function buildMarkdownRequestBody(
     markdown,
     ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
     ...(shouldInjectReview ? { reviewAnnotations: true } : {}),
+    ...(expires === undefined ? {} : { expires }),
     ...(slug === undefined ? {} : { slug }),
     ...pageIdPart,
   };
@@ -274,6 +284,7 @@ async function buildHtmlRequestBody(
   slug: string | undefined,
   pageIdPart: { pageId?: string },
   reviewAnnotations: boolean,
+  expires: string | undefined,
 ): Promise<Record<string, unknown>> {
   const source = await readFile(absoluteFilePath, "utf8");
   const inlined = await inlineHtmlAssets(source, {
@@ -300,6 +311,7 @@ async function buildHtmlRequestBody(
     source,
     document,
     ...(shouldInjectReview ? { reviewAnnotations: true } : {}),
+    ...(expires === undefined ? {} : { expires }),
     slug: slug ?? fallbackSlug,
     ...pageIdPart,
   };
@@ -497,6 +509,7 @@ function isCliOptionKey(value: string): value is keyof CliOptions {
   return (
     value === "api-base" ||
     value === "comments" ||
+    value === "expires" ||
     value === "namespace" ||
     value === "review" ||
     value === "slug"
@@ -516,13 +529,17 @@ async function readStdin(): Promise<string> {
 function printHelp(): void {
   console.log(`Usage:
   pubmd claim <namespace> [--api-base <url>]
-  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--comments] [--api-base <url>]
+  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--comments] [--expires <when>] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
   pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
   pubmd version
 
   publish accepts a .md or .html file. HTML pages have their local CSS, JS,
-  images and fonts inlined into a single self-contained page before upload.`);
+  images and fonts inlined into a single self-contained page before upload.
+
+  --expires <when> sets a time-to-live: a duration like 7d, 12h, 30m or 2w,
+  or "true" for the default 14 days, or "never". Pages never expire unless a
+  TTL is set here, in frontmatter (expires:), or by namespace policy.`);
 }
 
 main().catch((error: unknown) => {

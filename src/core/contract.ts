@@ -11,6 +11,17 @@ export const VisibilitySchema = z.enum(["public", "unlisted", "private"]);
 
 export const PageKindSchema = z.enum(["markdown", "html"]);
 
+/**
+ * Page expiration intent. `true`/`false` toggle the default lifetime; a number
+ * is days; a string is a duration ("7d", "12h") or "never". When omitted, the
+ * namespace/global policy applies. See {@link "./expiration.js"}.
+ */
+export const ExpirationSettingSchema = z.union([
+  z.boolean(),
+  z.number(),
+  z.string(),
+]);
+
 export const FrontmatterSchema = z
   .object({
     title: z.string().trim().min(1).max(200).optional(),
@@ -19,6 +30,7 @@ export const FrontmatterSchema = z
     noindex: z.boolean().optional(),
     visibility: VisibilitySchema.optional(),
     description: z.string().trim().min(1).max(300).optional(),
+    expires: ExpirationSettingSchema.optional(),
   })
   .passthrough();
 
@@ -32,6 +44,7 @@ export const PublishPageRequestSchema = z.object({
   markdown: z.string().min(1),
   renderMarkdown: z.string().min(1).optional(),
   reviewAnnotations: z.boolean().optional(),
+  expires: ExpirationSettingSchema.optional(),
   slug: NameSchema.optional(),
   pageId: z.string().uuid().optional(),
 });
@@ -43,6 +56,7 @@ export const PublishHtmlRequestSchema = z.object({
   /** Self-contained HTML to serve. When omitted, `source` is served verbatim. */
   document: z.string().min(1).optional(),
   reviewAnnotations: z.boolean().optional(),
+  expires: ExpirationSettingSchema.optional(),
   title: z.string().trim().min(1).max(200).optional(),
   description: z.string().trim().min(1).max(300).optional(),
   noindex: z.boolean().optional(),
@@ -66,6 +80,8 @@ export const PublishedPageSchema = z.object({
   created: z.boolean(),
   updated: z.boolean(),
   noOp: z.boolean(),
+  /** Absolute expiry timestamp, or null when the page never expires. */
+  expiresAt: z.string().datetime().nullable(),
 });
 
 export const StoredPageSchema = z.object({
@@ -82,6 +98,9 @@ export const StoredPageSchema = z.object({
   contentHash: z.string().min(1),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
+  // Absolute expiry timestamp, or null to never expire. Pages stored before
+  // expiration existed have no field; default to null (never).
+  expiresAt: z.string().datetime().nullable().default(null),
   markdownBlobKey: z.string().min(1),
   htmlBlobKey: z.string().min(1),
 });

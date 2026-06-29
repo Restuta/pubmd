@@ -221,6 +221,7 @@ description: A short summary for social previews
 noindex: false        # default: true
 visibility: public    # stored as metadata for now
 draft: true           # stored as metadata for now
+expires: 7d           # default: never (see Expiring Pages)
 ---
 
 # My Report
@@ -232,7 +233,73 @@ All fields are optional. Title and description are auto-extracted from content i
 
 Today:
 - `title`, `slug`, `description`, and `noindex` affect rendered output/metadata
+- `expires` sets a time-to-live (see [Expiring Pages](#expiring-pages))
 - `visibility` and `draft` are stored as page metadata, but are not yet enforced in listing/access rules
+
+## Expiring Pages
+
+Pages never expire by default. You can give a page a time-to-live (TTL) so it
+stops being served after a deadline. Once a page expires it returns `404` and
+disappears from `pubmd list`.
+
+A TTL can be set at three levels — **most specific wins**:
+
+1. **Per page** — a CLI flag, frontmatter, or an HTML `<meta>` tag.
+2. **Per namespace** — server-side policy, so sensitive namespaces can expire
+   everything by default.
+3. **Global default** — server-side fallback (off unless configured).
+
+When expiration is turned on but no duration is given, the default is **14 days**.
+
+Durations accept `m` (minutes), `h` (hours), `d` (days), and `w` (weeks); a bare
+number means days. `true` means "use the default", and `never` / `false` opts a
+page out (even of a namespace policy).
+
+### Per page
+
+```bash
+# CLI flag: a duration, "true" for the 14-day default, or "never"
+pubmd publish report.md --expires 7d
+pubmd publish report.md --expires true
+```
+
+Markdown frontmatter:
+
+```yaml
+---
+expires: 30d   # or: true (14d default), or false / never
+---
+```
+
+HTML `<meta>`:
+
+```html
+<meta name="pubmd:expires" content="7d">
+```
+
+The deadline is printed to stderr on publish, and the publish API response
+includes an `expiresAt` timestamp (or `null` when the page never expires).
+Re-publishing identical content keeps the original deadline; changing the
+content (or the TTL) resets the clock.
+
+### Per namespace (server config)
+
+The server reads a per-namespace policy from `PUB_NAMESPACE_CONFIG`, which is
+either a path to a JSON file or inline JSON:
+
+```json
+{
+  "default": { "expires": false },
+  "namespaces": {
+    "secret":  { "expires": true },
+    "scratch": { "expires": "7d" }
+  }
+}
+```
+
+With this config, every page published to `secret` expires after the default
+14 days and everything in `scratch` after 7 days — unless the page sets its own
+`expires` (including `expires: never` to pin it).
 
 ## Inline HTML
 
@@ -285,7 +352,7 @@ Pages are pre-rendered on publish. On Vercel, the first read may hit the app, bu
 
 ```
 node dist/src/cli/main.js claim <namespace>                                 Claim a namespace, get API token
-node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>] [--comments]  Publish or update a page
+node dist/src/cli/main.js publish [file.md|file.html] [--slug <s>] [--ns <n>] [--comments] [--expires <when>]  Publish or update a page
 node dist/src/cli/main.js list [--namespace <n>]                             List your published pages
 node dist/src/cli/main.js remove <slug> [--namespace <n>]                    Delete a page
 ```

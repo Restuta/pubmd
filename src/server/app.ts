@@ -147,6 +147,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                 ...(body.reviewAnnotations === undefined
                   ? {}
                   : { reviewAnnotations: body.reviewAnnotations }),
+                ...(body.expires === undefined
+                  ? {}
+                  : { expires: body.expires }),
                 ...(body.title === undefined ? {} : { title: body.title }),
                 ...(body.description === undefined
                   ? {}
@@ -169,6 +172,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                 ...(body.reviewAnnotations === undefined
                   ? {}
                   : { reviewAnnotations: body.reviewAnnotations }),
+                ...(body.expires === undefined
+                  ? {}
+                  : { expires: body.expires }),
                 ...(body.slug === undefined
                   ? {}
                   : { requestedSlug: body.slug }),
@@ -177,6 +183,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
       } else {
         const slug = context.req.query("slug") ?? undefined;
         const pageId = context.req.query("pageId") ?? undefined;
+        const expires = context.req.query("expires") ?? undefined;
         const text = await context.req.text();
 
         // The JSON path requires non-empty content; keep the raw-body path consistent
@@ -188,6 +195,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         const optional = {
           ...(slug === undefined ? {} : { requestedSlug: slug }),
           ...(pageId === undefined ? {} : { pageId }),
+          ...(expires === undefined ? {} : { expires }),
         };
 
         input =
@@ -283,10 +291,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
 
       return context.html(await service.readHtml(page), 200, {
         "cache-control": "public, max-age=0, must-revalidate",
-        "cdn-cache-control":
-          "public, s-maxage=60, stale-while-revalidate=86400",
-        "vercel-cdn-cache-control":
-          "public, s-maxage=60, stale-while-revalidate=86400",
+        ...cdnCacheHeaders(page.expiresAt),
         ...(page.kind === "html" ? userHtmlSecurityHeaders(page.noindex) : {}),
       });
     } catch (error) {
@@ -313,6 +318,37 @@ function parseBearerToken(header: string | undefined): string {
 
 function requestOrigin(url: string): string {
   return new URL(url).origin;
+}
+
+/**
+ * CDN cache headers for a served page. Non-expiring pages get the default
+ * aggressive edge cache. Expiring pages cap `s-maxage` at the time left before
+ * expiry and drop `stale-while-revalidate`, so the CDN never serves a page past
+ * its deadline.
+ */
+function cdnCacheHeaders(
+  expiresAt: string | null | undefined,
+): Record<string, string> {
+  const defaultCdnCache = "public, s-maxage=60, stale-while-revalidate=86400";
+
+  if (expiresAt === null || expiresAt === undefined) {
+    return {
+      "cdn-cache-control": defaultCdnCache,
+      "vercel-cdn-cache-control": defaultCdnCache,
+    };
+  }
+
+  const secondsLeft = Math.max(
+    0,
+    Math.floor((Date.parse(expiresAt) - Date.now()) / 1000),
+  );
+  const maxAge = Math.min(60, secondsLeft);
+  const expiringCdnCache = `public, s-maxage=${maxAge}, stale-while-revalidate=0`;
+
+  return {
+    "cdn-cache-control": expiringCdnCache,
+    "vercel-cdn-cache-control": expiringCdnCache,
+  };
 }
 
 /**

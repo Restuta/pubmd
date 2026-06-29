@@ -26,11 +26,21 @@ describe("extractHtmlMeta", () => {
     expect(meta.title).toBe("Tom & Jerry");
   });
 
-  it("returns null when title and description are absent", () => {
+  it("reads the pubmd:expires directive", () => {
+    expect(
+      extractHtmlMeta('<meta name="pubmd:expires" content="7d">').expires,
+    ).toBe("7d");
+    expect(
+      extractHtmlMeta("<meta content='true' name='pubmd:expires'>").expires,
+    ).toBe("true");
+  });
+
+  it("returns null when title, description, and expires are absent", () => {
     const meta = extractHtmlMeta("<h1>No head metadata here</h1>");
 
     expect(meta.title).toBeNull();
     expect(meta.description).toBeNull();
+    expect(meta.expires).toBeNull();
   });
 
   it("ignores an empty title", () => {
