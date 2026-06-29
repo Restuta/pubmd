@@ -1,8 +1,10 @@
+import { getHtmlTagAttr } from "./html-meta.js";
+
 const REVIEW_SENTINEL = "data-pubmd-review-annotations";
 
 export function hasReviewAnnotationsOptIn(html: string): boolean {
   for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
-    const name = getHtmlAttr(tag[0], "name");
+    const name = getHtmlTagAttr(tag[0], "name");
 
     if (
       name?.toLowerCase() !== "pubmd:comments" &&
@@ -11,7 +13,7 @@ export function hasReviewAnnotationsOptIn(html: string): boolean {
       continue;
     }
 
-    return getHtmlAttr(tag[0], "content")?.toLowerCase() === "true";
+    return getHtmlTagAttr(tag[0], "content")?.toLowerCase() === "true";
   }
 
   return false;
@@ -88,17 +90,6 @@ ${insertion}`;
 
   return `${html.slice(0, match.index)}${insertion}
 ${html.slice(match.index)}`;
-}
-
-function getHtmlAttr(tag: string, attrName: string): string | null {
-  const escapedAttr = attrName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const pattern = new RegExp(
-    `\\b${escapedAttr}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'>]+))`,
-    "i",
-  );
-  const match = tag.match(pattern);
-
-  return match?.[1] ?? match?.[2] ?? match?.[3] ?? null;
 }
 
 const REVIEW_STYLES = `<style data-pubmd-review-style>

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { z } from "zod";
 
+import { ExpirationSettingSchema } from "./contract.js";
 import type { ExpirationSetting } from "./expiration.js";
 
 /**
@@ -22,10 +23,9 @@ import type { ExpirationSetting } from "./expiration.js";
  * ```
  */
 
-/** `expires` accepts a boolean, a number of days, or a duration string. */
-const ExpirationSettingSchema = z.union([z.boolean(), z.number(), z.string()]);
-
 const NamespacePolicySchema = z.object({
+  // `expires` accepts a boolean, a number of days, or a duration string —
+  // the same shape used by page-level frontmatter (see contract.ts).
   expires: ExpirationSettingSchema.optional(),
 });
 

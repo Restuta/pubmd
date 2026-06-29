@@ -35,6 +35,14 @@ describe("extractHtmlMeta", () => {
     ).toBe("true");
   });
 
+  it("does not confuse a hyphenated attribute (data-name) for name", () => {
+    const meta = extractHtmlMeta(
+      '<meta data-name="ignored" name="pubmd:expires" content="7d">',
+    );
+
+    expect(meta.expires).toBe("7d");
+  });
+
   it("returns null when title, description, and expires are absent", () => {
     const meta = extractHtmlMeta("<h1>No head metadata here</h1>");
 

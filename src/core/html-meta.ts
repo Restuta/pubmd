@@ -18,15 +18,15 @@ export function extractHtmlMeta(html: string): HtmlMeta {
 
 function extractMetaContent(html: string, name: string): string | null {
   for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
-    const tagName = matchAttr(tag[0], "name");
+    const tagName = getHtmlTagAttr(tag[0], "name");
 
     if (tagName?.toLowerCase() !== name.toLowerCase()) {
       continue;
     }
 
-    const content = matchAttr(tag[0], "content");
+    const content = getHtmlTagAttr(tag[0], "content");
 
-    return content === undefined
+    return content === null
       ? null
       : nonEmpty(decodeBasicEntities(collapseWhitespace(content)));
   }
@@ -34,13 +34,20 @@ function extractMetaContent(html: string, name: string): string | null {
   return null;
 }
 
-function matchAttr(tag: string, attribute: string): string | undefined {
+/**
+ * Reads a single attribute value off an HTML start tag, supporting double,
+ * single, and unquoted values. The attribute name is anchored so it does not
+ * match as a suffix of another attribute (e.g. asking for `name` must not
+ * match `data-name`), and is escaped so regex metacharacters are literal.
+ */
+export function getHtmlTagAttr(tag: string, attribute: string): string | null {
+  const escaped = attribute.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const match = new RegExp(
-    `\\b${attribute}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`,
+    `(?<![\\w-])${escaped}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'>]+))`,
     "i",
   ).exec(tag);
 
-  return match?.[1] ?? match?.[2] ?? match?.[3];
+  return match?.[1] ?? match?.[2] ?? match?.[3] ?? null;
 }
 
 function extractTitle(html: string): string | null {
