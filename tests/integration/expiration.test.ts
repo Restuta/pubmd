@@ -5,7 +5,6 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { DEFAULT_EXPIRATION_MS } from "../../src/core/expiration.js";
-import type { NamespaceExpirationResolver } from "../../src/core/namespace-config.js";
 import { type StartedTestServer, startTestServer } from "./test-server.js";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -102,6 +101,41 @@ describe("page expiration", () => {
     expect(Date.parse(result.expiresAt ?? "")).toBe(base + 2 * MS_PER_DAY);
   });
 
+  it("applies defaultExpires, but lets the page's frontmatter override it", async () => {
+    const base = Date.parse("2026-06-29T00:00:00.000Z");
+    const root = await mkdtemp(path.join(os.tmpdir(), "pubmd-exp-default-fb-"));
+    server = await startTestServer(root, {
+      serviceOptions: { now: () => base },
+    });
+    const token = await claim(server.origin, "alice");
+
+    // defaultExpires applies when the document says nothing.
+    const defaulted = await publish(server.origin, "alice", token, {
+      markdown: "---\ntitle: Uses Default\n---\n\nBody.",
+      defaultExpires: "7d",
+    });
+    expect(Date.parse(defaulted.result.expiresAt ?? "")).toBe(
+      base + 7 * MS_PER_DAY,
+    );
+
+    // The page's own frontmatter outranks the consumer's default.
+    const pinned = await publish(server.origin, "alice", token, {
+      markdown: "---\ntitle: Pinned\nexpires: never\n---\n\nBody.",
+      defaultExpires: "7d",
+    });
+    expect(pinned.result.expiresAt).toBeNull();
+
+    // An explicit per-publish expires still wins over both.
+    const explicit = await publish(server.origin, "alice", token, {
+      markdown: "---\ntitle: Explicit\nexpires: never\n---\n\nBody.",
+      expires: "2d",
+      defaultExpires: "7d",
+    });
+    expect(Date.parse(explicit.result.expiresAt ?? "")).toBe(
+      base + 2 * MS_PER_DAY,
+    );
+  });
+
   it("404s an expired page and drops it from listings", async () => {
     const clock = { value: Date.parse("2026-06-29T00:00:00.000Z") };
     const root = await mkdtemp(path.join(os.tmpdir(), "pubmd-exp-gone-"));
@@ -134,40 +168,6 @@ describe("page expiration", () => {
       })
     ).json()) as { pages: unknown[] };
     expect(listAfter.pages).toHaveLength(0);
-  });
-
-  it("expires pages in namespaces under policy, with per-page override", async () => {
-    const base = Date.parse("2026-06-29T00:00:00.000Z");
-    const resolveNamespaceExpiration: NamespaceExpirationResolver = (ns) =>
-      ns === "secret" ? true : undefined;
-    const root = await mkdtemp(path.join(os.tmpdir(), "pubmd-exp-ns-"));
-    server = await startTestServer(root, {
-      serviceOptions: { now: () => base, resolveNamespaceExpiration },
-    });
-
-    const secretToken = await claim(server.origin, "secret");
-    const publicToken = await claim(server.origin, "public");
-
-    // Sensitive namespace: pages expire with the default TTL automatically.
-    const secret = await publish(server.origin, "secret", secretToken, {
-      markdown: "---\ntitle: Classified\n---\n\nBody.",
-    });
-    expect(Date.parse(secret.result.expiresAt ?? "")).toBe(
-      base + DEFAULT_EXPIRATION_MS,
-    );
-
-    // A page can opt out even under a namespace policy.
-    const pinned = await publish(server.origin, "secret", secretToken, {
-      markdown: "---\ntitle: Pinned\n---\n\nBody.",
-      expires: "never",
-    });
-    expect(pinned.result.expiresAt).toBeNull();
-
-    // Unconfigured namespace: still never expires.
-    const open = await publish(server.origin, "public", publicToken, {
-      markdown: "---\ntitle: Open\n---\n\nBody.",
-    });
-    expect(open.result.expiresAt).toBeNull();
   });
 
   it("keeps the original deadline when republishing identical content", async () => {

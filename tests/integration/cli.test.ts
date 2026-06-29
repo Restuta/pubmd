@@ -144,6 +144,47 @@ Updated body.
     expect(served.status).toBe(200);
   });
 
+  it("applies a per-namespace expiry default from the consumer's config", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-cfg-"));
+    const configDir = path.join(root, "config");
+    const configPath = path.join(configDir, "config.json");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const notePath = path.join(cwd, "note.md");
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(notePath, "---\ntitle: Cfg Note\n---\n\nBody.\n", "utf8");
+
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    // Consumer opts their namespace into a default TTL, no --expires flag.
+    const config = JSON.parse(await readFile(configPath, "utf8")) as {
+      namespaces: Record<string, { token: string; expires?: string }>;
+    };
+    const restuta = config.namespaces["restuta"];
+    if (restuta !== undefined) {
+      restuta.expires = "7d";
+    }
+    await writeFile(configPath, JSON.stringify(config, null, 2), "utf8");
+
+    const published = await runCli(
+      ["publish", notePath, "--api-base", server.origin],
+      { cwd, env },
+    );
+
+    expect(published.stdout.trim()).toContain("/restuta/cfg-note");
+    expect(published.stderr).toContain("Expires");
+  });
+
   it("renders local image embeds while preserving the original raw markdown", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-img-"));
     const configDir = path.join(root, "config");

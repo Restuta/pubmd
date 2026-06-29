@@ -245,15 +245,19 @@ disappears from `pubmd list`.
 A TTL can be set at three levels — **most specific wins**:
 
 1. **Per page** — a CLI flag, frontmatter, or an HTML `<meta>` tag.
-2. **Per namespace** — server-side policy, so sensitive namespaces can expire
-   everything by default.
-3. **Global default** — server-side fallback (off unless configured).
+2. **Per namespace (your config)** — a default in your CLI config for a given
+   namespace, so all your publishes to a sensitive namespace expire.
+3. **Your global default** — a default in your CLI config applied to every
+   publish.
+
+It's all consumer-driven: the publisher chooses the TTL, the server just honors
+it. There is no server-side configuration to enable expiration.
 
 When expiration is turned on but no duration is given, the default is **14 days**.
 
 Durations accept `m` (minutes), `h` (hours), `d` (days), and `w` (weeks); a bare
 number means days. `true` means "use the default", and `never` / `false` opts a
-page out (even of a namespace policy).
+publish out (even of a config default).
 
 ### Per page
 
@@ -282,24 +286,30 @@ includes an `expiresAt` timestamp (or `null` when the page never expires).
 Re-publishing identical content keeps the original deadline; changing the
 content (or the TTL) resets the clock.
 
-### Per namespace (server config)
+### Default for your publishes (CLI config)
 
-The server reads a per-namespace policy from `PUB_NAMESPACE_CONFIG`, which is
-either a path to a JSON file or inline JSON:
+To avoid passing `--expires` every time, set a default in your own config file
+(`~/.config/pub/config.json`). Use a top-level `defaultExpires` for all your
+publishes, and/or an `expires` under a specific namespace so everything you
+publish there expires:
 
 ```json
 {
-  "default": { "expires": false },
+  "apiBaseUrl": "https://bul.sh",
+  "defaultNamespace": "me",
+  "defaultExpires": false,
   "namespaces": {
-    "secret":  { "expires": true },
-    "scratch": { "expires": "7d" }
+    "me":     { "token": "…" },
+    "secret": { "token": "…", "expires": "14d" },
+    "scratch":{ "token": "…", "expires": "7d" }
   }
 }
 ```
 
-With this config, every page published to `secret` expires after the default
-14 days and everything in `scratch` after 7 days — unless the page sets its own
-`expires` (including `expires: never` to pin it).
+Precedence is most-specific-wins: `--expires` flag → the page's own
+frontmatter / `<meta>` → the namespace's `expires` → `defaultExpires`. So a
+document with `expires: never` still pins itself even when its namespace
+defaults to expiring, and `--expires never` overrides everything for one publish.
 
 Expired pages are hidden lazily — they return `404` and drop out of `list`
 immediately, but the underlying record stays in storage until the slug is

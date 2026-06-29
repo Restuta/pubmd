@@ -4,13 +4,21 @@ import path from "node:path";
 
 import { z } from "zod";
 
+import { ExpirationSettingSchema } from "../core/contract.js";
+
 const NamespaceConfigSchema = z.object({
   token: z.string().min(1),
+  // Optional per-namespace default expiration for this consumer's publishes.
+  // A duration ("7d"), a number of days, true (14-day default), or never.
+  expires: ExpirationSettingSchema.optional(),
 });
 
 const ConfigSchema = z.object({
   apiBaseUrl: z.string().url().optional(),
   defaultNamespace: z.string().optional(),
+  // Optional default expiration applied to every publish unless the namespace
+  // or the publish itself overrides it.
+  defaultExpires: ExpirationSettingSchema.optional(),
   namespaces: z.record(z.string(), NamespaceConfigSchema),
 });
 

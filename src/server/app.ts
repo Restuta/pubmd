@@ -150,6 +150,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                 ...(body.expires === undefined
                   ? {}
                   : { expires: body.expires }),
+                ...(body.defaultExpires === undefined
+                  ? {}
+                  : { defaultExpires: body.defaultExpires }),
                 ...(body.title === undefined ? {} : { title: body.title }),
                 ...(body.description === undefined
                   ? {}
@@ -175,6 +178,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                 ...(body.expires === undefined
                   ? {}
                   : { expires: body.expires }),
+                ...(body.defaultExpires === undefined
+                  ? {}
+                  : { defaultExpires: body.defaultExpires }),
                 ...(body.slug === undefined
                   ? {}
                   : { requestedSlug: body.slug }),

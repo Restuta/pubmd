@@ -9,6 +9,7 @@ import {
   ListPagesResponseSchema,
   PublishedPageSchema,
 } from "../core/contract.js";
+import type { ExpirationSetting } from "../core/expiration.js";
 import { inlineHtmlAssets } from "../core/inline-html.js";
 import { parseMarkdownDocument } from "../core/markdown.js";
 import { prepareMarkdownBodyForPublish } from "../core/publish-markdown.js";
@@ -165,7 +166,12 @@ async function runPublish(context: CommandContext): Promise<void> {
     existingPage?.pageId === undefined ? {} : { pageId: existingPage.pageId };
   const reviewAnnotations =
     options.review === true || options.comments === true;
+  // The --expires flag is the explicit per-publish override; the consumer's
+  // config (per-namespace, then global) is a lower-priority default that the
+  // server ranks below the document's own frontmatter/<meta>.
   const expires = options.expires;
+  const defaultExpires =
+    config.namespaces[namespace]?.expires ?? config.defaultExpires;
   const requestBody =
     absoluteFilePath !== undefined && /\.html?$/i.test(absoluteFilePath)
       ? await buildHtmlRequestBody(
@@ -174,6 +180,7 @@ async function runPublish(context: CommandContext): Promise<void> {
           pageIdPart,
           reviewAnnotations,
           expires,
+          defaultExpires,
         )
       : await buildMarkdownRequestBody(
           absoluteFilePath,
@@ -181,6 +188,7 @@ async function runPublish(context: CommandContext): Promise<void> {
           pageIdPart,
           reviewAnnotations,
           expires,
+          defaultExpires,
         );
 
   const response = await fetch(
@@ -255,7 +263,8 @@ async function buildMarkdownRequestBody(
   slug: string | undefined,
   pageIdPart: { pageId?: string },
   reviewAnnotations: boolean,
-  expires: string | undefined,
+  expires: ExpirationSetting,
+  defaultExpires: ExpirationSetting,
 ): Promise<Record<string, unknown>> {
   const markdown =
     absoluteFilePath === undefined
@@ -274,6 +283,7 @@ async function buildMarkdownRequestBody(
     ...(renderMarkdown === undefined ? {} : { renderMarkdown }),
     ...(shouldInjectReview ? { reviewAnnotations: true } : {}),
     ...(expires === undefined ? {} : { expires }),
+    ...(defaultExpires === undefined ? {} : { defaultExpires }),
     ...(slug === undefined ? {} : { slug }),
     ...pageIdPart,
   };
@@ -284,7 +294,8 @@ async function buildHtmlRequestBody(
   slug: string | undefined,
   pageIdPart: { pageId?: string },
   reviewAnnotations: boolean,
-  expires: string | undefined,
+  expires: ExpirationSetting,
+  defaultExpires: ExpirationSetting,
 ): Promise<Record<string, unknown>> {
   const source = await readFile(absoluteFilePath, "utf8");
   const inlined = await inlineHtmlAssets(source, {
@@ -312,6 +323,7 @@ async function buildHtmlRequestBody(
     document,
     ...(shouldInjectReview ? { reviewAnnotations: true } : {}),
     ...(expires === undefined ? {} : { expires }),
+    ...(defaultExpires === undefined ? {} : { defaultExpires }),
     slug: slug ?? fallbackSlug,
     ...pageIdPart,
   };
@@ -539,7 +551,9 @@ function printHelp(): void {
 
   --expires <when> sets a time-to-live: a duration like 7d, 12h, 30m or 2w,
   or "true" for the default 14 days, or "never". Pages never expire unless a
-  TTL is set here, in frontmatter (expires:), or by namespace policy.`);
+  TTL is set here, in frontmatter (expires:), or as a default in your config
+  (~/.config/pub/config.json: top-level "defaultExpires", or "expires" under a
+  namespace).`);
 }
 
 main().catch((error: unknown) => {
