@@ -2,6 +2,7 @@
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
 
 import pkg from "../../package.json" with { type: "json" };
 import {
@@ -191,6 +192,7 @@ async function runPublish(context: CommandContext): Promise<void> {
           defaultExpires,
         );
 
+  const publishBody = encodePublishRequestBody(requestBody);
   const response = await fetch(
     `${apiBase}/api/namespaces/${encodeURIComponent(namespace)}/pages/publish`,
     {
@@ -198,8 +200,9 @@ async function runPublish(context: CommandContext): Promise<void> {
       headers: {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
+        "content-encoding": "gzip",
       },
-      body: JSON.stringify(requestBody),
+      body: publishBody,
     },
   );
 
@@ -245,6 +248,20 @@ async function runPublish(context: CommandContext): Promise<void> {
   }
 
   console.log(outputUrl);
+}
+
+function encodePublishRequestBody(body: Record<string, unknown>): Blob {
+  // Vercel Functions have a fixed request body cap. Compress publish payloads
+  // on the wire so large markdown/HTML pages stay below the platform limit.
+  return new Blob([toArrayBuffer(gzipSync(JSON.stringify(body)))], {
+    type: "application/json",
+  });
+}
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
 }
 
 async function buildRenderMarkdownFromBody(

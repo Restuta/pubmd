@@ -1,3 +1,5 @@
+import { gunzipSync } from "node:zlib";
+
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 
@@ -130,7 +132,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
       let input: PublishPageInput;
 
       if (isJson) {
-        const body = PublishRequestSchema.parse(await context.req.json());
+        const body = PublishRequestSchema.parse(await readRequestJson(context));
 
         input =
           body.kind === "html"
@@ -190,7 +192,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         const slug = context.req.query("slug") ?? undefined;
         const pageId = context.req.query("pageId") ?? undefined;
         const expires = context.req.query("expires") ?? undefined;
-        const text = await context.req.text();
+        const text = await readRequestText(context);
 
         // The JSON path requires non-empty content; keep the raw-body path consistent
         // so an empty publish can't silently create a blank page (slugged "note").
@@ -306,6 +308,54 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
   });
 
   return app;
+}
+
+async function readRequestJson(context: {
+  req: { raw: Request; header(name: string): string | undefined };
+}): Promise<unknown> {
+  const text = await readRequestText(context);
+
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    throw new HTTPException(400, { message: "Invalid JSON request body." });
+  }
+}
+
+async function readRequestText(context: {
+  req: { raw: Request; header(name: string): string | undefined };
+}): Promise<string> {
+  const bytes = new Uint8Array(await context.req.raw.arrayBuffer());
+  const decoded = decodeRequestBytes(
+    bytes,
+    context.req.header("content-encoding"),
+  );
+  return new TextDecoder().decode(decoded);
+}
+
+function decodeRequestBytes(
+  bytes: Uint8Array,
+  contentEncoding: string | undefined,
+): Uint8Array {
+  const encoding = contentEncoding?.trim().toLowerCase();
+
+  if (encoding === undefined || encoding === "" || encoding === "identity") {
+    return bytes;
+  }
+
+  if (encoding === "gzip" || encoding === "x-gzip") {
+    try {
+      return new Uint8Array(gunzipSync(bytes));
+    } catch {
+      throw new HTTPException(400, {
+        message: "Invalid gzip request body.",
+      });
+    }
+  }
+
+  throw new HTTPException(415, {
+    message: `Unsupported content encoding: ${contentEncoding}.`,
+  });
 }
 
 function parseBearerToken(header: string | undefined): string {

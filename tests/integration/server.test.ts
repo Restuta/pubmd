@@ -1,10 +1,17 @@
 import { mkdtemp } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
 
 import { afterEach, describe, expect, it } from "vitest";
 
 import { type StartedTestServer, startTestServer } from "./test-server.js";
+
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return copy.buffer;
+}
 
 describe("server integration", () => {
   let server: StartedTestServer | null = null;
@@ -125,6 +132,42 @@ This is the body.`,
     };
     expect(listed.pages).toHaveLength(1);
     expect(listed.pages[0]?.slug).toBe("launch-post");
+  });
+
+  it("accepts gzipped JSON publish requests", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-gzip-"));
+    server = await startTestServer(root);
+
+    const claimResponse = await fetch(
+      `${server.origin}/api/namespaces/restuta/claim`,
+      { method: "POST" },
+    );
+    const claimed = (await claimResponse.json()) as { token: string };
+    const publishResponse = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${claimed.token}`,
+          "content-type": "application/json",
+          "content-encoding": "gzip",
+        },
+        body: new Blob([
+          toArrayBuffer(
+            gzipSync(
+              JSON.stringify({
+                markdown: "---\ntitle: Gzip Note\n---\n\nCompressed body.",
+              }),
+            ),
+          ),
+        ]),
+      },
+    );
+
+    expect(publishResponse.status).toBe(201);
+    const published = (await publishResponse.json()) as { url: string };
+    const htmlResponse = await fetch(published.url);
+    expect(await htmlResponse.text()).toContain("Compressed body.");
   });
 
   it("serves published html verbatim with sandbox isolation, while markdown stays unsandboxed", async () => {
