@@ -99,6 +99,27 @@ describe("review annotations", () => {
     expect(html).toContain(">Delete</button>");
   });
 
+  it("collapses the comments drawer without disabling review mode", () => {
+    const html = injectReviewAnnotations(BASIC_HTML);
+
+    expect(html).toContain('id="pubmdReviewDrawerToggle"');
+    expect(html).toContain('aria-controls="pubmdReviewList"');
+    expect(html).toContain('aria-expanded="true"');
+    expect(html).toContain(
+      ".pubmd-review-drawer.pubmd-review-drawer-collapsed",
+    );
+    expect(html).toContain("function syncDrawerState()");
+    expect(html).toContain(
+      'drawer.classList.toggle("pubmd-review-drawer-collapsed", drawerCollapsed);',
+    );
+    expect(html).toContain(
+      'document.body.classList.toggle("pubmd-review-drawer-space", !drawerCollapsed && window.innerWidth >= 961);',
+    );
+    expect(html).toContain(
+      'byId("pubmdReviewDrawerToggle").addEventListener("click"',
+    );
+  });
+
   it("scopes persisted annotations to the current page URL", () => {
     const html = injectReviewAnnotations(BASIC_HTML);
 

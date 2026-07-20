@@ -51,6 +51,7 @@ function buildReviewMarkup(sourceHtml: string): string {
     <div class="pubmd-review-drawer-header">
       <strong>Comments</strong>
       <span id="pubmdReviewCount">0</span>
+      <button class="pubmd-review-drawer-toggle" id="pubmdReviewDrawerToggle" type="button" aria-controls="pubmdReviewList" aria-expanded="true" aria-label="Collapse comments">›</button>
     </div>
     <div class="pubmd-review-list" id="pubmdReviewList"></div>
   </aside>
@@ -355,6 +356,32 @@ const REVIEW_STYLES = `<style data-pubmd-review-style>
     color: var(--pubmd-review-muted);
     font-size: 12px;
   }
+  .pubmd-review-drawer-toggle {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    border-radius: 999px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font: inherit;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .pubmd-review-drawer.pubmd-review-drawer-collapsed {
+    top: 14px;
+    right: 14px;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    min-width: 156px;
+    max-height: none;
+  }
+  .pubmd-review-drawer-collapsed .pubmd-review-list {
+    display: none;
+  }
   .pubmd-review-list {
     flex: 1;
     overflow-y: auto;
@@ -548,9 +575,20 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
   var pendingAnnotation = null;
   var editingId = null;
   var suppressClickUntil = 0;
+  var drawerCollapsed = false;
 
   function byId(id) {
     return document.getElementById(id);
+  }
+
+  function syncDrawerState() {
+    var drawer = byId("pubmdReviewDrawer");
+    var toggle = byId("pubmdReviewDrawerToggle");
+    drawer.classList.toggle("pubmd-review-drawer-collapsed", drawerCollapsed);
+    toggle.setAttribute("aria-expanded", drawerCollapsed ? "false" : "true");
+    toggle.setAttribute("aria-label", drawerCollapsed ? "Expand comments" : "Collapse comments");
+    toggle.textContent = drawerCollapsed ? "‹" : "›";
+    document.body.classList.toggle("pubmd-review-drawer-space", !drawerCollapsed && window.innerWidth >= 961);
   }
 
   function normalizeText(value) {
@@ -1145,6 +1183,7 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
   document.addEventListener("mousemove", renderHoverPreview, { passive: true });
   document.addEventListener("mouseleave", hideHoverPreview);
   window.addEventListener("resize", function () {
+    syncDrawerState();
     hideHoverPreview();
     renderMarkers();
   });
@@ -1178,10 +1217,16 @@ const REVIEW_SCRIPT = `<script data-pubmd-review-script>
     closeComposer();
     renderAll();
   });
+  byId("pubmdReviewDrawerToggle").addEventListener("click", function () {
+    drawerCollapsed = !drawerCollapsed;
+    syncDrawerState();
+    hideHoverPreview();
+    renderMarkers();
+  });
   var copyButton = byId("pubmdReviewCopyPrompt") || byId("copyPrompt");
   if (copyButton) copyButton.addEventListener("click", copyPrompt);
   document.body.classList.add("pubmd-review-active");
-  document.body.classList.toggle("pubmd-review-drawer-space", window.innerWidth >= 961);
+  syncDrawerState();
   renderAll();
 })();
 </script>`;
