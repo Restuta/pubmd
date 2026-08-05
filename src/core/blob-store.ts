@@ -113,9 +113,13 @@ export function createBlobStore(
 
     if (previousPage !== null) {
       // Protection toggled: the content moved stores. Remove the old copy so a
-      // stale public blob can't outlive the page's protection.
+      // stale public blob can't outlive the page's protection. Delete the
+      // PREVIOUS page's keys — a kind change swaps `.md` for `.html.src`, so the
+      // new keys don't cover the old blobs. (Same-store orphans are left alone:
+      // the `.html` key is shared between kinds, so deleting there could remove
+      // the just-written blob.)
       if (accessFor(previousPage) !== access) {
-        await del([markdown.key, html.key], {
+        await del([previousPage.markdownBlobKey, previousPage.htmlBlobKey], {
           token: contentTokenFor(accessFor(previousPage)),
         });
       }

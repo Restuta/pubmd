@@ -187,6 +187,50 @@ describe("createBlobStore", () => {
     expect(inStore(metadataToken, reprotected.htmlBlobKey)).toBe(false);
   });
 
+  it("removes old-store blobs on a kind change combined with a protection toggle", async () => {
+    const store = createBlobStore(contentToken, metadataToken);
+    // markdown page, public: blobs are {id}.md + {id}.html in the content store
+    const mdPage = makePage({
+      pageId: "55555555-5555-4555-8555-555555555555",
+      slug: "changing",
+      kind: "markdown",
+    });
+
+    await store.savePage(
+      mdPage,
+      { content: "# v1", key: mdPage.markdownBlobKey },
+      { content: "<h1>v1</h1>", key: mdPage.htmlBlobKey },
+    );
+    expect(storeHas(contentToken, mdPage.markdownBlobKey)).toBe(true);
+
+    // republished as a protected HTML page: the source key becomes .html.src
+    // and the content moves to the private store
+    const htmlPage = makePage({
+      pageId: mdPage.pageId,
+      slug: "changing",
+      kind: "html",
+      passwordHash: "salt:hash",
+      markdownBlobKey: `${mdPage.pageId}.html.src`,
+      updatedAt: "2026-03-19T00:05:00.000Z",
+    });
+
+    await store.savePage(
+      htmlPage,
+      { content: "<title>v2</title>", key: htmlPage.markdownBlobKey },
+      { content: "<title>v2</title>", key: htmlPage.htmlBlobKey },
+    );
+
+    // no trace of the old markdown source or rendered page in the public store
+    expect(storeHas(contentToken, mdPage.markdownBlobKey)).toBe(false);
+    expect(storeHas(contentToken, mdPage.htmlBlobKey)).toBe(false);
+    // new content lives only in the private store
+    const privateStore = blobState.stores.get(metadataToken);
+    expect(privateStore?.get(htmlPage.markdownBlobKey)).toBe(
+      "<title>v2</title>",
+    );
+    expect(privateStore?.get(htmlPage.htmlBlobKey)).toBe("<title>v2</title>");
+  });
+
   it("updates slug lookups when a page is renamed", async () => {
     const store = createBlobStore(contentToken, metadataToken);
     const original = makePage({
@@ -244,6 +288,10 @@ describe("createBlobStore", () => {
     );
   });
 });
+
+function storeHas(token: string, key: string): boolean {
+  return blobState.stores.get(token)?.has(key) ?? false;
+}
 
 function makePage(overrides: Partial<StoredPage>): StoredPage {
   return {
