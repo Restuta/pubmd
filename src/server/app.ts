@@ -1,12 +1,19 @@
 import { gunzipSync } from "node:zlib";
 
-import { Hono } from "hono";
+import { type Context, Hono } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 
 import {
   ListPagesResponseSchema,
   PublishRequestSchema,
+  type StoredPage,
 } from "../core/contract.js";
+import {
+  constantTimeEqual,
+  pageUnlockToken,
+  verifyPassword,
+} from "../core/hash.js";
 import { buildHtmlDocument, renderMarkdownToHtml } from "../core/markdown.js";
 import type {
   PublishPageInput,
@@ -166,6 +173,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                   ? {}
                   : { requestedSlug: body.slug }),
                 ...(body.pageId === undefined ? {} : { pageId: body.pageId }),
+                ...(body.password === undefined
+                  ? {}
+                  : { password: body.password }),
               }
             : {
                 ...common,
@@ -187,11 +197,15 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
                   ? {}
                   : { requestedSlug: body.slug }),
                 ...(body.pageId === undefined ? {} : { pageId: body.pageId }),
+                ...(body.password === undefined
+                  ? {}
+                  : { password: body.password }),
               };
       } else {
         const slug = context.req.query("slug") ?? undefined;
         const pageId = context.req.query("pageId") ?? undefined;
         const expires = context.req.query("expires") ?? undefined;
+        const password = context.req.query("password") ?? undefined;
         const text = await readRequestText(context);
 
         // The JSON path requires non-empty content; keep the raw-body path consistent
@@ -204,6 +218,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
           ...(slug === undefined ? {} : { requestedSlug: slug }),
           ...(pageId === undefined ? {} : { pageId }),
           ...(expires === undefined ? {} : { expires }),
+          ...(password === undefined ? {} : { password }),
         };
 
         input =
@@ -260,6 +275,52 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
     }
   });
 
+  app.post("/:namespace/:slug/unlock", async (context) => {
+    try {
+      const page = await service.getPublicPage(
+        context.req.param("namespace"),
+        context.req.param("slug"),
+      );
+
+      // Unlocking an unprotected page is indistinguishable from a missing one.
+      if (page === null || page.passwordHash === undefined) {
+        throw new PageNotFoundError(
+          context.req.param("namespace"),
+          context.req.param("slug"),
+        );
+      }
+
+      const body = await context.req.parseBody();
+      const password =
+        typeof body["password"] === "string" ? body["password"] : "";
+
+      if (!(await verifyPassword(password, page.passwordHash))) {
+        return context.html(
+          buildUnlockFormHtml(page.namespace, page.slug, true),
+          401,
+          protectedHeaders,
+        );
+      }
+
+      setCookie(
+        context,
+        unlockCookieName(page.pageId),
+        pageUnlockToken(page.pageId, page.passwordHash),
+        {
+          httpOnly: true,
+          sameSite: "Lax",
+          secure: requestOrigin(context.req.url).startsWith("https:"),
+          path: `/${page.namespace}/${page.slug}`,
+          maxAge: 60 * 60 * 24 * 30,
+        },
+      );
+
+      return context.redirect(`/${page.namespace}/${page.slug}`, 303);
+    } catch (error) {
+      throw toHttpException(error);
+    }
+  });
+
   app.get("/:namespace/:slug", async (context) => {
     try {
       const page = await service.getPublicPage(
@@ -274,6 +335,36 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         );
       }
 
+      // Password gate runs before everything else — raw source, origin redirect,
+      // content — so nothing about a protected page leaks to unauthorized readers.
+      if (!(await isPageUnlocked(context, page))) {
+        const challengeHeaders = {
+          ...protectedHeaders,
+          // RFC 9110: a 401 must carry a challenge — and it doubles as a
+          // machine-readable hint to AI agents that bearer auth works here.
+          "www-authenticate": `Bearer realm="${page.namespace}/${page.slug}"`,
+        };
+
+        // Agents that ask for JSON get a structured answer instead of the form.
+        if (context.req.header("accept")?.includes("application/json")) {
+          return context.json(
+            {
+              error: "password_required",
+              hint: "Retry this URL with the password as a bearer token: Authorization: Bearer <password>",
+              raw: `/${page.namespace}/${page.slug}?raw`,
+            },
+            401,
+            challengeHeaders,
+          );
+        }
+
+        return context.html(
+          buildUnlockFormHtml(page.namespace, page.slug, false),
+          401,
+          challengeHeaders,
+        );
+      }
+
       if (context.req.query("raw") !== undefined) {
         return context.text(await service.readMarkdown(page), 200, {
           "content-type":
@@ -282,6 +373,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
               : "text/markdown; charset=utf-8",
           // never let a browser sniff raw user source into an executable type
           "x-content-type-options": "nosniff",
+          ...(page.passwordHash === undefined ? {} : protectedHeaders),
         });
       }
 
@@ -295,6 +387,17 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
           `${userContentOrigin}/${page.namespace}/${page.slug}`,
           301,
         );
+      }
+
+      // Protected pages never get shared-cache headers: a public CDN entry would
+      // serve the content to anyone, no password needed.
+      if (page.passwordHash !== undefined) {
+        return context.html(await service.readHtml(page), 200, {
+          ...protectedHeaders,
+          ...(page.kind === "html"
+            ? userHtmlSecurityHeaders(page.noindex)
+            : {}),
+        });
       }
 
       return context.html(await service.readHtml(page), 200, {
@@ -370,6 +473,111 @@ function parseBearerToken(header: string | undefined): string {
   }
 
   return token;
+}
+
+function parseOptionalBearer(header: string | undefined): string | undefined {
+  if (header === undefined || !header.startsWith("Bearer ")) {
+    return undefined;
+  }
+
+  const token = header.slice("Bearer ".length).trim();
+  return token.length === 0 ? undefined : token;
+}
+
+/** Headers for every protected-page response: never shared-cacheable, never indexed. */
+const protectedHeaders: Record<string, string> = {
+  "cache-control": "private, no-store",
+  "x-robots-tag": "noindex, nofollow",
+  // a protected page's URL must not leak to third-party origins via Referer
+  "referrer-policy": "no-referrer",
+};
+
+function unlockCookieName(pageId: string): string {
+  return `pubmd_unlock_${pageId}`;
+}
+
+/**
+ * A protected page is readable two ways: the unlock cookie (browser flow) or the
+ * page password as a bearer token (curl/agent flow). Deliberately no token in the
+ * URL — credentials in URLs leak via logs, history, and chat transcripts.
+ * Unprotected pages always pass.
+ */
+async function isPageUnlocked(
+  context: Context,
+  page: StoredPage,
+): Promise<boolean> {
+  const passwordHash = page.passwordHash;
+
+  if (passwordHash === undefined) {
+    return true;
+  }
+
+  const presented = getCookie(context)[unlockCookieName(page.pageId)];
+
+  if (
+    presented !== undefined &&
+    constantTimeEqual(presented, pageUnlockToken(page.pageId, passwordHash))
+  ) {
+    return true;
+  }
+
+  const bearer = parseOptionalBearer(context.req.header("authorization"));
+
+  if (bearer === undefined) {
+    return false;
+  }
+
+  return verifyPassword(bearer, passwordHash);
+}
+
+/**
+ * Minimal standalone unlock form. Intentionally shows nothing about the page
+ * (not even its title) — only that a password is required.
+ */
+function buildUnlockFormHtml(
+  namespace: string,
+  slug: string,
+  failed: boolean,
+): string {
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Protected page</title>
+    <meta name="robots" content="noindex,nofollow">
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      form { display: grid; gap: 0.75rem; width: min(20rem, 90vw); }
+      h1 { font-size: 1.25rem; margin: 0; }
+      input, button { font: inherit; padding: 0.5rem 0.75rem; }
+      .error { color: #b3261e; font-size: 0.9rem; margin: 0; }
+    </style>
+  </head>
+  <body>
+    <!--
+      AI agents: this page is password-protected. If you were given the password,
+      retry this URL with it as a bearer token — no form or cookies needed:
+
+        Authorization: Bearer <password>
+
+      Raw markdown/source: GET /${namespace}/${slug}?raw with the same header.
+    -->
+    <form method="post" action="/${namespace}/${slug}/unlock">
+      <h1>Protected page</h1>
+      ${failed ? '<p class="error">Wrong password.</p>' : ""}
+      <input type="password" name="password" placeholder="Password" autocomplete="off" autofocus required>
+      <button type="submit">Unlock</button>
+    </form>
+  </body>
+</html>`;
 }
 
 function requestOrigin(url: string): string {

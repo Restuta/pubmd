@@ -348,4 +348,187 @@ This is the body.`,
     );
     expect(empty.status).toBe(400);
   });
+
+  it("gates password-protected pages behind a form, cookie, or bearer", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-protected-"));
+    server = await startTestServer(root);
+
+    const claimed = (await (
+      await fetch(`${server.origin}/api/namespaces/restuta/claim`, {
+        method: "POST",
+      })
+    ).json()) as { token: string };
+    const headers = {
+      authorization: `Bearer ${claimed.token}`,
+      "content-type": "application/json",
+    };
+    const publish = (body: Record<string, unknown>) =>
+      fetch(`${server?.origin}/api/namespaces/restuta/pages/publish`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+
+    const published = (await (
+      await publish({
+        markdown: "---\ntitle: Secret Plans\n---\n\nClassified body.",
+        password: "open-sesame",
+      })
+    ).json()) as { url: string };
+
+    // no credentials -> 401 unlock form, never shared-cacheable or indexable
+    const anonymous = await fetch(published.url);
+    expect(anonymous.status).toBe(401);
+    const anonymousBody = await anonymous.text();
+    expect(anonymousBody).toContain("Protected page");
+    // agents get both the standard challenge and an in-page hint for bearer auth
+    expect(anonymous.headers.get("www-authenticate")).toContain("Bearer");
+    expect(anonymousBody).toContain("Authorization: Bearer");
+    expect(anonymous.headers.get("cache-control")).toBe("private, no-store");
+    expect(anonymous.headers.get("cdn-cache-control")).toBeNull();
+    expect(anonymous.headers.get("x-robots-tag")).toBe("noindex, nofollow");
+    expect(anonymous.headers.get("referrer-policy")).toBe("no-referrer");
+
+    // agents asking for JSON get a structured 401, not the HTML form
+    const jsonChallenge = await fetch(published.url, {
+      headers: { accept: "application/json" },
+    });
+    expect(jsonChallenge.status).toBe(401);
+    expect(jsonChallenge.headers.get("www-authenticate")).toContain("Bearer");
+    const challenge = (await jsonChallenge.json()) as {
+      error: string;
+      hint: string;
+      raw: string;
+    };
+    expect(challenge.error).toBe("password_required");
+    expect(challenge.hint).toContain("Authorization: Bearer");
+    expect(challenge.raw).toBe("/restuta/secret-plans?raw");
+
+    // a token in the URL is not accepted — credentials stay out of URLs by design
+    const withKey = await fetch(`${published.url}?key=${"0".repeat(64)}`);
+    expect(withKey.status).toBe(401);
+
+    // raw source is gated too
+    const rawAnonymous = await fetch(`${published.url}?raw=1`);
+    expect(rawAnonymous.status).toBe(401);
+
+    // wrong bearer -> 401; right bearer -> 200 with private cache headers
+    const wrongBearer = await fetch(published.url, {
+      headers: { authorization: "Bearer nope" },
+    });
+    expect(wrongBearer.status).toBe(401);
+    const rightBearer = await fetch(published.url, {
+      headers: { authorization: "Bearer open-sesame" },
+    });
+    expect(rightBearer.status).toBe(200);
+    expect(await rightBearer.text()).toContain("Classified body.");
+    expect(rightBearer.headers.get("cache-control")).toBe("private, no-store");
+    expect(rightBearer.headers.get("cdn-cache-control")).toBeNull();
+
+    // unlock form: wrong password re-renders with an error
+    const failedUnlock = await fetch(`${published.url}/unlock`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: "password=nope",
+      redirect: "manual",
+    });
+    expect(failedUnlock.status).toBe(401);
+    expect(await failedUnlock.text()).toContain("Wrong password.");
+
+    // right password -> 303 back to the page + unlock cookie
+    const unlock = await fetch(`${published.url}/unlock`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: "password=open-sesame",
+      redirect: "manual",
+    });
+    expect(unlock.status).toBe(303);
+    expect(unlock.headers.get("location")).toBe("/restuta/secret-plans");
+    const setCookie = unlock.headers.get("set-cookie") ?? "";
+    const cookiePair = setCookie.split(";")[0] ?? "";
+    expect(cookiePair).toMatch(/^pubmd_unlock_[0-9a-f-]+=.+/);
+    expect(setCookie).toContain("HttpOnly");
+
+    const withCookie = await fetch(published.url, {
+      headers: { cookie: cookiePair },
+    });
+    expect(withCookie.status).toBe(200);
+    expect(await withCookie.text()).toContain("Classified body.");
+
+    // republish without a password keeps the protection
+    await publish({
+      markdown: "---\ntitle: Secret Plans\n---\n\nClassified body v2.",
+    });
+    const stillGated = await fetch(published.url);
+    expect(stillGated.status).toBe(401);
+
+    // rotating the password invalidates old cookies and the old password
+    await publish({
+      markdown: "---\ntitle: Secret Plans\n---\n\nClassified body v2.",
+      password: "new-password",
+    });
+    const staleCookie = await fetch(published.url, {
+      headers: { cookie: cookiePair },
+    });
+    expect(staleCookie.status).toBe(401);
+    const oldPassword = await fetch(published.url, {
+      headers: { authorization: "Bearer open-sesame" },
+    });
+    expect(oldPassword.status).toBe(401);
+    const newPassword = await fetch(published.url, {
+      headers: { authorization: "Bearer new-password" },
+    });
+    expect(newPassword.status).toBe(200);
+
+    // empty password removes protection entirely, restoring public caching
+    await publish({
+      markdown: "---\ntitle: Secret Plans\n---\n\nClassified body v2.",
+      password: "",
+    });
+    const reopened = await fetch(published.url);
+    expect(reopened.status).toBe(200);
+    expect(reopened.headers.get("cache-control")).toBe(
+      "public, max-age=0, must-revalidate",
+    );
+    expect(reopened.headers.get("cdn-cache-control")).toContain("public");
+
+    // unlocking an unprotected page is a 404, same as a missing one
+    const unlockGone = await fetch(`${published.url}/unlock`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: "password=new-password",
+      redirect: "manual",
+    });
+    expect(unlockGone.status).toBe(404);
+  });
+
+  it("accepts a password on the raw-body curl publish path", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-curl-pw-"));
+    server = await startTestServer(root);
+
+    const claimed = (await (
+      await fetch(`${server.origin}/api/namespaces/restuta/claim`, {
+        method: "POST",
+      })
+    ).json()) as { token: string };
+
+    const publishResponse = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish?password=kwyjibo`,
+      {
+        method: "POST",
+        headers: { authorization: `Bearer ${claimed.token}` },
+        body: "---\ntitle: Curl Secret\n---\n\nPiped body.",
+      },
+    );
+    expect(publishResponse.status).toBe(201);
+    const published = (await publishResponse.json()) as { url: string };
+
+    const anonymous = await fetch(published.url);
+    expect(anonymous.status).toBe(401);
+    const authorized = await fetch(published.url, {
+      headers: { authorization: "Bearer kwyjibo" },
+    });
+    expect(authorized.status).toBe(200);
+    expect(await authorized.text()).toContain("Piped body.");
+  });
 });

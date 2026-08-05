@@ -45,6 +45,7 @@ interface CliOptions {
   comments?: boolean;
   expires?: string;
   namespace?: string;
+  password?: string;
   review?: boolean;
   slug?: string;
 }
@@ -191,6 +192,11 @@ async function runPublish(context: CommandContext): Promise<void> {
           expires,
           defaultExpires,
         );
+
+  // Omitting --password keeps the page's existing protection; "" removes it.
+  if (options.password !== undefined) {
+    requestBody["password"] = options.password;
+  }
 
   const publishBody = encodePublishRequestBody(requestBody);
   const response = await fetch(
@@ -540,6 +546,7 @@ function isCliOptionKey(value: string): value is keyof CliOptions {
     value === "comments" ||
     value === "expires" ||
     value === "namespace" ||
+    value === "password" ||
     value === "review" ||
     value === "slug"
   );
@@ -558,7 +565,7 @@ async function readStdin(): Promise<string> {
 function printHelp(): void {
   console.log(`Usage:
   pubmd claim <namespace> [--api-base <url>]
-  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--comments] [--expires <when>] [--api-base <url>]
+  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--password <password>] [--comments] [--expires <when>] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
   pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
   pubmd version
@@ -570,7 +577,11 @@ function printHelp(): void {
   or "true" for the default 14 days, or "never". Pages never expire unless a
   TTL is set here, in frontmatter (expires:), or as a default in your config
   (~/.config/pub/config.json: top-level "defaultExpires", or "expires" under a
-  namespace).`);
+  namespace).
+
+  --password protects the page: readers need the password (browser prompt or
+  "Authorization: Bearer <password>"). Omitting it keeps the current setting;
+  passing --password "" removes protection.`);
 }
 
 main().catch((error: unknown) => {

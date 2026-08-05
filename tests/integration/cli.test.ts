@@ -185,6 +185,74 @@ Updated body.
     expect(published.stderr).toContain("Expires");
   });
 
+  it("publishes with --password, keeps it on republish, and removes it with an empty value", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-pw-"));
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const notePath = path.join(cwd, "secret.md");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(
+      notePath,
+      `---
+title: Secret Note
+---
+
+Protected body.
+`,
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publish = await runCli(
+      [
+        "publish",
+        notePath,
+        "--password",
+        "open-sesame",
+        "--api-base",
+        server.origin,
+      ],
+      { cwd, env },
+    );
+    const pageUrl = publish.stdout.trim();
+
+    const anonymous = await fetch(pageUrl);
+    expect(anonymous.status).toBe(401);
+    const authorized = await fetch(pageUrl, {
+      headers: { authorization: "Bearer open-sesame" },
+    });
+    expect(authorized.status).toBe(200);
+    expect(await authorized.text()).toContain("Protected body.");
+
+    // republish without the flag keeps the protection
+    await runCli(["publish", notePath, "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+    const stillGated = await fetch(pageUrl);
+    expect(stillGated.status).toBe(401);
+
+    // empty value removes the protection
+    await runCli(
+      ["publish", notePath, "--password", "", "--api-base", server.origin],
+      { cwd, env },
+    );
+    const reopened = await fetch(pageUrl);
+    expect(reopened.status).toBe(200);
+    expect(await reopened.text()).toContain("Protected body.");
+  });
+
   it("renders local image embeds while preserving the original raw markdown", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-img-"));
     const configDir = path.join(root, "config");
