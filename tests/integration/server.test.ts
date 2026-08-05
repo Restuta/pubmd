@@ -618,6 +618,23 @@ This is the body.`,
       redirect: "manual",
     });
     expect(viaForm.status).toBe(303);
+
+    // control characters are rejected: no unlock path could reproduce them
+    const controlChar = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${claimed.token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          markdown: "---\ntitle: Nope\n---\n\nBody.",
+          password: "line1\nline2",
+        }),
+      },
+    );
+    expect(controlChar.status).toBe(400);
   });
 
   it("posts the unlock form to the content origin for protected html pages", async () => {

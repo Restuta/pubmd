@@ -133,13 +133,20 @@ export function createBlobStore(
   }
 
   async function deletePage(page: StoredPage): Promise<void> {
+    // Content keys go to both stores' delete lists: an interrupted migration can
+    // leave copies in the store the current record doesn't point at, and delete
+    // is the last chance to remove them.
     await Promise.all([
-      del([pagePath(page.pageId), lookupPath(page.namespace, page.slug)], {
-        token: metadataToken,
-      }),
-      del([page.markdownBlobKey, page.htmlBlobKey], {
-        token: contentTokenFor(accessFor(page)),
-      }),
+      del(
+        [
+          pagePath(page.pageId),
+          lookupPath(page.namespace, page.slug),
+          page.markdownBlobKey,
+          page.htmlBlobKey,
+        ],
+        { token: metadataToken },
+      ),
+      del([page.markdownBlobKey, page.htmlBlobKey], { token: contentToken }),
       removeFromNamespaceIndex(page.namespace, page.pageId),
     ]);
   }

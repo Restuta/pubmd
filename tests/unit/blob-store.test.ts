@@ -279,6 +279,45 @@ describe("createBlobStore", () => {
     );
   });
 
+  it("deletePage sweeps content from both stores", async () => {
+    const store = createBlobStore(contentToken, metadataToken);
+    const page = makePage({
+      pageId: "77777777-7777-4777-8777-777777777777",
+      slug: "doomed",
+    });
+
+    await store.savePage(
+      page,
+      { content: "# v1", key: page.markdownBlobKey },
+      { content: "<h1>v1</h1>", key: page.htmlBlobKey },
+    );
+
+    // interrupted migration: record shows protected, public blobs linger
+    vi.mocked(del).mockImplementationOnce(async () => {
+      throw new Error("transient blob error");
+    });
+    const protectedPage = makePage({
+      ...page,
+      passwordHash: "salt:hash",
+      updatedAt: "2026-03-19T00:05:00.000Z",
+    });
+    await expect(
+      store.savePage(
+        protectedPage,
+        { content: "# v2", key: protectedPage.markdownBlobKey },
+        { content: "<h1>v2</h1>", key: protectedPage.htmlBlobKey },
+      ),
+    ).rejects.toThrow("transient blob error");
+    expect(storeHas(contentToken, page.htmlBlobKey)).toBe(true);
+
+    await store.deletePage(protectedPage);
+
+    expect(storeHas(contentToken, page.htmlBlobKey)).toBe(false);
+    expect(storeHas(contentToken, page.markdownBlobKey)).toBe(false);
+    expect(storeHas(metadataToken, page.htmlBlobKey)).toBe(false);
+    expect(await store.findPageById(page.pageId)).toBeNull();
+  });
+
   it("updates slug lookups when a page is renamed", async () => {
     const store = createBlobStore(contentToken, metadataToken);
     const original = makePage({

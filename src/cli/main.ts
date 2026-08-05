@@ -198,6 +198,14 @@ async function runPublish(context: CommandContext): Promise<void> {
   // Bare `--password` reads the password from a hidden prompt (or a piped line),
   // keeping it out of argv and shell history.
   if (options.passwordPrompt === true) {
+    // Piping the markdown itself consumes stdin to EOF — the prompt would hang
+    // waiting for input that can never come. The two stdin uses are incompatible.
+    if (absoluteFilePath === undefined) {
+      throw new Error(
+        "Cannot prompt for a password while markdown is piped via stdin. Pass --password <value> or publish a file path instead.",
+      );
+    }
+
     const prompted = await readPasswordHidden();
 
     if (prompted.trim().length === 0) {

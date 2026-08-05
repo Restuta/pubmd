@@ -39,7 +39,20 @@ export const ClaimNamespaceResponseSchema = z.object({
   token: z.string().min(1),
 });
 
-export const PasswordSchema = z.string().max(256);
+export const PasswordSchema = z
+  .string()
+  .max(256)
+  // Control characters (CR/LF, NUL, DEL, ...) can't be reproduced by the
+  // browser form or an HTTP header — a page protected with one would be
+  // unreadable through every supported unlock path.
+  .refine(
+    (value) =>
+      ![...value].some((char) => {
+        const code = char.codePointAt(0) ?? 0;
+        return code <= 31 || code === 127;
+      }),
+    { message: "Password must not contain control characters." },
+  );
 
 export const PublishPageRequestSchema = z.object({
   kind: z.literal("markdown").optional(),

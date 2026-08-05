@@ -302,6 +302,16 @@ Protected body.
         stdin: "\n",
       }),
     ).rejects.toThrow();
+
+    // piping the markdown itself can't be combined with the password prompt —
+    // stdin is already consumed, so the prompt would hang forever
+    await expect(
+      runCli(["publish", "--password", "--api-base", server.origin], {
+        cwd,
+        env,
+        stdin: "# piped markdown\n",
+      }),
+    ).rejects.toThrow();
   });
 
   it("renders local image embeds while preserving the original raw markdown", async () => {
