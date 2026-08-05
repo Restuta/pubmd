@@ -49,6 +49,12 @@ export interface PublishRepository {
   ): Promise<void>;
   /** Caller must verify the page exists before calling. Deletes are best-effort — no error on missing data. */
   deletePage(page: StoredPage): Promise<void>;
-  readMarkdown(key: string): Promise<string>;
-  readHtml(key: string): Promise<string>;
+  /**
+   * `access` selects the backing store: "private" for password-protected content
+   * (token-required reads), "public" otherwise. File-backed stores ignore it.
+   */
+  readMarkdown(key: string, access?: BlobAccess): Promise<string>;
+  readHtml(key: string, access?: BlobAccess): Promise<string>;
 }
+
+export type BlobAccess = "public" | "private";

@@ -107,10 +107,10 @@ This is the body.`,
       "public, max-age=0, must-revalidate",
     );
     expect(htmlResponse.headers.get("cdn-cache-control")).toBe(
-      "public, s-maxage=60, stale-while-revalidate=86400",
+      "public, s-maxage=60, stale-while-revalidate=300",
     );
     expect(htmlResponse.headers.get("vercel-cdn-cache-control")).toBe(
-      "public, s-maxage=60, stale-while-revalidate=86400",
+      "public, s-maxage=60, stale-while-revalidate=300",
     );
     expect(html).toContain("<title>Launch Post</title>");
     expect(html).toContain("This is the body.");
@@ -502,7 +502,7 @@ This is the body.`,
     expect(unlockGone.status).toBe(404);
   });
 
-  it("accepts a password on the raw-body curl publish path", async () => {
+  it("accepts a password via header on the raw-body curl publish path, never the query string", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-curl-pw-"));
     server = await startTestServer(root);
 
@@ -513,10 +513,13 @@ This is the body.`,
     ).json()) as { token: string };
 
     const publishResponse = await fetch(
-      `${server.origin}/api/namespaces/restuta/pages/publish?password=kwyjibo`,
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
       {
         method: "POST",
-        headers: { authorization: `Bearer ${claimed.token}` },
+        headers: {
+          authorization: `Bearer ${claimed.token}`,
+          "x-pubmd-password": "kwyjibo",
+        },
         body: "---\ntitle: Curl Secret\n---\n\nPiped body.",
       },
     );
@@ -530,5 +533,123 @@ This is the body.`,
     });
     expect(authorized.status).toBe(200);
     expect(await authorized.text()).toContain("Piped body.");
+
+    // a password in the query string is ignored — credentials stay out of URLs
+    const queryPublish = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish?password=kwyjibo`,
+      {
+        method: "POST",
+        headers: { authorization: `Bearer ${claimed.token}` },
+        body: "---\ntitle: Query Secret\n---\n\nQuery body.",
+      },
+    );
+    expect(queryPublish.status).toBe(201);
+    const queryPublished = (await queryPublish.json()) as { url: string };
+    const queryPage = await fetch(queryPublished.url);
+    expect(queryPage.status).toBe(200);
+  });
+
+  it("trims passwords so padded values work identically via form and bearer", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-pad-pw-"));
+    server = await startTestServer(root);
+
+    const claimed = (await (
+      await fetch(`${server.origin}/api/namespaces/restuta/claim`, {
+        method: "POST",
+      })
+    ).json()) as { token: string };
+
+    const publishResponse = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${claimed.token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          markdown: "---\ntitle: Padded\n---\n\nPadded body.",
+          password: "  padded  ",
+        }),
+      },
+    );
+    expect(publishResponse.status).toBe(201);
+    const published = (await publishResponse.json()) as { url: string };
+
+    // bearer (HTTP itself strips surrounding whitespace from header values)
+    const viaBearer = await fetch(published.url, {
+      headers: { authorization: "Bearer padded" },
+    });
+    expect(viaBearer.status).toBe(200);
+
+    // form post with the padded value (bodies preserve whitespace)
+    const viaForm = await fetch(`${published.url}/unlock`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: "password=%20%20padded%20%20",
+      redirect: "manual",
+    });
+    expect(viaForm.status).toBe(303);
+  });
+
+  it("posts the unlock form to the content origin for protected html pages", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-origin-pw-"));
+    const userContentOrigin = "https://u.bul.sh";
+    server = await startTestServer(root, { userContentOrigin });
+
+    const claimed = (await (
+      await fetch(`${server.origin}/api/namespaces/restuta/claim`, {
+        method: "POST",
+      })
+    ).json()) as { token: string };
+    const headers = {
+      authorization: `Bearer ${claimed.token}`,
+      "content-type": "application/json",
+    };
+
+    const htmlPublish = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          kind: "html",
+          source: "<title>Locked</title><h1>secret</h1>",
+          password: "open-sesame",
+        }),
+      },
+    );
+    const htmlPage = (await htmlPublish.json()) as {
+      url: string;
+      slug: string;
+    };
+
+    // the apex gate renders the form, but it posts to the content origin so the
+    // unlock cookie is set on the host that actually serves the page
+    const apexGate = await fetch(`${server.origin}/restuta/${htmlPage.slug}`);
+    expect(apexGate.status).toBe(401);
+    const apexForm = await apexGate.text();
+    expect(apexForm).toContain(
+      `action="${userContentOrigin}/restuta/${htmlPage.slug}/unlock"`,
+    );
+
+    // markdown pages keep a same-origin (relative) form action
+    const mdPublish = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          markdown: "---\ntitle: Locked Note\n---\n\nBody.",
+          password: "open-sesame",
+        }),
+      },
+    );
+    const mdPage = (await mdPublish.json()) as { slug: string };
+    const mdGate = await fetch(`${server.origin}/restuta/${mdPage.slug}`);
+    expect(mdGate.status).toBe(401);
+    expect(await mdGate.text()).toContain(
+      `action="/restuta/${mdPage.slug}/unlock"`,
+    );
   });
 });

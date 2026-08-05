@@ -26,6 +26,7 @@ import {
 } from "./markdown.js";
 import {
   AuthenticationError,
+  type BlobAccess,
   NamespaceExistsError,
   NamespaceNotFoundError,
   PageNotFoundError,
@@ -423,11 +424,11 @@ export function createPublishService(
   }
 
   async function readHtml(page: StoredPage): Promise<string> {
-    return repository.readHtml(page.htmlBlobKey);
+    return repository.readHtml(page.htmlBlobKey, blobAccessFor(page));
   }
 
   async function readMarkdown(page: StoredPage): Promise<string> {
-    return repository.readMarkdown(page.markdownBlobKey);
+    return repository.readMarkdown(page.markdownBlobKey, blobAccessFor(page));
   }
 
   async function authenticate(namespace: string, token: string): Promise<void> {
@@ -506,8 +507,9 @@ function isReviewFrontmatterOptIn(
 }
 
 /**
- * Password semantics on publish: omitted keeps the existing protection, empty string
- * clears it, any other value sets/rotates it. Returns the hash to store (or none).
+ * Password semantics on publish: omitted keeps the existing protection, empty
+ * (or whitespace-only — passwords are trimmed) clears it, any other value
+ * sets/rotates it. Returns the hash to store (or none).
  */
 async function resolvePasswordHash(
   password: string | undefined,
@@ -517,9 +519,14 @@ async function resolvePasswordHash(
     return existingPage?.passwordHash;
   }
 
-  if (password.length === 0) {
+  if (password.trim().length === 0) {
     return undefined;
   }
 
   return hashPassword(password);
+}
+
+/** Protected content is read from the private store; everything else from the public one. */
+function blobAccessFor(page: StoredPage): BlobAccess {
+  return page.passwordHash === undefined ? "public" : "private";
 }

@@ -24,6 +24,14 @@ describe("hashPassword / verifyPassword", () => {
     expect(await verifyPassword("anything", "not-a-hash")).toBe(false);
   });
 
+  it("trims surrounding whitespace so form and header paths agree", async () => {
+    const stored = await hashPassword("  padded  ");
+
+    expect(await verifyPassword("padded", stored)).toBe(true);
+    expect(await verifyPassword("  padded  ", stored)).toBe(true);
+    expect(await verifyPassword("padd", stored)).toBe(false);
+  });
+
   it("produces a different salt per call", async () => {
     const first = await hashPassword("same");
     const second = await hashPassword("same");

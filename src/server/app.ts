@@ -205,7 +205,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         const slug = context.req.query("slug") ?? undefined;
         const pageId = context.req.query("pageId") ?? undefined;
         const expires = context.req.query("expires") ?? undefined;
-        const password = context.req.query("password") ?? undefined;
+        // Password travels in a header, never the query string: URLs end up in
+        // logs, shell history, and telemetry.
+        const password = context.req.header("x-pubmd-password") ?? undefined;
         const text = await readRequestText(context);
 
         // The JSON path requires non-empty content; keep the raw-body path consistent
@@ -296,7 +298,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
 
       if (!(await verifyPassword(password, page.passwordHash))) {
         return context.html(
-          buildUnlockFormHtml(page.namespace, page.slug, true),
+          buildUnlockFormHtml(unlockFormAction(page), true),
           401,
           protectedHeaders,
         );
@@ -359,7 +361,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         }
 
         return context.html(
-          buildUnlockFormHtml(page.namespace, page.slug, false),
+          buildUnlockFormHtml(unlockFormAction(page), false),
           401,
           challengeHeaders,
         );
@@ -409,6 +411,21 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
       throw toHttpException(error);
     }
   });
+
+  /**
+   * Where the unlock form posts. For HTML pages served from a dedicated content
+   * origin, the post must go there — a cookie set on the apex would not be sent
+   * back to the content origin, challenging the reader twice.
+   */
+  function unlockFormAction(page: StoredPage): string {
+    const path = `/${page.namespace}/${page.slug}/unlock`;
+
+    if (page.kind === "html" && userContentOrigin !== undefined) {
+      return `${userContentOrigin}${path}`;
+    }
+
+    return path;
+  }
 
   return app;
 }
@@ -534,11 +551,9 @@ async function isPageUnlocked(
  * Minimal standalone unlock form. Intentionally shows nothing about the page
  * (not even its title) — only that a password is required.
  */
-function buildUnlockFormHtml(
-  namespace: string,
-  slug: string,
-  failed: boolean,
-): string {
+function buildUnlockFormHtml(action: string, failed: boolean): string {
+  const pagePath = action.replace(/\/unlock$/, "");
+
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -568,9 +583,9 @@ function buildUnlockFormHtml(
 
         Authorization: Bearer <password>
 
-      Raw markdown/source: GET /${namespace}/${slug}?raw with the same header.
+      Raw markdown/source: GET ${pagePath}?raw with the same header.
     -->
-    <form method="post" action="/${namespace}/${slug}/unlock">
+    <form method="post" action="${action}">
       <h1>Protected page</h1>
       ${failed ? '<p class="error">Wrong password.</p>' : ""}
       <input type="password" name="password" placeholder="Password" autocomplete="off" autofocus required>
@@ -593,7 +608,10 @@ function requestOrigin(url: string): string {
 function cdnCacheHeaders(
   expiresAt: string | null | undefined,
 ): Record<string, string> {
-  const defaultCdnCache = "public, s-maxage=60, stale-while-revalidate=86400";
+  // Keep the stale window short: republishes (including enabling password
+  // protection) replace content at the same URL, and SWR serves the old copy
+  // while revalidating. 300s bounds how long a superseded version can linger.
+  const defaultCdnCache = "public, s-maxage=60, stale-while-revalidate=300";
 
   if (expiresAt === null || expiresAt === undefined) {
     return {

@@ -124,7 +124,7 @@ pubmd publish secret.md --password hunter3   # rotate (old cookies stop working)
 pubmd publish secret.md --password ""        # remove protection
 ```
 
-Only a scrypt hash is stored — never the plaintext password. Protected responses are `private, no-store` (never CDN-cached) and `?raw` is gated too.
+Only a scrypt hash is stored — never the plaintext password (passwords are also trimmed, since HTTP headers can't carry surrounding whitespace). Protected responses are `private, no-store` (never CDN-cached) and `?raw` is gated too. On Vercel, protected pages' content lives in the **private Blob store** (token-required reads), not the public content store — so a leaked blob URL alone can't bypass the gate.
 
 **Reading, for humans:** the URL shows a minimal unlock form; the right password sets an `HttpOnly` cookie for that page.
 
@@ -136,7 +136,16 @@ curl -H "Authorization: Bearer hunter2" https://bul.sh/myname/secret?raw
 
 The `401` response itself tells agents how: `WWW-Authenticate: Bearer`, a machine-readable HTML comment, and a JSON body if the agent sends `Accept: application/json`.
 
+**Publishing with curl:** pass the password in a header, never the query string:
+
+```bash
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "x-pubmd-password: hunter2" \
+  --data-binary @secret.md https://bul.sh/api/namespaces/myname/pages/publish
+```
+
 > By design there is **no token-in-URL option**: credentials in URLs leak via server logs, browser history, and chat transcripts. Tools that can't set headers can't read protected pages — paste the content to them instead.
+>
+> One residual window: enabling protection on a page that was previously public can leave the old public copy in the edge cache for up to ~60s (bounded to 5 min worst case by `stale-while-revalidate`). If that matters, rotate content or wait a minute before sharing.
 
 ## For AI Agents
 

@@ -19,10 +19,12 @@ export function sha256(input: string): string {
 /**
  * Hash a page password for storage. Format: `{saltHex}:{scryptHex}` (scrypt defaults,
  * 32-byte key). Only the hash is stored — the plaintext password never is.
+ * Passwords are trimmed first: HTTP headers can't carry leading/trailing whitespace,
+ * so every verification path (form, bearer) must agree on the trimmed value.
  */
 export async function hashPassword(password: string): Promise<string> {
   const salt = randomBytes(16);
-  const derived = await scrypt(password, salt, 32);
+  const derived = await scrypt(password.trim(), salt, 32);
   return `${salt.toString("hex")}:${derived.toString("hex")}`;
 }
 
@@ -36,7 +38,11 @@ export async function verifyPassword(
     return false;
   }
 
-  const derived = await scrypt(password, Buffer.from(saltHex, "hex"), 32);
+  const derived = await scrypt(
+    password.trim(),
+    Buffer.from(saltHex, "hex"),
+    32,
+  );
   return constantTimeEqual(derived.toString("hex"), hashHex);
 }
 

@@ -124,6 +124,69 @@ describe("createBlobStore", () => {
     expect(await store.listPages("demo")).toHaveLength(1);
   });
 
+  it("stores protected content in the private store and moves it when protection toggles", async () => {
+    const store = createBlobStore(contentToken, metadataToken);
+    const page = makePage({
+      pageId: "44444444-4444-4444-8444-444444444444",
+      slug: "secret",
+      passwordHash: "salt:hash",
+    });
+
+    await store.savePage(
+      page,
+      { content: "# secret", key: page.markdownBlobKey },
+      { content: "<h1>secret</h1>", key: page.htmlBlobKey },
+    );
+
+    const contentStore = () => blobState.stores.get(contentToken);
+    const privateStore = () => blobState.stores.get(metadataToken);
+    const inStore = (token: string, key: string) =>
+      blobState.stores.get(token)?.has(key) ?? false;
+
+    // protected content never touches the public store
+    expect(inStore(contentToken, page.htmlBlobKey)).toBe(false);
+    expect(inStore(contentToken, page.markdownBlobKey)).toBe(false);
+    expect(privateStore()?.get(page.htmlBlobKey)).toBe("<h1>secret</h1>");
+    expect(await store.readHtml(page.htmlBlobKey, "private")).toBe(
+      "<h1>secret</h1>",
+    );
+
+    // removing protection moves the content to the public store and deletes
+    // the private copy
+    const reopened = makePage({
+      ...page,
+      passwordHash: undefined,
+      updatedAt: "2026-03-19T00:05:00.000Z",
+    });
+    await store.savePage(
+      reopened,
+      { content: "# secret", key: reopened.markdownBlobKey },
+      { content: "<h1>secret</h1>", key: reopened.htmlBlobKey },
+    );
+    expect(contentStore()?.get(reopened.htmlBlobKey)).toBe("<h1>secret</h1>");
+    expect(inStore(metadataToken, reopened.htmlBlobKey)).toBe(false);
+
+    // protecting again moves it back to private and deletes the public copy
+    const reprotected = makePage({
+      ...page,
+      passwordHash: "salt:hash2",
+      updatedAt: "2026-03-19T00:10:00.000Z",
+    });
+    await store.savePage(
+      reprotected,
+      { content: "# secret", key: reprotected.markdownBlobKey },
+      { content: "<h1>secret</h1>", key: reprotected.htmlBlobKey },
+    );
+    expect(privateStore()?.get(reprotected.htmlBlobKey)).toBe(
+      "<h1>secret</h1>",
+    );
+    expect(inStore(contentToken, reprotected.htmlBlobKey)).toBe(false);
+
+    // delete removes protected content from the private store
+    await store.deletePage(reprotected);
+    expect(inStore(metadataToken, reprotected.htmlBlobKey)).toBe(false);
+  });
+
   it("updates slug lookups when a page is renamed", async () => {
     const store = createBlobStore(contentToken, metadataToken);
     const original = makePage({
