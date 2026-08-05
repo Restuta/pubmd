@@ -8,6 +8,7 @@ import {
   StoredPageSchema,
 } from "./contract.js";
 import {
+  type BlobAccess,
   type FilePayload,
   NamespaceNotFoundError,
   type PublishRepository,
@@ -98,10 +99,11 @@ export function createBlobStore(
     html: FilePayload,
   ): Promise<void> {
     const previousPage = await findPageById(page.pageId);
+    const access = accessFor(page);
 
     await Promise.all([
-      writeContentBlob(markdown.key, markdown.content),
-      writeContentBlob(html.key, html.content),
+      writeContentBlob(markdown.key, markdown.content, access),
+      writeContentBlob(html.key, html.content, access),
       writeJsonBlob(pagePath(page.pageId), page),
       writeJsonBlob(lookupPath(page.namespace, page.slug), {
         pageId: page.pageId,
@@ -109,35 +111,67 @@ export function createBlobStore(
       writeNamespaceIndex(page.namespace, page),
     ]);
 
-    if (previousPage !== null && previousPage.slug !== page.slug) {
-      await del(lookupPath(previousPage.namespace, previousPage.slug), {
-        token: metadataToken,
+    if (previousPage !== null) {
+      // The store this page must NOT occupy gets swept on every save
+      // (del is idempotent), not only on an observed toggle. A cleanup that
+      // dies mid-save leaves the record already migrated, so on retry a
+      // previousPage-based toggle check would skip a leftover public blob —
+      // and for a protected page that leftover bypasses the password gate.
+      const staleKeys = new Set([markdown.key, html.key]);
+      staleKeys.add(previousPage.markdownBlobKey);
+      staleKeys.add(previousPage.htmlBlobKey);
+      await del([...staleKeys], {
+        token: contentTokenFor(access === "private" ? "public" : "private"),
       });
+
+      if (previousPage.slug !== page.slug) {
+        await del(lookupPath(previousPage.namespace, previousPage.slug), {
+          token: metadataToken,
+        });
+      }
     }
   }
 
   async function deletePage(page: StoredPage): Promise<void> {
+    // Content keys go to both stores' delete lists: an interrupted migration can
+    // leave copies in the store the current record doesn't point at, and delete
+    // is the last chance to remove them.
     await Promise.all([
-      del([pagePath(page.pageId), lookupPath(page.namespace, page.slug)], {
-        token: metadataToken,
-      }),
+      del(
+        [
+          pagePath(page.pageId),
+          lookupPath(page.namespace, page.slug),
+          page.markdownBlobKey,
+          page.htmlBlobKey,
+        ],
+        { token: metadataToken },
+      ),
       del([page.markdownBlobKey, page.htmlBlobKey], { token: contentToken }),
       removeFromNamespaceIndex(page.namespace, page.pageId),
     ]);
   }
 
-  async function readMarkdown(key: string): Promise<string> {
-    return readTextBlob(key);
+  async function readMarkdown(
+    key: string,
+    access: BlobAccess = "public",
+  ): Promise<string> {
+    return readTextBlob(key, access);
   }
 
-  async function readHtml(key: string): Promise<string> {
-    return readTextBlob(key);
+  async function readHtml(
+    key: string,
+    access: BlobAccess = "public",
+  ): Promise<string> {
+    return readTextBlob(key, access);
   }
 
-  async function readTextBlob(pathname: string): Promise<string> {
+  async function readTextBlob(
+    pathname: string,
+    access: BlobAccess,
+  ): Promise<string> {
     const result = await get(pathname, {
-      access: "public",
-      token: contentToken,
+      access,
+      token: contentTokenFor(access),
     });
 
     if (result === null || result.statusCode !== 200) {
@@ -166,13 +200,28 @@ export function createBlobStore(
     );
   }
 
-  async function writeContentBlob(key: string, content: string): Promise<void> {
+  async function writeContentBlob(
+    key: string,
+    content: string,
+    access: BlobAccess,
+  ): Promise<void> {
     await put(key, content, {
-      access: "public",
+      access,
       addRandomSuffix: false,
       allowOverwrite: true,
-      token: contentToken,
+      token: contentTokenFor(access),
     });
+  }
+
+  /** Password-protected content lives in the private store: its blobs require the token to read. */
+  function accessFor(page: StoredPage): BlobAccess {
+    return page.passwordHash === undefined ? "public" : "private";
+  }
+
+  function contentTokenFor(access: BlobAccess): string {
+    // The private store shares the metadata token — it is already the
+    // token-gated store in this deployment.
+    return access === "private" ? metadataToken : contentToken;
   }
 
   async function writeJsonBlob(

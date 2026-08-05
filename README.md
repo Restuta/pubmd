@@ -111,41 +111,41 @@ Remote references (`https://…`, protocol-relative) and existing `data:` URLs a
 
 > Multi-page sites (a folder of `.html` files) aren't hosted yet — v1 publishes one self-contained page per `publish`.
 
-## Review Comments
-
-Use comment mode when you want to share a page, let someone comment directly on
-paragraphs or selected text, then copy one prompt that contains every comment and
-enough location context to apply the feedback later.
-
-```bash
-pubmd publish report.html --comments
-pubmd publish report.md --comments
-```
-
-When comments are enabled, the CLI prints a share URL with `?comments=1`.
-That URL opens the comment UI. Remove the query string and the same page reads
-normally, without the comment drawer or bottom controls.
-
-You can also opt in from the document itself:
-
-```yaml
----
-comments: true
----
-```
-
-```html
-<meta name="pubmd:comments" content="true">
-```
-
-Document opt-in is useful when the file itself should always be published as
-commentable. `review: true`, `<meta name="pubmd:review" content="true">`, and
-`--review` still work as legacy aliases, but `comments: true`,
-`pubmd:comments`, and `--comments` are preferred.
-
 Comment mode is injected only into the served page. The raw markdown or HTML
 available through `?raw` stays unchanged, and local `.pub` mappings keep the
 clean base URL.
+
+## Password-protected pages
+
+```bash
+pubmd publish secret.md --password hunter2   # protect
+pubmd publish secret.md                      # republish: password kept
+pubmd publish secret.md --password hunter3   # rotate (old cookies stop working)
+pubmd publish secret.md --password ""        # remove protection
+```
+
+Only a scrypt hash is stored — never the plaintext password (passwords are also trimmed, since HTTP headers can't carry surrounding whitespace). Protected responses are `private, no-store` (never CDN-cached) and `?raw` is gated too. On Vercel, protected pages' content lives in the **private Blob store** (token-required reads), not the public content store — so a leaked blob URL alone can't bypass the gate.
+
+**Reading, for humans:** the URL shows a minimal unlock form; the right password sets an `HttpOnly` cookie for that page.
+
+**Reading, for AI agents:** give the agent the URL and the password. Any agent that can set headers (or run curl) reads it directly — no form parsing, no cookies:
+
+```bash
+curl -H "Authorization: Bearer hunter2" https://bul.sh/myname/secret?raw
+```
+
+The `401` response itself tells agents how: `WWW-Authenticate: Bearer`, a machine-readable HTML comment, and a JSON body if the agent sends `Accept: application/json`.
+
+**Publishing with curl:** pass the password in a header, never the query string:
+
+```bash
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "x-pubmd-password: hunter2" \
+  --data-binary @secret.md https://bul.sh/api/namespaces/myname/pages/publish
+```
+
+> By design there is **no token-in-URL option**: credentials in URLs leak via server logs, browser history, and chat transcripts. Tools that can't set headers can't read protected pages — paste the content to them instead.
+>
+> One residual window: enabling protection on a page that was previously public can leave the old public copy in the edge cache for up to ~60s (bounded to 5 min worst case by `stale-while-revalidate`). If that matters, rotate content or wait a minute before sharing.
 
 ## For AI Agents
 
@@ -412,5 +412,8 @@ npm run verify       # test + lint + typecheck + build
 | POST | `/api/namespaces/:ns/pages/publish` | Bearer | Publish/update a page (markdown, or `{ "kind": "html", "source": "…" }`) |
 | GET | `/api/namespaces/:ns/pages` | Bearer | List pages |
 | DELETE | `/api/namespaces/:ns/pages/:slug` | Bearer | Delete a page |
-| GET | `/:ns/:slug` | none | Read published page (HTML pages serve from `u.bul.sh`, sandboxed) |
-| GET | `/:ns/:slug?raw` | none | Read the source (markdown, or HTML for html pages) |
+| GET | `/:ns/:slug` | none¹ | Read published page (HTML pages serve from `u.bul.sh`, sandboxed) |
+| GET | `/:ns/:slug?raw` | none¹ | Read the source (markdown, or HTML for html pages) |
+| POST | `/:ns/:slug/unlock` | page password | Browser unlock: sets the page cookie, redirects back |
+
+¹ Password-protected pages require the page password as `Authorization: Bearer <password>` or the unlock cookie.

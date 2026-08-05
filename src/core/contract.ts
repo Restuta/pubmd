@@ -39,6 +39,21 @@ export const ClaimNamespaceResponseSchema = z.object({
   token: z.string().min(1),
 });
 
+export const PasswordSchema = z
+  .string()
+  .max(256)
+  // Control characters (CR/LF, NUL, DEL, ...) can't be reproduced by the
+  // browser form or an HTTP header — a page protected with one would be
+  // unreadable through every supported unlock path.
+  .refine(
+    (value) =>
+      ![...value].some((char) => {
+        const code = char.codePointAt(0) ?? 0;
+        return code <= 31 || code === 127;
+      }),
+    { message: "Password must not contain control characters." },
+  );
+
 export const PublishPageRequestSchema = z.object({
   kind: z.literal("markdown").optional(),
   markdown: z.string().min(1),
@@ -49,6 +64,8 @@ export const PublishPageRequestSchema = z.object({
   defaultExpires: ExpirationSettingSchema.optional(),
   slug: NameSchema.optional(),
   pageId: z.string().uuid().optional(),
+  /** Set/rotate the page password; empty string removes protection; omitted keeps as-is. */
+  password: PasswordSchema.optional(),
 });
 
 export const PublishHtmlRequestSchema = z.object({
@@ -66,6 +83,8 @@ export const PublishHtmlRequestSchema = z.object({
   noindex: z.boolean().optional(),
   slug: NameSchema.optional(),
   pageId: z.string().uuid().optional(),
+  /** Set/rotate the page password; empty string removes protection; omitted keeps as-is. */
+  password: PasswordSchema.optional(),
 });
 
 /** A publish request is either markdown (default) or html, discriminated by `kind`. */
@@ -100,6 +119,8 @@ export const StoredPageSchema = z.object({
   draft: z.boolean(),
   noindex: z.boolean(),
   contentHash: z.string().min(1),
+  /** scrypt hash of the page password; absent means the page is not password-protected. */
+  passwordHash: z.string().min(1).optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   // Absolute expiry timestamp, or null to never expire. Pages stored before

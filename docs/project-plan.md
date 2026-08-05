@@ -159,6 +159,7 @@ Local .pub mapping:
 - [x] **Goal**: published pages look clean and professional
 
 ### M3: Nice-to-Haves (ongoing)
+- [x] Password-protected pages (per-page password; browser unlock form + bearer for agents)
 - [ ] `--watch` mode (re-publish on file save)
 - [ ] Math/KaTeX + Mermaid rendering (add when requested)
 - [ ] Page versioning (keep history, show diffs) — data model already supports this

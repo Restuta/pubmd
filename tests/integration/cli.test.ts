@@ -185,6 +185,135 @@ Updated body.
     expect(published.stderr).toContain("Expires");
   });
 
+  it("publishes with --password, keeps it on republish, and removes it with an empty value", async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-pw-"));
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const notePath = path.join(cwd, "secret.md");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(
+      notePath,
+      `---
+title: Secret Note
+---
+
+Protected body.
+`,
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publish = await runCli(
+      [
+        "publish",
+        notePath,
+        "--password",
+        "open-sesame",
+        "--api-base",
+        server.origin,
+      ],
+      { cwd, env },
+    );
+    const pageUrl = publish.stdout.trim();
+
+    const anonymous = await fetch(pageUrl);
+    expect(anonymous.status).toBe(401);
+    const authorized = await fetch(pageUrl, {
+      headers: { authorization: "Bearer open-sesame" },
+    });
+    expect(authorized.status).toBe(200);
+    expect(await authorized.text()).toContain("Protected body.");
+
+    // republish without the flag keeps the protection
+    await runCli(["publish", notePath, "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+    const stillGated = await fetch(pageUrl);
+    expect(stillGated.status).toBe(401);
+
+    // empty value removes the protection
+    await runCli(
+      ["publish", notePath, "--password", "", "--api-base", server.origin],
+      { cwd, env },
+    );
+    const reopened = await fetch(pageUrl);
+    expect(reopened.status).toBe(200);
+    expect(await reopened.text()).toContain("Protected body.");
+  });
+
+  it("reads a bare --password from a hidden stdin prompt, keeping it out of argv", async () => {
+    const root = await mkdtemp(
+      path.join(os.tmpdir(), "publish-it-cli-prompt-"),
+    );
+    const configDir = path.join(root, "config");
+    const mappingPath = path.join(root, ".pub");
+    const cwd = path.join(root, "workspace");
+    const notePath = path.join(cwd, "secret.md");
+    const env = {
+      PUB_CONFIG_DIR: configDir,
+      PUB_MAPPING_PATH: mappingPath,
+    };
+
+    server = await startTestServer(root);
+    await mkdir(cwd, { recursive: true });
+    await writeFile(
+      notePath,
+      "---\ntitle: Prompted\n---\n\nPrompted body.\n",
+      "utf8",
+    );
+
+    await runCli(["claim", "restuta", "--api-base", server.origin], {
+      cwd,
+      env,
+    });
+
+    const publish = await runCli(
+      ["publish", notePath, "--password", "--api-base", server.origin],
+      { cwd, env, stdin: "prompted-pw\n" },
+    );
+    const pageUrl = publish.stdout.trim();
+    expect(publish.stderr).toContain("Page password:");
+
+    const anonymous = await fetch(pageUrl);
+    expect(anonymous.status).toBe(401);
+    const authorized = await fetch(pageUrl, {
+      headers: { authorization: "Bearer prompted-pw" },
+    });
+    expect(authorized.status).toBe(200);
+    expect(await authorized.text()).toContain("Prompted body.");
+
+    // empty prompt input is rejected, never treated as "remove protection"
+    await expect(
+      runCli(["publish", notePath, "--password", "--api-base", server.origin], {
+        cwd,
+        env,
+        stdin: "\n",
+      }),
+    ).rejects.toThrow();
+
+    // piping the markdown itself can't be combined with the password prompt —
+    // stdin is already consumed, so the prompt would hang forever
+    await expect(
+      runCli(["publish", "--password", "--api-base", server.origin], {
+        cwd,
+        env,
+        stdin: "# piped markdown\n",
+      }),
+    ).rejects.toThrow();
+  });
+
   it("renders local image embeds while preserving the original raw markdown", async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), "publish-it-cli-img-"));
     const configDir = path.join(root, "config");
@@ -638,6 +767,7 @@ async function runCli(
   options: {
     cwd: string;
     env: Record<string, string>;
+    stdin?: string;
   },
 ): Promise<{ stderr: string; stdout: string }> {
   await mkdirIfNeeded(options.cwd);
@@ -656,16 +786,25 @@ async function runCli(
           ...process.env,
           ...options.env,
         },
-        stdio: ["ignore", "pipe", "pipe"],
+        stdio: [
+          options.stdin === undefined ? "ignore" : "pipe",
+          "pipe",
+          "pipe",
+        ],
       },
     );
     let stdout = "";
     let stderr = "";
 
-    child.stdout.on("data", (chunk) => {
+    if (options.stdin !== undefined && child.stdin !== null) {
+      child.stdin.write(options.stdin);
+      child.stdin.end();
+    }
+
+    child.stdout?.on("data", (chunk) => {
       stdout += chunk.toString("utf8");
     });
-    child.stderr.on("data", (chunk) => {
+    child.stderr?.on("data", (chunk) => {
       stderr += chunk.toString("utf8");
     });
     child.on("error", reject);

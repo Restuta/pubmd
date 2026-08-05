@@ -45,6 +45,9 @@ interface CliOptions {
   comments?: boolean;
   expires?: string;
   namespace?: string;
+  password?: string;
+  /** Bare `--password` with no value: read the password from a hidden prompt. */
+  passwordPrompt?: boolean;
   review?: boolean;
   slug?: string;
 }
@@ -191,6 +194,33 @@ async function runPublish(context: CommandContext): Promise<void> {
           expires,
           defaultExpires,
         );
+
+  // Bare `--password` reads the password from a hidden prompt (or a piped line),
+  // keeping it out of argv and shell history.
+  if (options.passwordPrompt === true) {
+    // Piping the markdown itself consumes stdin to EOF — the prompt would hang
+    // waiting for input that can never come. The two stdin uses are incompatible.
+    if (absoluteFilePath === undefined) {
+      throw new Error(
+        "Cannot prompt for a password while markdown is piped via stdin. Pass --password <value> or publish a file path instead.",
+      );
+    }
+
+    const prompted = await readPasswordHidden();
+
+    if (prompted.trim().length === 0) {
+      throw new Error(
+        'Password cannot be empty (use --password "" to remove protection).',
+      );
+    }
+
+    requestBody["password"] = prompted;
+  }
+
+  // Omitting --password keeps the page's existing protection; "" removes it.
+  if (options.password !== undefined) {
+    requestBody["password"] = options.password;
+  }
 
   const publishBody = encodePublishRequestBody(requestBody);
   const response = await fetch(
@@ -523,6 +553,19 @@ function splitArgs(argumentsList: string[]): {
       continue;
     }
 
+    if (key === "password") {
+      // Bare `--password` (no value): prompt instead, so the password never lands
+      // in argv, shell history, or process listings.
+      if (value === undefined || value.startsWith("--")) {
+        options.passwordPrompt = true;
+        continue;
+      }
+
+      options.password = value;
+      index += 1;
+      continue;
+    }
+
     if (value === undefined || value.startsWith("--")) {
       throw new Error(`Expected value after ${current}`);
     }
@@ -534,12 +577,16 @@ function splitArgs(argumentsList: string[]): {
   return { options, positional };
 }
 
-function isCliOptionKey(value: string): value is keyof CliOptions {
+/** CLI flags accepted on the command line (`passwordPrompt` is internal-only). */
+type CliArgKey = Exclude<keyof CliOptions, "passwordPrompt">;
+
+function isCliOptionKey(value: string): value is CliArgKey {
   return (
     value === "api-base" ||
     value === "comments" ||
     value === "expires" ||
     value === "namespace" ||
+    value === "password" ||
     value === "review" ||
     value === "slug"
   );
@@ -555,10 +602,68 @@ async function readStdin(): Promise<string> {
   return Buffer.concat(chunks).toString("utf8");
 }
 
+/**
+ * Read a password without echoing it. On a TTY this uses raw mode (nothing is
+ * echoed); piped stdin just reads the first line, so
+ * `printf 'pw\n' | pubmd publish --password` works for scripts and agents.
+ */
+function readPasswordHidden(): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const stdin = process.stdin;
+    let buffer = "";
+
+    const cleanup = () => {
+      if (stdin.isTTY) {
+        stdin.setRawMode(false);
+      }
+      stdin.pause();
+      stdin.removeListener("data", onData);
+      stdin.removeListener("end", onEnd);
+    };
+
+    const finish = () => {
+      cleanup();
+      process.stderr.write("\n");
+      resolve(buffer);
+    };
+
+    const onData = (chunk: Buffer) => {
+      for (const char of chunk.toString("utf8")) {
+        if (char === "\n" || char === "\r") {
+          finish();
+          return;
+        }
+
+        if (char === "\u0003") {
+          cleanup();
+          reject(new Error("Aborted."));
+          return;
+        }
+
+        buffer += char;
+      }
+    };
+
+    const onEnd = () => {
+      finish();
+    };
+
+    process.stderr.write("Page password: ");
+
+    if (stdin.isTTY) {
+      stdin.setRawMode(true);
+    }
+
+    stdin.resume();
+    stdin.on("data", onData);
+    stdin.on("end", onEnd);
+  });
+}
+
 function printHelp(): void {
   console.log(`Usage:
   pubmd claim <namespace> [--api-base <url>]
-  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--comments] [--expires <when>] [--api-base <url>]
+  pubmd publish [file] [--namespace <namespace>] [--slug <slug>] [--password [<password>]] [--comments] [--expires <when>] [--api-base <url>]
   pubmd list [--namespace <namespace>] [--all] [--api-base <url>]
   pubmd remove <slug> [--namespace <namespace>] [--api-base <url>]
   pubmd version
@@ -570,7 +675,13 @@ function printHelp(): void {
   or "true" for the default 14 days, or "never". Pages never expire unless a
   TTL is set here, in frontmatter (expires:), or as a default in your config
   (~/.config/pub/config.json: top-level "defaultExpires", or "expires" under a
-  namespace).`);
+  namespace).
+
+  --password protects the page: readers need the password (browser prompt or
+  "Authorization: Bearer <password>"). Bare --password (no value) prompts with
+  hidden input, keeping the password out of argv and shell history — prefer it
+  for interactive use, or pipe a line for scripts. Omitting the flag keeps the
+  current setting; --password "" removes protection.`);
 }
 
 main().catch((error: unknown) => {

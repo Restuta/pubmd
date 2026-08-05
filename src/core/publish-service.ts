@@ -12,7 +12,12 @@ import {
   isExpired,
   resolveExpirationMs,
 } from "./expiration.js";
-import { constantTimeEqual, createToken, sha256 } from "./hash.js";
+import {
+  constantTimeEqual,
+  createToken,
+  hashPassword,
+  sha256,
+} from "./hash.js";
 import { extractHtmlMeta } from "./html-meta.js";
 import {
   buildHtmlDocument,
@@ -21,6 +26,7 @@ import {
 } from "./markdown.js";
 import {
   AuthenticationError,
+  type BlobAccess,
   NamespaceExistsError,
   NamespaceNotFoundError,
   PageNotFoundError,
@@ -52,6 +58,8 @@ export interface PublishPageInput {
   namespace: string;
   pageId?: string;
   requestedSlug?: string;
+  /** Set/rotate the page password; empty string removes protection; omitted keeps as-is. */
+  password?: string;
   token: string;
   origin: string;
 }
@@ -150,6 +158,10 @@ export function createPublishService(
         input.defaultExpires,
       ),
     );
+    const passwordHash = await resolvePasswordHash(
+      input.password,
+      existingPage,
+    );
     const markdownBlobKey = `${pageId}.md`;
     const htmlBlobKey = `${pageId}.html`;
     const rendered = await renderMarkdownToHtml(renderMarkdown);
@@ -179,6 +191,7 @@ export function createPublishService(
         // content keeps the original deadline (no-op), but changing the policy
         // forces a republish and resets the clock.
         expirationMs,
+        passwordHash: passwordHash ?? null,
       }),
     );
     const noOp =
@@ -201,6 +214,7 @@ export function createPublishService(
         draft: parsed.draft,
         noindex: parsed.noindex,
         contentHash,
+        ...(passwordHash === undefined ? {} : { passwordHash }),
         createdAt: existingPage?.createdAt ?? nowIso,
         updatedAt: nowIso,
         expiresAt,
@@ -273,6 +287,10 @@ export function createPublishService(
         input.defaultExpires,
       ),
     );
+    const passwordHash = await resolvePasswordHash(
+      input.password,
+      existingPage,
+    );
     const sourceBlobKey = `${pageId}.html.src`;
     const htmlBlobKey = `${pageId}.html`;
     const contentHash = sha256(
@@ -288,6 +306,7 @@ export function createPublishService(
         noindex,
         // The duration, not the timestamp — see the markdown path for rationale.
         expirationMs,
+        passwordHash: passwordHash ?? null,
       }),
     );
     const noOp =
@@ -310,6 +329,7 @@ export function createPublishService(
         draft: false,
         noindex,
         contentHash,
+        ...(passwordHash === undefined ? {} : { passwordHash }),
         createdAt: existingPage?.createdAt ?? nowIso,
         updatedAt: nowIso,
         expiresAt,
@@ -404,11 +424,11 @@ export function createPublishService(
   }
 
   async function readHtml(page: StoredPage): Promise<string> {
-    return repository.readHtml(page.htmlBlobKey);
+    return repository.readHtml(page.htmlBlobKey, blobAccessFor(page));
   }
 
   async function readMarkdown(page: StoredPage): Promise<string> {
-    return repository.readMarkdown(page.markdownBlobKey);
+    return repository.readMarkdown(page.markdownBlobKey, blobAccessFor(page));
   }
 
   async function authenticate(namespace: string, token: string): Promise<void> {
@@ -484,4 +504,29 @@ function isReviewFrontmatterOptIn(
     review === true ||
     (typeof review === "string" && review.toLowerCase() === "true")
   );
+}
+
+/**
+ * Password semantics on publish: omitted keeps the existing protection, empty
+ * (or whitespace-only — passwords are trimmed) clears it, any other value
+ * sets/rotates it. Returns the hash to store (or none).
+ */
+async function resolvePasswordHash(
+  password: string | undefined,
+  existingPage: StoredPage | null,
+): Promise<string | undefined> {
+  if (password === undefined) {
+    return existingPage?.passwordHash;
+  }
+
+  if (password.trim().length === 0) {
+    return undefined;
+  }
+
+  return hashPassword(password);
+}
+
+/** Protected content is read from the private store; everything else from the public one. */
+function blobAccessFor(page: StoredPage): BlobAccess {
+  return page.passwordHash === undefined ? "public" : "private";
 }
