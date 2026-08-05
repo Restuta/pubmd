@@ -6,6 +6,7 @@ import { HTTPException } from "hono/http-exception";
 
 import {
   ListPagesResponseSchema,
+  PasswordSchema,
   PublishRequestSchema,
   type StoredPage,
 } from "../core/contract.js";
@@ -206,8 +207,12 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         const pageId = context.req.query("pageId") ?? undefined;
         const expires = context.req.query("expires") ?? undefined;
         // Password travels in a header, never the query string: URLs end up in
-        // logs, shell history, and telemetry.
-        const password = context.req.header("x-pubmd-password") ?? undefined;
+        // logs, shell history, and telemetry. Same contract as the JSON path.
+        const passwordHeader = context.req.header("x-pubmd-password");
+        const password =
+          passwordHeader === undefined
+            ? undefined
+            : PasswordSchema.parse(passwordHeader);
         const text = await readRequestText(context);
 
         // The JSON path requires non-empty content; keep the raw-body path consistent
@@ -295,10 +300,13 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
       const body = await context.req.parseBody();
       const password =
         typeof body["password"] === "string" ? body["password"] : "";
+      // The form action carries the originally requested query (?raw, ?comments=1)
+      // into this POST; keep it so a successful unlock lands in the same mode.
+      const requestedSearch = new URL(context.req.url).search;
 
       if (!(await verifyPassword(password, page.passwordHash))) {
         return context.html(
-          buildUnlockFormHtml(unlockFormAction(page), true),
+          buildUnlockFormHtml(unlockFormAction(page) + requestedSearch, true),
           401,
           protectedHeaders,
         );
@@ -317,7 +325,10 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         },
       );
 
-      return context.redirect(`/${page.namespace}/${page.slug}`, 303);
+      return context.redirect(
+        `/${page.namespace}/${page.slug}${requestedSearch}`,
+        303,
+      );
     } catch (error) {
       throw toHttpException(error);
     }
@@ -346,6 +357,9 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
           // machine-readable hint to AI agents that bearer auth works here.
           "www-authenticate": `Bearer realm="${page.namespace}/${page.slug}"`,
         };
+        // Preserve the requested mode (?raw, ?comments=1) through the unlock
+        // round-trip; the form action carries it into the POST.
+        const requestedSearch = new URL(context.req.url).search;
 
         // Agents that ask for JSON get a structured answer instead of the form.
         if (context.req.header("accept")?.includes("application/json")) {
@@ -354,6 +368,14 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
               error: "password_required",
               hint: "Retry this URL with the password as a bearer token: Authorization: Bearer <password>",
               raw: `/${page.namespace}/${page.slug}?raw`,
+              // For HTML pages on the apex, point agents at the content origin —
+              // cross-origin redirects strip Authorization, so retrying the apex
+              // with a redirect-following client loops back to a 401.
+              ...(page.kind === "html" &&
+              userContentOrigin !== undefined &&
+              requestOrigin(context.req.url) !== userContentOrigin
+                ? { url: `${userContentOrigin}/${page.namespace}/${page.slug}` }
+                : {}),
             },
             401,
             challengeHeaders,
@@ -361,7 +383,7 @@ Open source — [github.com/Restuta/pubmd](https://github.com/Restuta/pubmd)`;
         }
 
         return context.html(
-          buildUnlockFormHtml(unlockFormAction(page), false),
+          buildUnlockFormHtml(unlockFormAction(page) + requestedSearch, false),
           401,
           challengeHeaders,
         );
@@ -552,7 +574,8 @@ async function isPageUnlocked(
  * (not even its title) — only that a password is required.
  */
 function buildUnlockFormHtml(action: string, failed: boolean): string {
-  const pagePath = action.replace(/\/unlock$/, "");
+  // action may carry a mode query (?raw, ?comments=1); the hint uses the bare path
+  const pagePath = (action.split("?")[0] ?? action).replace(/\/unlock$/, "");
 
   return `<!doctype html>
 <html lang="en">

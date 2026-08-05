@@ -70,6 +70,8 @@ vi.mock("@vercel/blob", () => {
   };
 });
 
+import { del } from "@vercel/blob";
+
 import { createBlobStore } from "../../src/core/blob-store.js";
 import type { StoredPage } from "../../src/core/contract.js";
 
@@ -229,6 +231,52 @@ describe("createBlobStore", () => {
       "<title>v2</title>",
     );
     expect(privateStore?.get(htmlPage.htmlBlobKey)).toBe("<title>v2</title>");
+  });
+
+  it("sweeps the public store on retry when a cleanup died mid-save", async () => {
+    const store = createBlobStore(contentToken, metadataToken);
+    const page = makePage({
+      pageId: "66666666-6666-4666-8666-666666666666",
+      slug: "retry",
+    });
+
+    await store.savePage(
+      page,
+      { content: "# v1", key: page.markdownBlobKey },
+      { content: "<h1>v1</h1>", key: page.htmlBlobKey },
+    );
+    expect(storeHas(contentToken, page.htmlBlobKey)).toBe(true);
+
+    // The cleanup del rejects transiently AFTER the protected record was
+    // persisted — the retry trap: previousPage now reads as already protected.
+    vi.mocked(del).mockImplementationOnce(async () => {
+      throw new Error("transient blob error");
+    });
+    const protectedPage = makePage({
+      ...page,
+      passwordHash: "salt:hash",
+      updatedAt: "2026-03-19T00:05:00.000Z",
+    });
+    await expect(
+      store.savePage(
+        protectedPage,
+        { content: "# v2", key: protectedPage.markdownBlobKey },
+        { content: "<h1>v2</h1>", key: protectedPage.htmlBlobKey },
+      ),
+    ).rejects.toThrow("transient blob error");
+    expect(storeHas(contentToken, page.htmlBlobKey)).toBe(true);
+
+    // the retry sweeps the leftover public blobs anyway
+    await store.savePage(
+      protectedPage,
+      { content: "# v2", key: protectedPage.markdownBlobKey },
+      { content: "<h1>v2</h1>", key: protectedPage.htmlBlobKey },
+    );
+    expect(storeHas(contentToken, page.htmlBlobKey)).toBe(false);
+    expect(storeHas(contentToken, page.markdownBlobKey)).toBe(false);
+    expect(blobState.stores.get(metadataToken)?.get(page.htmlBlobKey)).toBe(
+      "<h1>v2</h1>",
+    );
   });
 
   it("updates slug lookups when a page is renamed", async () => {

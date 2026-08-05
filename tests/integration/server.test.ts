@@ -412,6 +412,20 @@ This is the body.`,
     const rawAnonymous = await fetch(`${published.url}?raw=1`);
     expect(rawAnonymous.status).toBe(401);
 
+    // the unlock round-trip preserves the requested mode (?raw, ?comments=1)
+    const rawForm = await rawAnonymous.text();
+    expect(rawForm).toContain('action="/restuta/secret-plans/unlock?raw=1"');
+    const unlockRaw = await fetch(`${published.url}/unlock?raw=1`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: "password=open-sesame",
+      redirect: "manual",
+    });
+    expect(unlockRaw.status).toBe(303);
+    expect(unlockRaw.headers.get("location")).toBe(
+      "/restuta/secret-plans?raw=1",
+    );
+
     // wrong bearer -> 401; right bearer -> 200 with private cache headers
     const wrongBearer = await fetch(published.url, {
       headers: { authorization: "Bearer nope" },
@@ -547,6 +561,20 @@ This is the body.`,
     const queryPublished = (await queryPublish.json()) as { url: string };
     const queryPage = await fetch(queryPublished.url);
     expect(queryPage.status).toBe(200);
+
+    // the header follows the same contract as the JSON path (256 chars max)
+    const tooLong = await fetch(
+      `${server.origin}/api/namespaces/restuta/pages/publish`,
+      {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${claimed.token}`,
+          "x-pubmd-password": "x".repeat(257),
+        },
+        body: "---\ntitle: Too Long\n---\n\nBody.",
+      },
+    );
+    expect(tooLong.status).toBe(400);
   });
 
   it("trims passwords so padded values work identically via form and bearer", async () => {
@@ -632,6 +660,15 @@ This is the body.`,
     expect(apexForm).toContain(
       `action="${userContentOrigin}/restuta/${htmlPage.slug}/unlock"`,
     );
+
+    // agents asking for JSON get pointed at the content origin directly —
+    // cross-origin redirects strip Authorization, so retrying the apex loops
+    const jsonGate = await fetch(`${server.origin}/restuta/${htmlPage.slug}`, {
+      headers: { accept: "application/json" },
+    });
+    expect(jsonGate.status).toBe(401);
+    const challenge = (await jsonGate.json()) as { url?: string };
+    expect(challenge.url).toBe(`${userContentOrigin}/restuta/${htmlPage.slug}`);
 
     // markdown pages keep a same-origin (relative) form action
     const mdPublish = await fetch(

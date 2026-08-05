@@ -112,17 +112,17 @@ export function createBlobStore(
     ]);
 
     if (previousPage !== null) {
-      // Protection toggled: the content moved stores. Remove the old copy so a
-      // stale public blob can't outlive the page's protection. Delete the
-      // PREVIOUS page's keys — a kind change swaps `.md` for `.html.src`, so the
-      // new keys don't cover the old blobs. (Same-store orphans are left alone:
-      // the `.html` key is shared between kinds, so deleting there could remove
-      // the just-written blob.)
-      if (accessFor(previousPage) !== access) {
-        await del([previousPage.markdownBlobKey, previousPage.htmlBlobKey], {
-          token: contentTokenFor(accessFor(previousPage)),
-        });
-      }
+      // The store this page must NOT occupy gets swept on every save
+      // (del is idempotent), not only on an observed toggle. A cleanup that
+      // dies mid-save leaves the record already migrated, so on retry a
+      // previousPage-based toggle check would skip a leftover public blob —
+      // and for a protected page that leftover bypasses the password gate.
+      const staleKeys = new Set([markdown.key, html.key]);
+      staleKeys.add(previousPage.markdownBlobKey);
+      staleKeys.add(previousPage.htmlBlobKey);
+      await del([...staleKeys], {
+        token: contentTokenFor(access === "private" ? "public" : "private"),
+      });
 
       if (previousPage.slug !== page.slug) {
         await del(lookupPath(previousPage.namespace, previousPage.slug), {
